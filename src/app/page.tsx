@@ -27,7 +27,7 @@ export default function LandingPage() {
           </div>
 
           {/* Mobile menu toggle */}
-          <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="md:hidden text-black" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
@@ -81,7 +81,7 @@ export default function LandingPage() {
                data-aos-delay="300"
                data-aos-duration="1000">
                 <button className="bg-emerald-600 flex h-max text-white p-2 px-4 rounded-full text-base font-semibold hover:scale-110 transition-all duration-300">
-                  Get Started
+                  Join Waitlist
                   <ArrowRight className="ml-2  w-4" />
                 </button>
                 <button
@@ -124,7 +124,8 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  <div className="mb-4"  data-aos="fade-up"
+                  <div className="mb-4"  
+                    data-aos="fade-up"
                     data-aos-delay="100"
                     data-aos-duration="1000">
                     <div className="flex justify-between text-sm mb-2">
@@ -136,7 +137,8 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6"  data-aos="fade-up"
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6"  
+                    data-aos="fade-up"
                     data-aos-delay="100"
                     data-aos-duration="1000">
                     <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
@@ -290,13 +292,13 @@ export default function LandingPage() {
                   Ready for smarter, more efficient budgeting?
                 </h2>
                 <p className="mx-auto max-w-[700px] text-emerald-100 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Try Greenor  today. It's free to get started.
+                  Try Greenor  today. It's free to Join Waitlist.
                 </p>
               </div>
               <div className="mx-auto w-full max-w-sm space-y-2">
                 <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
                   <button className="bg-white text-emerald-900 hover:bg-emerald-50">
-                    Get Started
+                    Join Waitlist
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </button>
                   <button variant="outline" className="border-white text-white hover:bg-emerald-800">
