@@ -524,7 +524,7 @@ export default function LandingPage() {
                 Everything you need.
                 <br />
                 <span className="bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
-                  Nothing you don't.
+                  Nothing you don&apos;t.
                 </span>
               </h2>
               <p className="max-w-[900px] text-white/60 text-lg leading-relaxed mt-4">
@@ -703,8 +703,8 @@ export default function LandingPage() {
                 Ready for smarter, more efficient budgeting?
               </h2>
               <p className="text-white/70 text-xl max-w-2xl">
-                Try BudgetPro today and transform your relationship with money. It's free to get started, and we're
-                confident you'll love the results.
+                Try BudgetPro today and transform your relationship with money. It&apos;s free to get started, and we&apos;re
+                confident you&apos;ll love the results.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
                 <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:shadow-[0_0_30px_rgba(168,85,247,0.7)] transition-all duration-500 hover:-translate-y-1 flex-1">
