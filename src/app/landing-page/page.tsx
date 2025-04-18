@@ -2,367 +2,750 @@
 import { useState } from "react"
 import Link from "next/link"
 import {
-    ArrowRight,
-    //   BarChart3,
-    //   Calendar,
-    //   ChevronRight,
-    DollarSign,
-    LineChart,
-    PieChart,
-    //   Star,
-    //   Users,
-    Sparkles,
-    Clock,
-    CreditCard,
-    TrendingUp,
-    Target,
-    X,
-    Menu,
+  ArrowRight,
+  BarChart3,
+  Calendar,
+  ChevronRight,
+  DollarSign,
+  LineChart,
+  PieChart,
+  Star,
+  Users,
+  Sparkles,
+  Clock,
+  CreditCard,
+  TrendingUp,
+  Target,
+  X,
+  Menu,
+  ChartNoAxesCombined,
+  BadgePoundSterling,
+  Banknote,
+  ChartCandlestick
 } from "lucide-react"
 
 export default function LandingPage() {
-    const [menuOpen, setMenuOpen] = useState(false)
-    return (
-        <div className="flex flex-col min-h-screen  text-white overflow-hidden  ">
-            <header className=" backdrop-blur-xl sticky top-0 bg-[#1D2345] z-50">
-                <div className="container mx-auto px-4 flex h-20 items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="relative w-10 h-10 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-lg opacity-90 "></div>
-                            <DollarSign className="h-6 w-6 text-white z-10" />
-                        </div>
-                        <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                            Greenor
+  const [menuOpen, setMenuOpen] = useState(false)
+  return (
+    <div className="flex flex-col min-h-screen  text-white overflow-hidden  ">
+      <header className=" backdrop-blur-xl sticky top-0 bg-[#1D2345] z-50">
+        <div className="container mx-auto px-4 flex h-20 items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-green-400 rounded-lg opacity-90 "></div>
+              <DollarSign className="h-6 w-6 text-white z-10" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
+              Greenor
+            </span>
+          </div>
+          <nav className="hidden md:flex gap-8 items-center justify-center">
+            <Link
+              href="/"
+              className="text-sm font-medium text-white/80 hover:text-white transition-colors relative group"
+            >
+              Home
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+
+            <Link
+              href="/pricing"
+              className="text-sm font-medium text-white/80 hover:text-white transition-colors relative group"
+            >
+              Pricing
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
+
+          </nav>
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-white/80 hover:text-white transition-all duration-300"
+            >
+              Log in
+            </Link>
+            <button className="relative overflow-hidden group bg-gradient-to-tr from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white px-4 py-2 rounded-2xl transition-all duration-300 ">
+              <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
+              <span className="font-medium flex items-center">
+                Join Waitlist
+                <svg
+                  className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+            </button>
+          </div>
+          <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
+            {menuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+          </button>
+        </div>
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="md:hidden bg-[#151525] shadow-lg px-4 py-4 flex flex-col gap-4">
+            <Link href="/" className="text-sm font-medium hover:text-gray-200 transition-colors">Home</Link>
+            <Link href="/pricing" className="text-sm font-medium hover:text-gray-200 transition-colors">Pricing</Link>
+            <Link href="/login" className="text-sm font-medium hover:text-gray-200 transition-colors">Log in</Link>
+            <button className="bg-gradient-to-tr from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 p-2 px-4 rounded-full text-white w-full">Join Waitlist</button>
+          </div>
+        )}
+      </header>
+
+      <main className="flex-1 relative">
+        {/* Gradient Background */}
+        <div className="absolute inset-0 bg-gradient-to-br  from-[#1a1a2e] via-[#16213e] to-[#0f172a]"></div>
+        {/* Hero Section with Advanced Gradient and Animations */}
+        <section className="relative py-24 md:py-6 overflow-hidden isolate">
+
+
+          {/* Animated Gradient Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15)_0%,rgba(0,0,0,0)_60%)]"></div>
+
+          {/* Geometric Decorations */}
+          <div className="absolute w-96 h-96 -top-20 -right-20 bg-purple-600/10 rounded-full blur-3xl animate-slow-pulse">
+            <ChartNoAxesCombined className="text-white" /></div>
+          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
+
+          {/* Floating Elements */}
+          <div className="absolute top-1/4 left-10 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
+            <ChartNoAxesCombined className="text-gray-400" />
+          </div>
+          <div className="absolute top-[8%] left-32 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
+            <ChartCandlestick className="text-gray-400" />
+          </div>
+          <div className="absolute top-[10%] right-10 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
+            <Banknote className="text-gray-400" />
+          </div>
+          <div className="absolute bottom-1/4 right-10 w-20 h-20 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower">
+            <BadgePoundSterling className="text-gray-400" />
+          </div>
+          <div className="absolute top-1/3 right-1/4 w-8 h-8  backdrop-blur-xl rounded-lg rotate-45 animate-float">
+            <BadgePoundSterling className="text-gray-400" />
+          </div>
+
+          {/* Glowing lines */}
+          <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-600/50 to-transparent"></div>
+          <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/50 to-transparent"></div>
+
+          <div className="container mx-auto px-4 relative"
+            data-aos="fade-up"
+            data-aos-offset="200"
+            data-aos-delay="50"
+            data-aos-duration="1000"
+            data-aos-easing="ease-in-out">
+            <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 md:mb-24">
+              <div className="inline-flex items-center backdrop-blur-md bg-white/5 rounded-full px-4 py-2 text-white mb-8 animate-fade-in shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+                <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
+                <span className="text-sm font-medium">Next-Gen Budget Management</span>
+              </div>
+
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 animate-slide-up leading-tight"
+                data-aos="fade-up"
+                data-aos-delay="100"
+                data-aos-duration="1000">
+                <span className="relative">
+                  <span className="relative z-10">Visualize your</span>
+                  {/* <span className="absolute bottom-0 left-0 w-full h-3 bg-purple-600/30 -rotate-1 translate-y-2 z-0"></span> */}
+                </span>
+                <br />
+                <span className="relative mt-2 inline-block">
+                  <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
+                    financial future
+                  </span>
+                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-purple-600/20 rounded-full blur-xl z-0"></span>
+                </span>
+              </h1>
+
+              <p className="text-white/70 text-xl max-w-[900px] mb-10 animate-slide-up-delayed leading-relaxed"
+                data-aos="fade-up"
+                data-aos-delay="200"
+                data-aos-duration="1000">
+                Experience a new dimension of financial management with our AI-powered budget tracking platform.
+                Visualize, analyze, and optimize your finances like never before.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-6 animate-slide-up-more-delayed"
+                data-aos="fade-up"
+                data-aos-delay="300"
+                data-aos-duration="1000">
+                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white rounded-2xl px-10 py-4 font-medium text-base  hover:-translate-y-1">
+                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
+                  <span className="relative z-10 flex items-center">
+                    Join Waitlist
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </button>
+                <button className="relative overflow-hidden bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 backdrop-blur-sm">
+                  <span className="relative z-10">Learn more</span>
+                  <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-white/5"></div>
+                </button>
+              </div>
+            </div>
+
+            {/* Enhanced Dashboard Preview */}
+            <div className="relative max-w-6xl mx-auto animate-float">
+              {/* Shadow and Glow Effects */}
+              <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-green-400/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/30 to-green-400/30 rounded-3xl opacity-70 blur-xl"></div>
+
+              {/* Main Dashboard Container */}
+              <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
+                <div className="bg-gradient-to-r from-purple-600 to-green-600 h-1"></div>
+                <div className="p-8">
+                  {/* Dashboard Header */}
+                  <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 w-full">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="relative w-10 h-10 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
+                        <DollarSign className="h-5 w-5 text-white z-10" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white text-lg">Financial Dashboard</h3>
+                        <p className="text-sm text-white/50">Visualize, analyze, optimize</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-white/5 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                        <span className="text-sm font-medium text-white/70 flex items-center">
+                          <Clock className="w-3.5 h-3.5 mr-1.5 text-purple-400" />
+                          July 2023
                         </span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600/20 to-green-400/20 backdrop-blur-md flex items-center justify-center border border-white/10">
+                        <span className="text-sm font-medium text-white/80">JD</span>
+                      </div>
                     </div>
-                    <nav className="hidden md:flex gap-8 items-center justify-center">
-                        <Link
-                            href="/"
-                            className="text-sm font-medium text-white/80 hover:text-white transition-colors relative group"
-                        >
-                            Home
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
+                  </div>
 
-                        <Link
-                            href="/pricing"
-                            className="text-sm font-medium text-white/80 hover:text-white transition-colors relative group"
-                        >
-                            Pricing
-                            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 group-hover:w-full"></span>
-                        </Link>
-
-                    </nav>
-                    <div className="hidden md:flex items-center gap-6">
-                        <Link
-                            href="/login"
-                            className="text-sm font-medium text-white/80 hover:text-white transition-all duration-300"
-                        >
-                            Log in
-                        </Link>
-                        <button className="relative overflow-hidden group bg-gradient-to-tr from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 rounded-2xl transition-all duration-300 ">
-                            <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
-                            <span className="font-medium flex items-center">
-                                Join Waitlist
-                                <svg
-                                    className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </span>
-                        </button>
+                  {/* Budget Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="150">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-purple-600/10 flex items-center justify-center text-purple-400" >
+                          <CreditCard className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-white/50">Total Budget</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-green-400">
+                          $4,500.00
+                        </p>
+                        <span className="text-purple-400 text-sm font-medium pb-1">+5% from last month</span>
+                      </div>
                     </div>
-                    <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
-                        {menuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
-                    </button>
+
+                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="250">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-green-400/10 flex items-center justify-center text-green-400">
+                          <DollarSign className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-white/50">Spent</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-purple-400">
+                          $2,345.67
+                        </p>
+                        <span className="text-green-400 text-sm font-medium pb-1">52% of budget</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="350">
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
+                          <TrendingUp className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-white/50">Remaining</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
+                          $2,154.33
+                        </p>
+                        <span className="text-blue-400 text-sm font-medium pb-1">48% left</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="mb-10"
+                    data-aos="fade-up"
+                    data-aos-delay="100"
+                    data-aos-duration="1000">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="font-medium flex items-center text-white/70">
+                        <Target className="h-4 w-4 mr-2 text-purple-400" />
+                        Budget Usage
+                      </span>
+                      <span className="text-purple-400 font-medium">52%</span>
+                    </div>
+                    <div className="h-3 bg-[#1e1e3a] rounded-full overflow-hidden shadow-inner border border-white/5">
+                      <div className="h-3 bg-gradient-to-r from-purple-600 to-green-600 rounded-full w-[52%] relative">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_60%)]"></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Charts and Recent Transactions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                    data-aos="fade-up"
+                    data-aos-delay="100"
+                    data-aos-duration="1000">
+                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                      <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
+                        <PieChart className="h-4 w-4 mr-2 text-purple-400" />
+                        Expense Categories
+                      </h4>
+                      <div className="flex items-center justify-center h-48 relative">
+                        {/* Stylized donut chart */}
+                        <div className="w-32 h-32 rounded-full border-[12px] border-purple-600/70 relative">
+                          <div className="absolute inset-0 border-[12px] border-transparent border-t-green-400/70 rounded-full transform rotate-45"></div>
+                          <div className="absolute inset-0 border-[12px] border-transparent border-r-blue-500/70 rounded-full transform rotate-45"></div>
+                          <div className="absolute inset-0 border-[4px] border-[#151525] rounded-full transform scale-90"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xl font-bold text-white">52%</span>
+                          </div>
+                        </div>
+
+                        {/* Blurred glow effects */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-purple-600/20 rounded-full blur-xl"></div>
+                        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-green-400/20 rounded-full blur-lg"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-blue-500/20 rounded-full blur-xl"></div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all" data-aos="fade-up">
+                      <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
+                        <LineChart className="h-4 w-4 mr-2 text-purple-400" />
+                        Recent Transactions
+                      </h4>
+                      <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400">
+                              <span className="text-xs font-medium">GR</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-white">Grocery Shopping</span>
+                              <p className="text-xs text-white/50">Today, 10:30 AM</p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-white">-$85.32</span>
+                        </div>
+
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-400/20 flex items-center justify-center text-green-400">
+                              <span className="text-xs font-medium">IB</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-white">Internet Bill</span>
+                              <p className="text-xs text-white/50">Yesterday, 2:15 PM</p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-white">-$59.99</span>
+                        </div>
+
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
+                              <span className="text-xs font-medium">CS</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-white">Coffee Shop</span>
+                              <p className="text-xs text-white/50">Jul 24, 9:45 AM</p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-bold text-white">-$4.75</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                {/* Mobile menu */}
-                {menuOpen && (
-                    <div className="md:hidden bg-[#151525] shadow-lg px-4 py-4 flex flex-col gap-4">
-                        <Link href="/" className="text-sm font-medium hover:text-gray-200 transition-colors">Home</Link>
-                        <Link href="/pricing" className="text-sm font-medium hover:text-gray-200 transition-colors">Pricing</Link>
-                        <Link href="/login" className="text-sm font-medium hover:text-gray-200 transition-colors">Log in</Link>
-                        <button className="bg-gradient-to-tr from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 p-2 px-4 rounded-full text-white w-full">Join Waitlist</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20 relative overflow-hidden">
+          {/* Background patterns */}
+          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#151525]/50 to-transparent"></div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-600/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="absolute top-1/3 left-10 w-40 h-40 bg-green-400/5 rounded-full"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-5xl font-bold text-white">
+                Here’s What We’ve<br />
+                <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg"> Accomplished Together</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-green-400/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
+                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600/10 to-green-400/10 flex items-center justify-center border border-white/5">
+                    <Users className="h-8 w-8 text-purple-400" />
+                  </div>
+                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-green-400">
+                    <span className="relative z-10">10,000+</span>
+                    <span className="absolute bottom-1 left-0 w-full h-3 bg-purple-600/20 -z-10 transform -rotate-1"></span>
+                  </div>
+                  <p className="text-white/60 font-medium">Active Users</p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 to-purple-600/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
+                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-400/10 to-purple-600/10 flex items-center justify-center border border-white/5">
+                    <DollarSign className="h-8 w-8 text-green-400" />
+                  </div>
+                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-purple-400">
+                    <span className="relative z-10">$2.5M</span>
+                    <span className="absolute bottom-1 left-0 w-full h-3 bg-green-400/20 -z-10 transform -rotate-1"></span>
+                  </div>
+                  <p className="text-white/60 font-medium">Budget Managed</p>
+                </div>
+              </div>
+
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
+                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-600/10 flex items-center justify-center border border-white/5">
+                    <Star className="h-8 w-8 text-blue-400" />
+                  </div>
+                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
+                    <span className="relative z-10">98%</span>
+                    <span className="absolute bottom-1 left-0 w-full h-3 bg-blue-500/20 -z-10 transform -rotate-1"></span>
+                  </div>
+                  <p className="text-white/60 font-medium">Customer Satisfaction</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
+          <div className="absolute top-20 right-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-72 h-72 bg-green-500/10 rounded-full blur-3xl"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-white/10">
+                <span className="text-sm font-medium text-white/70">How It Works</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
+                Simplify your financial journey
+              </h2>
+              <p className="max-w-2xl mx-auto text-white/60 text-lg leading-relaxed">
+                BudgetPro makes financial management intuitive and effortless with a powerful yet easy-to-use platform
+                built for the modern world.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto relative">
+              {/* Connecting Line */}
+              <div className="absolute top-8 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500/50 to-green-500/50 hidden md:block"></div>
+
+              <div className="flex flex-col items-center text-center relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-green-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(168,85,247,0.5)] relative z-10">
+                  <span className="text-white font-bold text-xl">1</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Create Your Budget</h3>
+                <p className="text-white/60">
+                  Set up your budget categories and allocate funds based on your financial goals and income. Our
+                  intuitive interface makes this process quick and painless.
+                </p>
+                <div className="mt-6">
+                  <button className="text-purple-400 font-medium flex items-center hover:text-purple-300 transition-colors">
+                    Learn more
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center text-center relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(219,39,119,0.5)] relative z-10">
+                  <span className="text-white font-bold text-xl">2</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Track Expenses</h3>
+                <p className="text-white/60">
+                  Record your expenses and categorize them to keep track of your spending habits. Our smart
+                  categorization helps you understand where your money goes.
+                </p>
+                <div className="mt-6">
+                  <button className="text-green-400 font-medium flex items-center hover:text-green-300 transition-colors">
+                    Learn more
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center text-center relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(96,165,250,0.5)] relative z-10">
+                  <span className="text-white font-bold text-xl">3</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-white">Gain Insights</h3>
+                <p className="text-white/60">
+                  Analyze your financial data with powerful visualizations and make informed decisions. Our detailed
+                  reports reveal spending patterns and saving opportunities.
+                </p>
+                <div className="mt-6">
+                  <button className="text-blue-400 font-medium flex items-center hover:text-blue-300 transition-colors">
+                    Learn more
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Enhanced Features Section */}
+        <section className="w-full py-24 bg-[#0a0a16] relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/5 rounded-full"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/5 rounded-full"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-20">
+              <div className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-2 border border-white/10">
+                <span className="text-sm font-medium text-white/70">Premium Features</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+                Everything you need.
+                <br />
+                <span className="bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
+                  Nothing you don't.
+                </span>
+              </h2>
+              <p className="max-w-[900px] text-white/60 text-lg leading-relaxed mt-4">
+                Financial management and visibility in one place. Experience a flexible toolkit that makes every task
+                feel like a breeze, designed with your needs in mind.
+              </p>
+            </div>
+
+            <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 lg:grid-cols-2 lg:gap-16">
+              <div className="grid gap-8">
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 flex items-center justify-center border border-white/5">
+                        <BarChart3 className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Budget Management</h3>
                     </div>
-                )}
-            </header>
+                    <p className="text-white/60 pl-16">
+                      Create and manage budgets for different time periods. Track your spending against your budget in
+                      real-time with visual indicators and alerts.
+                    </p>
+                  </div>
+                </div>
 
-            <main className="flex-1">
-                {/* Hero Section with Advanced Gradient and Animations */}
-                <section className="relative py-24 md:py-6 overflow-hidden isolate">
-                    {/* Gradient Background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f172a]"></div>
-
-                    {/* Animated Gradient Overlay */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15)_0%,rgba(0,0,0,0)_60%)]"></div>
-
-                    {/* Geometric Decorations */}
-                    <div className="absolute w-96 h-96 -top-20 -right-20 bg-purple-500/10 rounded-full blur-3xl animate-slow-pulse"></div>
-                    <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-pink-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
-
-                    {/* Floating Elements */}
-                    <div className="absolute top-1/4 left-10 w-12 h-12 bg-white/5 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow"></div>
-                    <div className="absolute bottom-1/4 right-10 w-20 h-20 bg-white/5 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower"></div>
-                    <div className="absolute top-1/3 right-1/4 w-8 h-8 bg-white/5 backdrop-blur-xl rounded-lg rotate-45 animate-float"></div>
-
-                    {/* Glowing lines */}
-                    <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/50 to-transparent"></div>
-                    <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-pink-500/50 to-transparent"></div>
-
-                    <div className="container mx-auto px-4 relative"
-                        data-aos="fade-up"
-                        data-aos-offset="200"
-                        data-aos-delay="50"
-                        data-aos-duration="1000"
-                        data-aos-easing="ease-in-out">
-                        <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 md:mb-24">
-                            <div className="inline-flex items-center backdrop-blur-md bg-white/5 rounded-full px-4 py-2 text-white mb-8 animate-fade-in shadow-[0_0_15px_rgba(168,85,247,0.3)]">
-                                <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
-                                <span className="text-sm font-medium">Next-Gen Budget Management</span>
-                            </div>
-
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 animate-slide-up leading-tight"
-                                data-aos="fade-up"
-                                data-aos-delay="100"
-                                data-aos-duration="1000">
-                                <span className="relative">
-                                    <span className="relative z-10">Visualize your</span>
-                                    {/* <span className="absolute bottom-0 left-0 w-full h-3 bg-purple-500/30 -rotate-1 translate-y-2 z-0"></span> */}
-                                </span>
-                                <br />
-                                <span className="relative mt-2 inline-block">
-                                    <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
-                                        financial future
-                                    </span>
-                                    <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-purple-500/20 rounded-full blur-xl z-0"></span>
-                                </span>
-                            </h1>
-
-                            <p className="text-white/70 text-xl max-w-[900px] mb-10 animate-slide-up-delayed leading-relaxed"
-                                data-aos="fade-up"
-                                data-aos-delay="200"
-                                data-aos-duration="1000">
-                                Experience a new dimension of financial management with our AI-powered budget tracking platform.
-                                Visualize, analyze, and optimize your finances like never before.
-                            </p>
-
-                            <div className="flex flex-col sm:flex-row gap-6 animate-slide-up-more-delayed"
-                                data-aos="fade-up"
-                                data-aos-delay="300"
-                                data-aos-duration="1000">
-                                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-2xl px-10 py-4 font-medium text-base  hover:-translate-y-1">
-                                    <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
-                                    <span className="relative z-10 flex items-center">
-                                        Join Waitlist
-                                        <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                                    </span>
-                                </button>
-                                <button className="relative overflow-hidden bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 backdrop-blur-sm">
-                                    <span className="relative z-10">Learn more</span>
-                                    <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-white/5"></div>
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Enhanced Dashboard Preview */}
-                        <div className="relative max-w-6xl mx-auto animate-float">
-                            {/* Shadow and Glow Effects */}
-                            <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-pink-500/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500/30 to-pink-500/30 rounded-3xl opacity-70 blur-xl"></div>
-
-                            {/* Main Dashboard Container */}
-                            <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
-                                <div className="bg-gradient-to-r from-purple-600 to-pink-600 h-1"></div>
-                                <div className="p-8">
-                                    {/* Dashboard Header */}
-                                    <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 w-full">
-                                        <div className="flex items-center gap-3 mb-2">
-                                            <div className="relative w-10 h-10 flex items-center justify-center">
-                                                <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-lg opacity-90 blur-[1px]"></div>
-                                                <DollarSign className="h-5 w-5 text-white z-10" />
-                                            </div>
-                                            <div>
-                                                <h3 className="font-semibold text-white text-lg">Financial Dashboard</h3>
-                                                <p className="text-sm text-white/50">Visualize, analyze, optimize</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="bg-white/5 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
-                                                <span className="text-sm font-medium text-white/70 flex items-center">
-                                                    <Clock className="w-3.5 h-3.5 mr-1.5 text-purple-400" />
-                                                    July 2023
-                                                </span>
-                                            </div>
-                                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                                <span className="text-sm font-medium text-white/80">JD</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Budget Cards */}
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                                        <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="150">
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400" >
-                                                    <CreditCard className="h-5 w-5" />
-                                                </div>
-                                                <p className="text-sm text-white/50">Total Budget</p>
-                                            </div>
-                                            <div className="flex items-end gap-2">
-                                                <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-pink-400">
-                                                    $4,500.00
-                                                </p>
-                                                <span className="text-purple-400 text-sm font-medium pb-1">+5% from last month</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="250">
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="w-10 h-10 rounded-lg bg-pink-500/10 flex items-center justify-center text-pink-400">
-                                                    <DollarSign className="h-5 w-5" />
-                                                </div>
-                                                <p className="text-sm text-white/50">Spent</p>
-                                            </div>
-                                            <div className="flex items-end gap-2">
-                                                <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-pink-400 group-hover:to-purple-400">
-                                                    $2,345.67
-                                                </p>
-                                                <span className="text-pink-400 text-sm font-medium pb-1">52% of budget</span>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="350">
-                                            <div className="flex items-center gap-4 mb-3">
-                                                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
-                                                    <TrendingUp className="h-5 w-5" />
-                                                </div>
-                                                <p className="text-sm text-white/50">Remaining</p>
-                                            </div>
-                                            <div className="flex items-end gap-2">
-                                                <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
-                                                    $2,154.33
-                                                </p>
-                                                <span className="text-blue-400 text-sm font-medium pb-1">48% left</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="mb-10"
-                                        data-aos="fade-up"
-                                        data-aos-delay="100"
-                                        data-aos-duration="1000">
-                                        <div className="flex justify-between text-sm mb-2">
-                                            <span className="font-medium flex items-center text-white/70">
-                                                <Target className="h-4 w-4 mr-2 text-purple-400" />
-                                                Budget Usage
-                                            </span>
-                                            <span className="text-purple-400 font-medium">52%</span>
-                                        </div>
-                                        <div className="h-3 bg-[#1e1e3a] rounded-full overflow-hidden shadow-inner border border-white/5">
-                                            <div className="h-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full w-[52%] relative">
-                                                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_60%)]"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Charts and Recent Transactions */}
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                                        data-aos="fade-up"
-                                        data-aos-delay="100"
-                                        data-aos-duration="1000">
-                                        <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
-                                            <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
-                                                <PieChart className="h-4 w-4 mr-2 text-purple-400" />
-                                                Expense Categories
-                                            </h4>
-                                            <div className="flex items-center justify-center h-48 relative">
-                                                {/* Stylized donut chart */}
-                                                <div className="w-32 h-32 rounded-full border-[12px] border-purple-500/70 relative">
-                                                    <div className="absolute inset-0 border-[12px] border-transparent border-t-pink-500/70 rounded-full transform rotate-45"></div>
-                                                    <div className="absolute inset-0 border-[12px] border-transparent border-r-blue-500/70 rounded-full transform rotate-45"></div>
-                                                    <div className="absolute inset-0 border-[4px] border-[#151525] rounded-full transform scale-90"></div>
-                                                    <div className="absolute inset-0 flex items-center justify-center">
-                                                        <span className="text-xl font-bold text-white">52%</span>
-                                                    </div>
-                                                </div>
-
-                                                {/* Blurred glow effects */}
-                                                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-purple-500/20 rounded-full blur-xl"></div>
-                                                <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-pink-500/20 rounded-full blur-lg"></div>
-                                                <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-blue-500/20 rounded-full blur-xl"></div>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all" data-aos="fade-up">
-                                            <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
-                                                <LineChart className="h-4 w-4 mr-2 text-purple-400" />
-                                                Recent Transactions
-                                            </h4>
-                                            <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
-                                                <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
-                                                            <span className="text-xs font-medium">GR</span>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-sm font-medium text-white">Grocery Shopping</span>
-                                                            <p className="text-xs text-white/50">Today, 10:30 AM</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-sm font-bold text-white">-$85.32</span>
-                                                </div>
-
-                                                <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400">
-                                                            <span className="text-xs font-medium">IB</span>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-sm font-medium text-white">Internet Bill</span>
-                                                            <p className="text-xs text-white/50">Yesterday, 2:15 PM</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-sm font-bold text-white">-$59.99</span>
-                                                </div>
-
-                                                <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
-                                                            <span className="text-xs font-medium">CS</span>
-                                                        </div>
-                                                        <div>
-                                                            <span className="text-sm font-medium text-white">Coffee Shop</span>
-                                                            <p className="text-xs text-white/50">Jul 24, 9:45 AM</p>
-                                                        </div>
-                                                    </div>
-                                                    <span className="text-sm font-bold text-white">-$4.75</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-purple-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
+                        <DollarSign className="h-6 w-6 text-green-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Expense Tracking</h3>
                     </div>
-                </section>
+                    <p className="text-white/60 pl-16">
+                      Record and categorize expenses with ease. Add notes, attach receipts, and never lose track of
+                      where your money goes with our intelligent categorization system.
+                    </p>
+                  </div>
+                </div>
 
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
+                        <PieChart className="h-6 w-6 text-blue-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Insightful Analytics</h3>
+                    </div>
+                    <p className="text-white/60 pl-16">
+                      Visualize your spending patterns with beautiful interactive charts and graphs. Gain insights to
+                      make better financial decisions with our comprehensive reporting tools.
+                    </p>
+                  </div>
+                </div>
 
-            </main>
+                <div className="group relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
+                        <Calendar className="h-6 w-6 text-purple-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Time Tracking</h3>
+                    </div>
+                    <p className="text-white/60 pl-16">
+                      Track time spent on different projects and categories. Connect time investments to financial
+                      outcomes for a complete picture of your productivity and ROI.
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-            {/* <footer className="border-t border-white/5 bg-[#0a0a16]">
-        <div className="container mx-auto px-4 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
+              <div className="flex items-center justify-center">
+                <div className="relative w-full max-w-md aspect-square">
+                  {/* Glowing background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-green-500/20 to-blue-500/20 rounded-3xl blur-3xl transform -rotate-6"></div>
+
+                  {/* Main feature showcase */}
+                  <div className="relative bg-[#151525] rounded-2xl shadow-xl border border-white/10 p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    {/* Header with title and date */}
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-white flex items-center">
+                        <Sparkles className="h-5 w-5 mr-2 text-purple-400" />
+                        Expense Analysis
+                      </h3>
+                      <span className="text-xs text-white/50 bg-white/5 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
+                        July 2023
+                      </span>
+                    </div>
+
+                    {/* Chart visualization */}
+                    <div className="aspect-square bg-gradient-to-br from-[#1a1a2e] to-[#151525] rounded-xl flex items-center justify-center border border-white/5 shadow-inner p-4 mb-6">
+                      <div className="relative">
+                        {/* Stylized donut chart with glow effects */}
+                        <div className="w-40 h-40 rounded-full relative">
+                          <div className="absolute inset-0 rounded-full border-[16px] border-purple-500/70 opacity-80"></div>
+                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-t-green-500/70 opacity-80"></div>
+                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-l-blue-500/70 opacity-80"></div>
+
+                          {/* Inner circle */}
+                          <div className="absolute inset-[16px] rounded-full bg-[#151525] border border-white/5 flex items-center justify-center">
+                            <div className="text-center">
+                              <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400">
+                                $2,345
+                              </span>
+                              <span className="text-xs text-white/50">Total Spent</span>
+                            </div>
+                          </div>
+
+                          {/* Glow effects */}
+                          <div className="absolute -inset-4 bg-purple-500/10 rounded-full blur-xl"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Category legend */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-white">Housing</span>
+                          <span className="block text-xs text-white/50">$950 • 40%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-white">Food</span>
+                          <span className="block text-xs text-white/50">$450 • 19%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-white">Transport</span>
+                          <span className="block text-xs text-white/50">$350 • 15%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-white">Other</span>
+                          <span className="block text-xs text-white/50">$595 • 26%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-24 relative overflow-hidden isolate">
+          {/* Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 to-[#151525]"></div>
+
+          {/* Animated Gradient Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.2)_0%,rgba(0,0,0,0)_60%)]"></div>
+
+          {/* Geometric Decorations */}
+          <div className="absolute w-96 h-96 -top-20 -right-20 bg-purple-500/20 rounded-full blur-3xl animate-slow-pulse"></div>
+          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/20 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
+
+          {/* Floating Elements */}
+          <div className="absolute top-1/4 left-10 w-12 h-12 bg-white/5 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow"></div>
+          <div className="absolute bottom-1/4 right-10 w-20 h-20 bg-white/5 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="flex flex-col items-center justify-center space-y-8 text-center max-w-3xl mx-auto">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
+                Ready for smarter, more efficient budgeting?
+              </h2>
+              <p className="text-white/70 text-xl max-w-2xl">
+                Try BudgetPro today and transform your relationship with money. It's free to get started, and we're
+                confident you'll love the results.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
+                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:shadow-[0_0_30px_rgba(168,85,247,0.7)] transition-all duration-500 hover:-translate-y-1 flex-1">
+                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
+                  <span className="relative z-10 flex items-center justify-center">
+                    Get Started
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </button>
+                <button className="relative overflow-hidden bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 backdrop-blur-sm flex-1">
+                  <span className="relative z-10">Schedule Demo</span>
+                  <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-white/5"></div>
+                </button>
+              </div>
+              <div className="flex items-center gap-4 mt-6">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 rounded-full bg-purple-500/70 border-2 border-[#151525]"></div>
+                  <div className="w-8 h-8 rounded-full bg-green-500/70 border-2 border-[#151525]"></div>
+                  <div className="w-8 h-8 rounded-full bg-blue-500/70 border-2 border-[#151525]"></div>
+                  <div className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#151525] flex items-center justify-center">
+                    <span className="text-xs font-medium text-white/80">+</span>
+                  </div>
+                </div>
+                <span className="text-sm text-white/60">Join 10,000+ users already saving money</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+     <footer className="border-t border-white/5 bg-[#0a0a16]">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col justify-between md:flex-row gap-10">
+
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="relative w-10 h-10 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-lg opacity-90 blur-[1px]"></div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
                   <DollarSign className="h-6 w-6 text-white z-10" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
                   Greenor
                 </span>
               </div>
@@ -405,81 +788,25 @@ export default function LandingPage() {
                 </a>
               </div>
             </div>
+
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Product</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Quick links</h3>
               <ul className="space-y-3">
                 <li>
                   <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Features
+                    Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
+                  <Link href="/pricing" className="text-white/50 hover:text-purple-400 transition-colors">
                     Pricing
                   </Link>
                 </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    FAQ
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Roadmap
-                  </Link>
-                </li>
+          
               </ul>
             </div>
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Company</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Careers
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Press
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Support</h3>
-              <ul className="space-y-3">
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Community
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
-                    Status
-                  </Link>
-                </li>
-              </ul>
-            </div>
+
+        
           </div>
         </div>
         <div className="border-t border-white/5 py-8">
@@ -498,7 +825,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </footer> */}
-        </div>
-    )
+      </footer> 
+    </div>
+  )
 }
