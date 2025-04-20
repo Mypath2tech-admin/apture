@@ -1,34 +1,36 @@
+
 "use client"
 import { useState } from "react"
 import Link from "next/link"
 import {
   ArrowRight,
   BarChart3,
-  Calendar,
   ChevronRight,
   DollarSign,
-  LineChart,
   PieChart,
-  Star,
-  Users,
+  // Users,
   Sparkles,
   Clock,
   CreditCard,
-  TrendingUp,
   Target,
   X,
   Menu,
-  ChartNoAxesCombined,
-  BadgePoundSterling,
-  Banknote,
-  ChartCandlestick
+  ClipboardList,
+  BarChart2,
+  PieChartIcon as PieChart2,
+  Wallet,
+  FileText,
+  // Briefcase,
+  CheckCircle2,
+  NotebookIcon,
 } from "lucide-react"
-
+import Image from 'next/image'
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
-    <div className="flex flex-col min-h-screen  text-white overflow-hidden  ">
-      <header className=" backdrop-blur-xl sticky top-0 bg-[#1D2345] z-50">
+    <div className="flex flex-col min-h-screen text-white overflow-hidden bg-gradient-to-br from-[#0f0f1a] via-[#16213e] to-[#0f172a]">
+      <header className=" backdrop-blur-xl sticky top-0  z-50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15)_0%,rgba(0,0,0,0)_60%)]"></div>
         <div className="container mx-auto px-4 flex h-20 items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="relative w-10 h-10 flex items-center justify-center">
@@ -94,84 +96,75 @@ export default function LandingPage() {
         )}
       </header>
 
-      <main className="flex-1 relative">
-        {/* Gradient Background */}
-        <div className="absolute inset-0 bg-gradient-to-br  from-[#1a1a2e] via-[#16213e] to-[#0f172a]"></div>
-        {/* Hero Section with Advanced Gradient and Animations */}
-        <section className="relative py-24 md:py-6 overflow-hidden isolate">
-
-
+      <main className="flex-1">
+        {/* Hero Section */}
+        <section className="relative py-24 md:py-32 overflow-hidden">
           {/* Animated Gradient Overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.15)_0%,rgba(0,0,0,0)_60%)]"></div>
 
-          {/* Geometric Decorations */}
-          <div className="absolute w-96 h-96 -top-20 -right-20 bg-purple-600/10 rounded-full blur-3xl animate-slow-pulse">
-            <ChartNoAxesCombined className="text-white" /></div>
-          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
-
-          {/* Floating Elements */}
-          <div className="absolute top-1/4 left-10 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
-            <ChartNoAxesCombined className="text-gray-400" />
+          {/* Floating Finance Elements */}
+          <div className="absolute w-12 h-12 top-1/4 left-10 text-purple-400/30 animate-float-slow">
+            <BarChart2 className="w-9 lg:w-14" />
           </div>
-          <div className="absolute top-[8%] left-32 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
-            <ChartCandlestick className="text-gray-400" />
+          <div className="absolute w-16 h-16 top-1/3 right-20 text-green-400/30 animate-float">
+            <PieChart2 className="w-9 lg:w-14" />
           </div>
-          <div className="absolute top-[10%] right-10 w-12 h-12 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow">
-            <Banknote className="text-gray-400" />
+          <div className="absolute w-10 h-10 bottom-1/4 left-1/4 text-purple-400/30 animate-float-slower">
+            <Wallet className="w-9 lg:w-14" />
           </div>
-          <div className="absolute bottom-1/4 right-10 w-20 h-20 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower">
-            <BadgePoundSterling className="text-gray-400" />
+          <div className="absolute w-14 h-14 top-1/2 right-10 text-green-400/30 animate-float-slow">
+            <FileText className="w-9 lg:w-14" />
           </div>
-          <div className="absolute top-1/3 right-1/4 w-8 h-8  backdrop-blur-xl rounded-lg rotate-45 animate-float">
-            <BadgePoundSterling className="text-gray-400" />
+          <div className="absolute w-12 h-12 bottom-1/3 right-1/3 text-purple-400/30 animate-float">
+            <ClipboardList className="w-9 lg:w-14" />
           </div>
 
           {/* Glowing lines */}
           <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-600/50 to-transparent"></div>
           <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/50 to-transparent"></div>
 
-          <div className="container mx-auto px-4 relative"
-            data-aos="fade-up"
-            data-aos-offset="200"
-            data-aos-delay="50"
-            data-aos-duration="1000"
-            data-aos-easing="ease-in-out">
+          <div className="container mx-auto px-4 relative">
             <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 md:mb-24">
-              <div className="inline-flex items-center backdrop-blur-md bg-white/5 rounded-full px-4 py-2 text-white mb-8 animate-fade-in shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+              <div
+                className="inline-flex items-center backdrop-blur-md bg-white/5 rounded-full px-4 py-2 text-white mb-8 shadow-[0_0_15px_rgba(168,85,247,0.3)]"
+                data-aos="fade-down"
+              >
                 <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-sm font-medium">Next-Gen Budget Management</span>
+                <span className="text-sm font-medium">Budget & Timesheet Management</span>
               </div>
 
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 animate-slide-up leading-tight"
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-tight"
                 data-aos="fade-up"
                 data-aos-delay="100"
-                data-aos-duration="1000">
+              >
                 <span className="relative">
-                  <span className="relative z-10">Visualize your</span>
-                  {/* <span className="absolute bottom-0 left-0 w-full h-3 bg-purple-600/30 -rotate-1 translate-y-2 z-0"></span> */}
+                  <span className="relative z-10">All your work tools</span>
                 </span>
                 <br />
                 <span className="relative mt-2 inline-block">
                   <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
-                    financial future
+                    in one place
                   </span>
                   <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-purple-600/20 rounded-full blur-xl z-0"></span>
                 </span>
               </h1>
 
-              <p className="text-white/70 text-xl max-w-[900px] mb-10 animate-slide-up-delayed leading-relaxed"
+              <p
+                className="text-white/70 text-xl max-w-[900px] mb-10 leading-relaxed"
                 data-aos="fade-up"
                 data-aos-delay="200"
-                data-aos-duration="1000">
-                Experience a new dimension of financial management with our AI-powered budget tracking platform.
-                Visualize, analyze, and optimize your finances like never before.
+              >
+                Combine budget management, timesheet tracking, and more in a single powerful platform.
+                Streamline your workflow and boost productivity with our all-in-one solution.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-6 animate-slide-up-more-delayed"
+              <div
+                className="flex flex-col sm:flex-row gap-6"
                 data-aos="fade-up"
                 data-aos-delay="300"
-                data-aos-duration="1000">
-                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white rounded-2xl px-10 py-4 font-medium text-base  hover:-translate-y-1">
+              >
+                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                   <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
                   <span className="relative z-10 flex items-center">
                     Join Waitlist
@@ -185,26 +178,30 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Enhanced Dashboard Preview */}
-            <div className="relative max-w-6xl mx-auto animate-float">
+            {/* Dashboard Preview */}
+            <div
+              className="relative max-w-6xl mx-auto"
+              data-aos="zoom-in"
+              data-aos-delay="400"
+            >
               {/* Shadow and Glow Effects */}
               <div className="absolute inset-0 bg-gradient-to-b from-purple-600/10 to-green-400/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
               <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600/30 to-green-400/30 rounded-3xl opacity-70 blur-xl"></div>
 
               {/* Main Dashboard Container */}
               <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10">
-                <div className="bg-gradient-to-r from-purple-600 to-green-600 h-1"></div>
+                <div className="bg-gradient-to-r from-purple-600 to-green-500 h-1"></div>
                 <div className="p-8">
                   {/* Dashboard Header */}
                   <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 w-full">
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-4 md:mb-0">
                       <div className="relative w-10 h-10 flex items-center justify-center">
                         <div className="absolute inset-0 bg-gradient-to-tr from-purple-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
                         <DollarSign className="h-5 w-5 text-white z-10" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-white text-lg">Financial Dashboard</h3>
-                        <p className="text-sm text-white/50">Visualize, analyze, optimize</p>
+                        <p className="text-sm text-white/50">Budget & Timesheet Overview</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -222,9 +219,13 @@ export default function LandingPage() {
 
                   {/* Budget Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="150">
+                    <div
+                      className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-lg hover:shadow-xl transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="100"
+                    >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-purple-600/10 flex items-center justify-center text-purple-400" >
+                        <div className="w-10 h-10 rounded-lg bg-purple-600/10 flex items-center justify-center text-purple-400">
                           <CreditCard className="h-5 w-5" />
                         </div>
                         <p className="text-sm text-white/50">Total Budget</p>
@@ -237,7 +238,11 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="250">
+                    <div
+                      className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-lg hover:shadow-xl transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="200"
+                    >
                       <div className="flex items-center gap-4 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-green-400/10 flex items-center justify-center text-green-400">
                           <DollarSign className="h-5 w-5" />
@@ -252,27 +257,32 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all group" data-aos="zoom-in" data-aos-delay="350">
+                    <div
+                      className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] p-6 rounded-xl border border-white/5 shadow-lg hover:shadow-xl transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="300"
+                    >
                       <div className="flex items-center gap-4 mb-3">
                         <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
-                          <TrendingUp className="h-5 w-5" />
+                          <Clock className="h-5 w-5" />
                         </div>
-                        <p className="text-sm text-white/50">Remaining</p>
+                        <p className="text-sm text-white/50">Hours Tracked</p>
                       </div>
                       <div className="flex items-end gap-2">
                         <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
-                          $2,154.33
+                          128.5
                         </p>
-                        <span className="text-blue-400 text-sm font-medium pb-1">48% left</span>
+                        <span className="text-blue-400 text-sm font-medium pb-1">This month</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="mb-10"
+                  <div
+                    className="mb-10"
                     data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-aos-duration="1000">
+                    data-aos-delay="400"
+                  >
                     <div className="flex justify-between text-sm mb-2">
                       <span className="font-medium flex items-center text-white/70">
                         <Target className="h-4 w-4 mr-2 text-purple-400" />
@@ -281,18 +291,19 @@ export default function LandingPage() {
                       <span className="text-purple-400 font-medium">52%</span>
                     </div>
                     <div className="h-3 bg-[#1e1e3a] rounded-full overflow-hidden shadow-inner border border-white/5">
-                      <div className="h-3 bg-gradient-to-r from-purple-600 to-green-600 rounded-full w-[52%] relative">
+                      <div className="h-3 bg-gradient-to-r from-purple-600 to-green-500 rounded-full w-[52%] relative">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,rgba(255,255,255,0.2)_0%,rgba(255,255,255,0)_60%)]"></div>
                       </div>
                     </div>
                   </div>
 
                   {/* Charts and Recent Transactions */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-aos-duration="1000">
-                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                      className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-lg hover:shadow-xl transition-all"
+                      data-aos="fade-up"
+                      data-aos-delay="500"
+                    >
                       <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
                         <PieChart className="h-4 w-4 mr-2 text-purple-400" />
                         Expense Categories
@@ -315,49 +326,53 @@ export default function LandingPage() {
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-[0_0_15px_rgba(0,0,0,0.5)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all" data-aos="fade-up">
+                    <div
+                      className="bg-gradient-to-br from-[#1e1e3a] to-[#2a2a4a] rounded-xl p-6 border border-white/5 shadow-lg hover:shadow-xl transition-all"
+                      data-aos="fade-up"
+                      data-aos-delay="600"
+                    >
                       <h4 className="text-sm font-medium mb-4 flex items-center text-white/70">
-                        <LineChart className="h-4 w-4 mr-2 text-purple-400" />
-                        Recent Transactions
+                        <Clock className="h-4 w-4 mr-2 text-green-400" />
+                        Recent Timesheets
                       </h4>
-                      <div className="space-y-4" data-aos="fade-up" data-aos-delay="100">
+                      <div className="space-y-4">
                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-purple-600/20 flex items-center justify-center text-purple-400">
-                              <span className="text-xs font-medium">GR</span>
+                              <span className="text-xs font-medium">WD</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Grocery Shopping</span>
-                              <p className="text-xs text-white/50">Today, 10:30 AM</p>
+                              <span className="text-sm font-medium text-white">Web Development</span>
+                              <p className="text-xs text-white/50">Today, 10:30 AM - 2:45 PM</p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">-$85.32</span>
+                          <span className="text-sm font-bold text-white">4.25h</span>
                         </div>
 
                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-green-400/20 flex items-center justify-center text-green-400">
-                              <span className="text-xs font-medium">IB</span>
+                              <span className="text-xs font-medium">MT</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Internet Bill</span>
-                              <p className="text-xs text-white/50">Yesterday, 2:15 PM</p>
+                              <span className="text-sm font-medium text-white">Marketing Tasks</span>
+                              <p className="text-xs text-white/50">Yesterday, 9:15 AM - 11:30 AM</p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">-$59.99</span>
+                          <span className="text-sm font-bold text-white">2.25h</span>
                         </div>
 
                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
-                              <span className="text-xs font-medium">CS</span>
+                              <span className="text-xs font-medium">RM</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Coffee Shop</span>
-                              <p className="text-xs text-white/50">Jul 24, 9:45 AM</p>
+                              <span className="text-sm font-medium text-white">Research Meeting</span>
+                              <p className="text-xs text-white/50">Jul 24, 1:00 PM - 2:30 PM</p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">-$4.75</span>
+                          <span className="text-sm font-bold text-white">1.5h</span>
                         </div>
                       </div>
                     </div>
@@ -368,69 +383,83 @@ export default function LandingPage() {
           </div>
         </section>
 
-        <section className="py-20 relative overflow-hidden">
-          {/* Background patterns */}
-          <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-[#151525]/50 to-transparent"></div>
-          <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-600/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-          <div className="absolute top-1/3 left-10 w-40 h-40 bg-green-400/5 rounded-full"></div>
-
+        {/* <section className="py-20 relative overflow-hidden">
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-5xl font-bold text-white">
-                Here’s What We’ve<br />
-                <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg"> Accomplished Together</span>
+              <h2
+                className="text-3xl md:text-5xl font-bold text-white mb-6"
+                data-aos="fade-up"
+              >
+                Here&apos;s What We&apos;ve<br />
+                <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">Accomplished Together</span>
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
+            <div className="flex flex-row flex-wrap justify-around items-center gap-10 text-center">
 
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/5 to-green-400/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
-                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+              <div
+                className="relative group"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+              
+                <div className="relative p-8 rounded-2xl  transition-all">
                   <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-purple-600/10 to-green-400/10 flex items-center justify-center border border-white/5">
                     <Users className="h-8 w-8 text-purple-400" />
                   </div>
-                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-green-400">
-                    <span className="relative z-10">10,000+</span>
+                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:from-purple-400 group-hover:to-green-400">
+                    <span className="relative text-5xl z-10">10,000+</span>
                     <span className="absolute bottom-1 left-0 w-full h-3 bg-purple-600/20 -z-10 transform -rotate-1"></span>
                   </div>
                   <p className="text-white/60 font-medium">Active Users</p>
                 </div>
               </div>
 
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-green-400/5 to-purple-600/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
-                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+              <div className="absolute hidden left-[34%] lg:flex bg-[#d9d9d9]  h-[200px] w-[0.5px]"></div>
+
+              <div
+                className="relative group"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+             
+                <div className="relative p-8 rounded-2xl transition-all">
                   <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-green-400/10 to-purple-600/10 flex items-center justify-center border border-white/5">
                     <DollarSign className="h-8 w-8 text-green-400" />
                   </div>
-                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-purple-400">
-                    <span className="relative z-10">$2.5M</span>
+                  <div className="text-5xl font-bold text-white mb-3 relative   group-hover:from-green-400 group-hover:to-purple-400">
+                    <span className="relative text-5xl z-10">$2.5M</span>
                     <span className="absolute bottom-1 left-0 w-full h-3 bg-green-400/20 -z-10 transform -rotate-1"></span>
                   </div>
                   <p className="text-white/60 font-medium">Budget Managed</p>
                 </div>
               </div>
 
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-600/5 rounded-2xl transform transition-transform group-hover:scale-105 group-hover:rotate-1"></div>
-                <div className="relative p-8 rounded-2xl border border-white/10 bg-[#151525] shadow-[0_0_25px_rgba(0,0,0,0.3)] hover:shadow-[0_0_35px_rgba(168,85,247,0.3)] transition-all">
+              <div className="bg-[#d9d9d9] absolute right-[30%] hidden lg:flex  h-[200px] w-[0.5px]"></div>
+
+              <div
+                className="relative group"
+                data-aos="fade-up"
+                data-aos-delay="300"
+              >
+           
+                <div className="relative p-8 rounded-2xl transition-all">
                   <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500/10 to-purple-600/10 flex items-center justify-center border border-white/5">
-                    <Star className="h-8 w-8 text-blue-400" />
+                    <Clock className="h-8 w-8 text-blue-400" />
                   </div>
-                  <div className="text-5xl font-bold text-white mb-3 relative  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
-                    <span className="relative z-10">98%</span>
+                  <div className="text-5xl font-bold text-white mb-3 relative   group-hover:from-blue-400 group-hover:to-purple-400">
+                    <span className="relative text-5xl z-10">50K+</span>
                     <span className="absolute bottom-1 left-0 w-full h-3 bg-blue-500/20 -z-10 transform -rotate-1"></span>
                   </div>
-                  <p className="text-white/60 font-medium">Customer Satisfaction</p>
+                  <p className="text-white/60 font-medium">Hours Tracked</p>
                 </div>
               </div>
 
             </div>
           </div>
-        </section>
-
-        <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
+        </section> */}
+       
+       <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
@@ -439,77 +468,209 @@ export default function LandingPage() {
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-20">
-              <div className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-white/10">
+              <div 
+                className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-white/10"
+                data-aos="fade-down"
+              >
                 <span className="text-sm font-medium text-white/70">How It Works</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight">
-                Simplify your financial journey
+              <h2 
+                className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
+                data-aos="fade-up"
+              >
+                Simplify your workflow
               </h2>
-              <p className="max-w-2xl mx-auto text-white/60 text-lg leading-relaxed">
-                BudgetPro makes financial management intuitive and effortless with a powerful yet easy-to-use platform
-                built for the modern world.
+              <p 
+                className="max-w-2xl mx-auto text-white/60 text-lg leading-relaxed"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                Greenor combines budget management and timesheet tracking in one intuitive platform,
+                making it easier to manage your finances and time.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto relative">
-              {/* Connecting Line */}
-              <div className="absolute top-8 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500/50 to-green-500/50 hidden md:block"></div>
-
-              <div className="flex flex-col items-center text-center relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-green-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(168,85,247,0.5)] relative z-10">
-                  <span className="text-white font-bold text-xl">1</span>
+            {/* Feature 1: Create Budget */}
+            <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
+              <div 
+                className="order-2 lg:order-1"
+                data-aos="fade-right"
+                data-aos-delay="100"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-green-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <span className="text-white font-bold text-xl">1</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white">Create Budget</h3>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Create Your Budget</h3>
-                <p className="text-white/60">
+                <p className="text-white/70 text-lg mb-6 leading-relaxed">
                   Set up your budget categories and allocate funds based on your financial goals and income. Our
                   intuitive interface makes this process quick and painless.
                 </p>
-                <div className="mt-6">
-                  <button className="text-purple-400 font-medium flex items-center hover:text-purple-300 transition-colors">
-                    Learn more
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </button>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Create multiple budget categories</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Set monthly or annual budget limits</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Track progress with visual indicators</span>
+                  </li>
+                </ul>
+                <button className="text-purple-400 font-medium flex items-center hover:text-purple-300 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+              <div 
+                className="order-1 lg:order-2 relative"
+                data-aos="fade-left"
+                data-aos-delay="200"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/20 via-green-500/20 to-purple-600/20 rounded-3xl blur-xl opacity-70"></div>
+                <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
+                  <Image 
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Create+Budget" 
+                    alt="Create Budget Interface" 
+                    className="rounded-xl w-full h-auto"
+                    width={0}
+                    height={0}
+                  />
                 </div>
               </div>
+            </div>
 
-              <div className="flex flex-col items-center text-center relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(219,39,119,0.5)] relative z-10">
-                  <span className="text-white font-bold text-xl">2</span>
-                </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Track Expenses</h3>
-                <p className="text-white/60">
-                  Record your expenses and categorize them to keep track of your spending habits. Our smart
-                  categorization helps you understand where your money goes.
-                </p>
-                <div className="mt-6">
-                  <button className="text-green-400 font-medium flex items-center hover:text-green-300 transition-colors">
-                    Learn more
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </button>
+            {/* Feature 2: Add Expenses */}
+            <div className="grid  mx-6  grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
+              <div 
+                className="order-2"
+                data-aos="fade-left"
+                data-aos-delay="100"
+              >
+                <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-green-500/20 via-purple-600/20 to-green-500/20 rounded-3xl blur-xl opacity-70"></div>
+                  <Image 
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Add+Expenses" 
+                    alt="Add Expenses Interface" 
+                    className="rounded-xl w-full h-auto relative"
+                    width={0}
+                    height={0}
+                  />
                 </div>
               </div>
-
-              <div className="flex flex-col items-center text-center relative">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(96,165,250,0.5)] relative z-10">
-                  <span className="text-white font-bold text-xl">3</span>
+              <div 
+                className="order-1"
+                data-aos="fade-right"
+                data-aos-delay="200"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <span className="text-white font-bold text-xl">2</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white">Add Expenses</h3>
                 </div>
-                <h3 className="text-2xl font-bold mb-4 text-white">Gain Insights</h3>
-                <p className="text-white/60">
-                  Analyze your financial data with powerful visualizations and make informed decisions. Our detailed
-                  reports reveal spending patterns and saving opportunities.
+                <p className="text-white/70 text-lg mb-6 leading-relaxed">
+                  Easily record and categorize your expenses as they happen. Attach receipts, add notes, and keep
+                  everything organized in one place for easy reference.
                 </p>
-                <div className="mt-6">
-                  <button className="text-blue-400 font-medium flex items-center hover:text-blue-300 transition-colors">
-                    Learn more
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </button>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Quick expense entry with smart categorization</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Upload receipt photos directly from your phone</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Automatic budget updates and alerts</span>
+                  </li>
+                </ul>
+                <button className="text-green-400 font-medium flex items-center hover:text-green-300 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 3: Record Timesheets */}
+            <div className="grid  mx-6  grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div 
+                className="order-2 lg:order-1"
+                data-aos="fade-right"
+                data-aos-delay="100"
+              >
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
+                    <span className="text-white font-bold text-xl">3</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-white">Record Timesheets</h3>
+                </div>
+                <p className="text-white/70 text-lg mb-6 leading-relaxed">
+                  Track your working hours with precision and ease. Log time by project, client, or task to maintain
+                  accurate records and improve your productivity.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-blue-400" />
+                    </div>
+                    <span className="text-white/70">Simple time tracking with start/stop functionality</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-blue-400" />
+                    </div>
+                    <span className="text-white/70">Categorize time entries by project or client</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-blue-400" />
+                    </div>
+                    <span className="text-white/70">Generate detailed time reports for billing</span>
+                  </li>
+                </ul>
+                <button className="text-blue-400 font-medium flex items-center hover:text-blue-300 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+              <div 
+                className="order-1 lg:order-2 relative"
+                data-aos="fade-left"
+                data-aos-delay="200"
+              >
+                <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-blue-600/20 rounded-3xl blur-xl opacity-70"></div>
+                <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
+                  <Image 
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Record+Timesheets" 
+                    alt="Timesheet Recording Interface" 
+                    className="rounded-xl w-full h-auto"
+                    width={0}
+                    height={0}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </section>
-
-        {/* Enhanced Features Section */}
         <section className="w-full py-24 bg-[#0a0a16] relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute -top-40 -right-40 w-96 h-96 bg-purple-500/5 rounded-full"></div>
@@ -517,27 +678,41 @@ export default function LandingPage() {
 
           <div className="container mx-auto px-4 relative">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-20">
-              <div className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-2 border border-white/10">
+              <div
+                className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-2 border border-white/10"
+                data-aos="fade-down"
+              >
                 <span className="text-sm font-medium text-white/70">Premium Features</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+              <h2
+                className="text-4xl md:text-5xl font-bold tracking-tight text-white"
+                data-aos="fade-up"
+              >
                 Everything you need.
                 <br />
                 <span className="bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
                   Nothing you don&apos;t.
                 </span>
               </h2>
-              <p className="max-w-[900px] text-white/60 text-lg leading-relaxed mt-4">
-                Financial management and visibility in one place. Experience a flexible toolkit that makes every task
+              <p
+                className="max-w-[900px] text-white/60 text-lg leading-relaxed mt-4"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                Financial management and time tracking in one place. Experience a flexible toolkit that makes every task
                 feel like a breeze, designed with your needs in mind.
               </p>
             </div>
 
             <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 lg:grid-cols-2 lg:gap-16">
               <div className="grid gap-8">
-                <div className="group relative">
+                <div
+                  className="group relative"
+                  data-aos="fade-right"
+                  data-aos-delay="100"
+                >
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
-                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 flex items-center justify-center border border-white/5">
                         <BarChart3 className="h-6 w-6 text-purple-400" />
@@ -551,25 +726,53 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-purple-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
-                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                <div
+                  className="group relative"
+                  data-aos="fade-right"
+                  data-aos-delay="100"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
-                        <DollarSign className="h-6 w-6 text-green-400" />
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 flex items-center justify-center border border-white/5">
+                        <NotebookIcon className="h-6 w-6 text-purple-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">Expense Tracking</h3>
+                      <h3 className="text-xl font-bold text-white">Expense Recording</h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Record and categorize expenses with ease. Add notes, attach receipts, and never lose track of
-                      where your money goes with our intelligent categorization system.
+                      Create and manage your expense for  a particular budget. Track your spending against your budget in
+                      real-time with visual indicators and alerts.
                     </p>
                   </div>
                 </div>
 
-                <div className="group relative">
+                <div
+                  className="group relative"
+                  data-aos="fade-right"
+                  data-aos-delay="200"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-purple-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
+                        <Clock className="h-6 w-6 text-green-400" />
+                      </div>
+                      <h3 className="text-xl font-bold text-white">Timesheet Tracking</h3>
+                    </div>
+                    <p className="text-white/60 pl-16">
+                      Log your hours with precision and ease. Track time by project, client, or task to maintain
+                      accurate records and improve your productivity.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  className="group relative"
+                  data-aos="fade-right"
+                  data-aos-delay="300"
+                >
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
-                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
+                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
                         <PieChart className="h-6 w-6 text-blue-400" />
@@ -577,30 +780,20 @@ export default function LandingPage() {
                       <h3 className="text-xl font-bold text-white">Insightful Analytics</h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Visualize your spending patterns with beautiful interactive charts and graphs. Gain insights to
-                      make better financial decisions with our comprehensive reporting tools.
+                      Visualize your spending patterns and time allocation with beautiful interactive charts and graphs.
+                      Gain insights to make better decisions with our comprehensive reporting tools.
                     </p>
                   </div>
                 </div>
 
-                <div className="group relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
-                  <div className="relative bg-[#151525] p-6 rounded-xl border border-white/10 shadow-[0_0_15px_rgba(0,0,0,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.3)] transition-all">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-white/5">
-                        <Calendar className="h-6 w-6 text-purple-400" />
-                      </div>
-                      <h3 className="text-xl font-bold text-white">Time Tracking</h3>
-                    </div>
-                    <p className="text-white/60 pl-16">
-                      Track time spent on different projects and categories. Connect time investments to financial
-                      outcomes for a complete picture of your productivity and ROI.
-                    </p>
-                  </div>
-                </div>
+
               </div>
 
-              <div className="flex items-center justify-center">
+              <div
+                className="flex items-center justify-center"
+                data-aos="fade-left"
+                data-aos-delay="200"
+              >
                 <div className="relative w-full max-w-md aspect-square">
                   {/* Glowing background effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 via-green-500/20 to-blue-500/20 rounded-3xl blur-3xl transform -rotate-6"></div>
@@ -611,7 +804,7 @@ export default function LandingPage() {
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold text-white flex items-center">
                         <Sparkles className="h-5 w-5 mr-2 text-purple-400" />
-                        Expense Analysis
+                        Weekly Report
                       </h3>
                       <span className="text-xs text-white/50 bg-white/5 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
                         July 2023
@@ -631,9 +824,9 @@ export default function LandingPage() {
                           <div className="absolute inset-[16px] rounded-full bg-[#151525] border border-white/5 flex items-center justify-center">
                             <div className="text-center">
                               <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400">
-                                $2,345
+                                32.5h
                               </span>
-                              <span className="text-xs text-white/50">Total Spent</span>
+                              <span className="text-xs text-white/50">Total Hours</span>
                             </div>
                           </div>
 
@@ -648,29 +841,29 @@ export default function LandingPage() {
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Housing</span>
-                          <span className="block text-xs text-white/50">$950 • 40%</span>
+                          <span className="text-xs font-medium text-white">Development</span>
+                          <span className="block text-xs text-white/50">15.5h • 48%</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Food</span>
-                          <span className="block text-xs text-white/50">$450 • 19%</span>
+                          <span className="text-xs font-medium text-white">Marketing</span>
+                          <span className="block text-xs text-white/50">8.0h • 25%</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Transport</span>
-                          <span className="block text-xs text-white/50">$350 • 15%</span>
+                          <span className="text-xs font-medium text-white">Meetings</span>
+                          <span className="block text-xs text-white/50">6.0h • 18%</span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
                         <div>
                           <span className="text-xs font-medium text-white">Other</span>
-                          <span className="block text-xs text-white/50">$595 • 26%</span>
+                          <span className="block text-xs text-white/50">3.0h • 9%</span>
                         </div>
                       </div>
                     </div>
@@ -681,61 +874,116 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* CTA Section */}
-        <section className="py-24 relative overflow-hidden isolate">
-          {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/80 to-[#151525]"></div>
-
-          {/* Animated Gradient Overlay */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(168,85,247,0.2)_0%,rgba(0,0,0,0)_60%)]"></div>
-
-          {/* Geometric Decorations */}
-          <div className="absolute w-96 h-96 -top-20 -right-20 bg-purple-500/20 rounded-full blur-3xl animate-slow-pulse"></div>
-          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/20 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
-
-          {/* Floating Elements */}
-          <div className="absolute top-1/4 left-10 w-12 h-12 bg-white/5 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow"></div>
-          <div className="absolute bottom-1/4 right-10 w-20 h-20 bg-white/5 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower"></div>
+        <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
 
           <div className="container mx-auto px-4 relative">
-            <div className="flex flex-col items-center justify-center space-y-8 text-center max-w-3xl mx-auto">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-                Ready for smarter, more efficient budgeting?
+            <div className="text-center mb-16">
+              <h2
+                className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
+                data-aos="fade-up"
+              >
+                Maximize Your Productivity
               </h2>
-              <p className="text-white/70 text-xl max-w-2xl">
-                Try BudgetPro today and transform your relationship with money. It&apos;s free to get started, and we&apos;re
-                confident you&apos;ll love the results.
+              <p
+                className="max-w-2xl mx-auto text-white/60 text-lg"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                Managing your budget, expense and time shouldn&apos;t be complicated. See how Greenor simplifies your workflow.
               </p>
-              <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
-                <button className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:shadow-[0_0_30px_rgba(168,85,247,0.7)] transition-all duration-500 hover:-translate-y-1 flex-1">
-                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
-                  <span className="relative z-10 flex items-center justify-center">
-                    Get Started
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                </button>
-                <button className="relative overflow-hidden bg-transparent hover:bg-white/5 text-white border border-white/20 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 backdrop-blur-sm flex-1">
-                  <span className="relative z-10">Schedule Demo</span>
-                  <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-white/5"></div>
-                </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div
+                className="relative bg-[#151525] p-8 rounded-2xl border border-white/10 shadow-xl"
+                data-aos="fade-right"
+                data-aos-delay="200"
+              >
+                <h3 className="text-2xl font-bold mb-6 text-white">Old Way</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
+                      <X className="h-3 w-3 text-red-400" />
+                    </div>
+                    <span className="text-white/70">Connect up to 8 different software tools</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
+                      <X className="h-3 w-3 text-red-400" />
+                    </div>
+                    <span className="text-white/70">Manually track time in one system and expenses in another</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
+                      <X className="h-3 w-3 text-red-400" />
+                    </div>
+                    <span className="text-white/70">Waste hours reconciling data between systems</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
+                      <X className="h-3 w-3 text-red-400" />
+                    </div>
+                    <span className="text-white/70">Pay for multiple subscriptions</span>
+                  </li>
+                </ul>
               </div>
-              <div className="flex items-center gap-4 mt-6">
-                <div className="flex -space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-purple-500/70 border-2 border-[#151525]"></div>
-                  <div className="w-8 h-8 rounded-full bg-green-500/70 border-2 border-[#151525]"></div>
-                  <div className="w-8 h-8 rounded-full bg-blue-500/70 border-2 border-[#151525]"></div>
-                  <div className="w-8 h-8 rounded-full bg-white/10 border-2 border-[#151525] flex items-center justify-center">
-                    <span className="text-xs font-medium text-white/80">+</span>
-                  </div>
-                </div>
-                <span className="text-sm text-white/60">Join 10,000+ users already saving money</span>
+
+              <div
+                className="relative bg-[#151525] p-8 rounded-2xl border border-white/10 shadow-xl"
+                data-aos="fade-left"
+                data-aos-delay="300"
+              >
+                <h3 className="text-2xl font-bold mb-6 text-white">Greenor Way</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Use 1 platform for all your budget and time tracking needs</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Seamlessly connect time entries with expenses</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Get unified reports and insights across all your data</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="h-3 w-3 text-green-400" />
+                    </div>
+                    <span className="text-white/70">Save money with a single subscription</span>
+                  </li>
+                </ul>
               </div>
+            </div>
+
+            <div className="flex justify-center mt-12">
+              <button
+                className="group relative overflow-hidden bg-gradient-to-r from-purple-600 to-green-500 hover:from-purple-700 hover:to-green-600 text-white rounded-full px-10 py-4 font-medium text-base shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
+                <span className="relative z-10 flex items-center">
+                  Start Free Trial
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </button>
             </div>
           </div>
         </section>
+
       </main>
 
-     <footer className="border-t border-white/5 bg-[#0a0a16]">
+      <footer className="border-t border-white/5 bg-[#0a0a16]">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col justify-between md:flex-row gap-10">
 
@@ -802,11 +1050,11 @@ export default function LandingPage() {
                     Pricing
                   </Link>
                 </li>
-          
+
               </ul>
             </div>
 
-        
+
           </div>
         </div>
         <div className="border-t border-white/5 py-8">
@@ -825,7 +1073,7 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </footer> 
+      </footer>
     </div>
   )
 }

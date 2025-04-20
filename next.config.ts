@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "ui-avatars.com",
+       
+      },
+      {
+        protocol: "https",
+        hostname: "placehold.co",
+       
       },
     ],
     dangerouslyAllowSVG: true, // Allow SVG images
