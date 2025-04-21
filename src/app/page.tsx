@@ -1,178 +1,372 @@
 "use client"
-import Link from "next/link"
-import { ArrowRight, DollarSign, Sparkles, Menu, X } from "lucide-react"
 import { useState } from "react"
-// import {  BarChart3, Calendar, PieChart } from "lucide-react"
-// import { button } from "@/components/ui/button"
+import Link from "next/link"
+import {
+  ArrowRight,
+  BarChart3,
+  ChevronRight,
+  DollarSign,
+  PieChart,
+  Sparkles,
+  Clock,
+  CreditCard,
+  Target,
+  X,
+  Menu,
+  ClipboardList,
+  BarChart2,
+  PieChartIcon as PieChart2,
+  Wallet,
+  FileText,
+  CheckCircle2,
+  NotebookIcon,
+} from "lucide-react"
+import Image from "next/image"
+
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
-    <div className="flex flex-col min-h-screen  bg-linear-to-br from-white to-emerald-500">
-      <header className="sticky top-0 z-50 ">
-        <div className="container flex h-16 items-center justify-between px-4 md:px-6">
+    <div className="flex flex-col min-h-screen text-gray-800 overflow-hidden bg-white">
+      <header className="backdrop-blur-xl sticky top-0 z-50 border-b border-gray-200/50">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.05)_0%,rgba(255,255,255,0)_60%)]"></div>
+        <div className="container mx-auto px-4 flex h-20 items-center justify-between">
           <div className="flex items-center gap-2">
-            <DollarSign className="h-6 w-6 text-emerald-600" />
-            <span className="text-xl font-bold">Greenor</span>
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
+              <DollarSign className="h-6 w-6 text-white z-10" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+              Greenor
+            </span>
           </div>
+          <nav className="hidden md:flex gap-8 items-center justify-center">
+            <Link
+              href="/"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative group"
+            >
+              Home
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
 
-          <nav className="hidden md:flex gap-6">
-            <Link href="/" className="text-sm font-medium hover:text-emerald-600 transition-colors">Home</Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-emerald-600 transition-colors">Pricing</Link>
+            <Link
+              href="/pricing"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative group"
+            >
+              Pricing
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            </Link>
           </nav>
-
-          <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium hover:text-emerald-600 transition-colors">Log in</Link>
-            <button className="bg-emerald-600 hover:bg-emerald-700 p-2 px-4 rounded-full text-white">Join Waitlist</button>
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300"
+            >
+              Log in
+            </Link>
+            <button className="relative overflow-hidden group bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md">
+              <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
+              <span className="font-medium flex items-center">
+                Join Waitlist
+                <svg
+                  className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </span>
+            </button>
           </div>
-
-          {/* Mobile menu toggle */}
-          <button className="md:hidden text-black" onClick={() => setMenuOpen(!menuOpen)}>
+          <button className="md:hidden text-gray-800" onClick={() => setMenuOpen(!menuOpen)}>
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
-
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden bg-white shadow-lg px-4 py-4 flex flex-col gap-4">
-            <Link href="/" className="text-sm font-medium hover:text-emerald-600 transition-colors">Home</Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-emerald-600 transition-colors">Pricing</Link>
-            <Link href="/login" className="text-sm font-medium hover:text-emerald-600 transition-colors">Log in</Link>
-            <button className="bg-emerald-600 hover:bg-emerald-700 p-2 px-4 rounded-full text-white w-full">Join Waitlist</button>
+            <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              Home
+            </Link>
+            <Link href="/pricing" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              Pricing
+            </Link>
+            <Link href="/login" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              Log in
+            </Link>
+            <button className="bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 p-2 px-4 rounded-full text-white w-full">
+              Join Waitlist
+            </button>
           </div>
         )}
       </header>
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="py-20 md:py-32 relative overflow-hidden bg-linear-to-br from-white to-emerald-500">
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-[10%] -ight-[10%] w-[40%] h-[40%] rounded-full bg-emerald-100/40 blur-3xl"></div>
-            <div className="absolute bottom-[10%] left-[10%] w-[40%] h-[40%] rounded-full bg-emerald-100/40 blur-3xl"></div>
+        <section className="relative py-24 md:py-32 overflow-hidden">
+          {/* Animated Gradient Overlay */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.08)_0%,rgba(255,255,255,0)_60%)]"></div>
+
+          {/* Floating Finance Elements */}
+          <div className="absolute w-12 h-12 top-1/4 left-10 text-green-400/30 animate-float-slow">
+            <BarChart2 className="w-9 lg:w-14" />
+          </div>
+          <div className="absolute w-16 h-16 top-1/3 right-20 text-green-400/30 animate-float">
+            <PieChart2 className="w-9 lg:w-14" />
+          </div>
+          <div className="absolute w-10 h-10 bottom-1/4 left-1/4 text-green-400/30 animate-float-slower">
+            <Wallet className="w-9 lg:w-14" />
+          </div>
+          <div className="absolute w-14 h-14 top-1/2 right-10 text-green-400/30 animate-float-slow">
+            <FileText className="w-9 lg:w-14" />
+          </div>
+          <div className="absolute w-12 h-12 bottom-1/3 right-1/3 text-green-400/30 animate-float">
+            <ClipboardList className="w-9 lg:w-14" />
           </div>
 
-          <div className="container px-4 md:px-6 relative"
-            data-aos="fade-up"
-            data-aos-offset="200"
-            data-aos-delay="50"
-            data-aos-duration="1000"
-            data-aos-easing="ease-in-out">
-            <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-12 md:mb-20">
-              <div className="inline-flex justify-center gap-2 items-center rounded-lg bg-emerald-100 px-3 py-1 text-sm text-emerald-700 mb-6 animate-fade-in">
-                <Sparkles className="w-4" /> Modern Budget Management
+          {/* Glowing lines */}
+          <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-600/20 to-transparent"></div>
+          <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-400/20 to-transparent"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16 md:mb-24">
+              <div
+                className="inline-flex items-center backdrop-blur-md bg-white/80 rounded-full px-4 py-2 text-gray-800 mb-8 shadow-sm border border-gray-200/50"
+                data-aos="fade-down"
+              >
+                <Sparkles className="h-4 w-4 mr-2 text-green-500" />
+                <span className="text-sm font-medium">Budget & Timesheet Management</span>
               </div>
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none text-emerald-950 mb-6 animate-slide-up"
-               data-aos="fade-up"
-               data-aos-delay="100"
-               data-aos-duration="1000">
-                Unleash the power of <br />
-                <span className="text-emerald-600">intuitive budgeting</span>
+
+              <h1
+                className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-8 leading-tight"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                <span className="relative">
+                  <span className="relative z-10">All your work tools</span>
+                </span>
+                <br />
+                <span className="relative mt-2 inline-block">
+                  <span className="bg-gradient-to-r from-green-600 via-green-500 to-emerald-500 bg-clip-text text-transparent drop-shadow-sm">
+                    in one place
+                  </span>
+                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-green-600/10 rounded-full blur-xl z-0"></span>
+                </span>
               </h1>
-              <p className="text-gray-600 md:text-xl max-w-[800px] mb-8 animate-slide-up-delayed"
-               data-aos="fade-up"
-               data-aos-delay="200"
-               data-aos-duration="1000">
-                Say goodbye to outdated financial tools. Take control of your finances with a modern, intuitive budget
-                and expense tracking solution designed for today&apos;s needs.
+
+              <p
+                className="text-gray-600 text-xl max-w-[900px] mb-10 leading-relaxed"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                Combine budget management, timesheet tracking, and more in a single powerful platform. Streamline your
+                workflow and boost productivity with our all-in-one solution.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 animate-slide-up-more-delayed"
-               data-aos="fade-up"
-               data-aos-delay="300"
-               data-aos-duration="1000">
-                <button className="bg-emerald-600 flex h-max text-white p-2 px-4 rounded-full text-base font-semibold hover:scale-110 transition-all duration-300">
-                  Join Waitlist
-                  <ArrowRight className="ml-2  w-4" />
+
+              <div className="flex flex-col sm:flex-row gap-6" data-aos="fade-up" data-aos-delay="300">
+                <button className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1">
+                  <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
+                  <span className="relative z-10 flex items-center">
+                    Join Waitlist
+                    <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
                 </button>
-                <button
-                  className="rounded-full p-2 px-4 h-max font-medium text-base border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-all duration-300"
-                >
-                  Learn more
+                <button className="relative overflow-hidden bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 shadow-sm">
+                  <span className="relative z-10">Learn more</span>
+                  <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-gray-100/50"></div>
                 </button>
               </div>
             </div>
 
             {/* Dashboard Preview */}
-            <div className="relative max-w-5xl mx-auto animate-float">
-              <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/5 to-emerald-500/20 rounded-2xl transform rotate-1 scale-[1.03] blur-sm"></div>
-              <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-emerald-100">
-                <div className="bg-gradient-to-r from-emerald-600 to-teal-500 h-2"></div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center mb-8">
-                    <div className="flex items-center gap-2">
-                      <DollarSign className="h-6 w-6 text-emerald-600" />
-                      <h3 className="font-semibold text-emerald-950">Monthly Budget Overview</h3>
+            <div className="relative max-w-6xl mx-auto" data-aos="zoom-in" data-aos-delay="400">
+              {/* Shadow and Glow Effects */}
+              <div className="absolute inset-0 bg-gradient-to-b from-green-600/5 to-green-400/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-green-600/10 to-green-400/10 rounded-3xl opacity-70 blur-xl"></div>
+
+              {/* Main Dashboard Container */}
+              <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+                <div className="bg-gradient-to-r from-green-600 to-green-500 h-1"></div>
+                <div className="p-8">
+                  {/* Dashboard Header */}
+                  <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 w-full">
+                    <div className="flex items-center gap-3 mb-4 md:mb-0">
+                      <div className="relative w-10 h-10 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
+                        <DollarSign className="h-5 w-5 text-white z-10" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900 text-lg">Financial Dashboard</h3>
+                        <p className="text-sm text-gray-500">Budget & Timesheet Overview</p>
+                      </div>
                     </div>
-                    <span className="text-sm text-gray-500">March 2024</span>
+                    <div className="flex items-center gap-3">
+                      <div className="bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
+                        <span className="text-sm font-medium text-gray-700 flex items-center">
+                          <Clock className="w-3.5 h-3.5 mr-1.5 text-green-500" />
+                          July 2023
+                        </span>
+                      </div>
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-600/10 to-green-400/10 flex items-center justify-center border border-gray-200">
+                        <span className="text-sm font-medium text-gray-700">JD</span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-aos-duration="1000">
-                    <div className="bg-emerald-50 p-5 rounded-lg border border-emerald-100" data-aos="zoom-in" data-aos-delay="150">
-                      <p className="text-sm text-gray-500 mb-1">Total Budget</p>
-                      <p className="text-2xl font-bold text-emerald-700">$4,500.00</p>
+                  {/* Budget Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="100"
+                    >
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+                          <CreditCard className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-gray-500">Total Budget</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-600 group-hover:to-green-500">
+                          $4,500.00
+                        </p>
+                        <span className="text-green-600 text-sm font-medium pb-1">+5% from last month</span>
+                      </div>
                     </div>
-                    <div className="bg-emerald-50 p-5 rounded-lg border border-emerald-100" data-aos="zoom-in" data-aos-delay="250">
-                      <p className="text-sm text-gray-500 mb-1">Spent</p>
-                      <p className="text-2xl font-bold text-emerald-700">$2,345.67</p>
+
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="200"
+                    >
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+                          <DollarSign className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-gray-500">Spent</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-500 group-hover:to-emerald-600">
+                          $2,345.67
+                        </p>
+                        <span className="text-green-600 text-sm font-medium pb-1">52% of budget</span>
+                      </div>
                     </div>
-                    <div className="bg-emerald-50 p-5 rounded-lg border border-emerald-100" data-aos="zoom-in" data-aos-delay="350">
-                      <p className="text-sm text-gray-500 mb-1">Remaining</p>
-                      <p className="text-2xl font-bold text-emerald-700">$2,154.33</p>
+
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all group"
+                      data-aos="fade-up"
+                      data-aos-delay="300"
+                    >
+                      <div className="flex items-center gap-4 mb-3">
+                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600">
+                          <Clock className="h-5 w-5" />
+                        </div>
+                        <p className="text-sm text-gray-500">Hours Tracked</p>
+                      </div>
+                      <div className="flex items-end gap-2">
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-500 group-hover:to-green-600">
+                          128.5
+                        </p>
+                        <span className="text-green-600 text-sm font-medium pb-1">This month</span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="mb-4"  
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-aos-duration="1000">
+                  {/* Progress Bar */}
+                  <div className="mb-10" data-aos="fade-up" data-aos-delay="400">
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="font-medium">Budget Usage</span>
-                      <span className="text-emerald-700 font-medium">52%</span>
+                      <span className="font-medium flex items-center text-gray-700">
+                        <Target className="h-4 w-4 mr-2 text-green-600" />
+                        Budget Usage
+                      </span>
+                      <span className="text-green-600 font-medium">52%</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full">
-                      <div className="h-2 bg-emerald-500 rounded-full w-[52%]"></div>
+                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200">
+                      <div className="h-3 bg-gradient-to-r from-green-600 to-green-500 rounded-full w-[52%] relative">
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_60%)]"></div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6"  
-                    data-aos="fade-up"
-                    data-aos-delay="100"
-                    data-aos-duration="1000">
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                      <h4 className="text-sm font-medium mb-3">Expense Categories</h4>
-                      <div className="flex items-center justify-center h-32">
-                        <div className="w-24 h-24 rounded-full border-[6px] border-emerald-500 relative">
-                          <div className="absolute inset-0 border-[6px] border-transparent border-t-teal-400 rounded-full transform rotate-45"></div>
-                          <div className="absolute inset-0 border-[6px] border-transparent border-r-blue-400 rounded-full transform rotate-45"></div>
+                  {/* Charts and Recent Transactions */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                      data-aos="fade-up"
+                      data-aos-delay="500"
+                    >
+                      <h4 className="text-sm font-medium mb-4 flex items-center text-gray-700">
+                        <PieChart className="h-4 w-4 mr-2 text-green-600" />
+                        Expense Categories
+                      </h4>
+                      <div className="flex items-center justify-center h-48 relative">
+                        {/* Stylized donut chart */}
+                        <div className="w-32 h-32 rounded-full border-[12px] border-green-500/70 relative">
+                          <div className="absolute inset-0 border-[12px] border-transparent border-t-emerald-500/70 rounded-full transform rotate-45"></div>
+                          <div className="absolute inset-0 border-[12px] border-transparent border-r-teal-500/70 rounded-full transform rotate-45"></div>
+                          <div className="absolute inset-0 border-[4px] border-white rounded-full transform scale-90"></div>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-xl font-bold text-gray-900">52%</span>
+                          </div>
                         </div>
+
+                        {/* Blurred glow effects */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-green-500/10 rounded-full blur-xl"></div>
+                        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-green-500/10 rounded-full blur-lg"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                       </div>
                     </div>
-                    <div className="bg-gray-50 rounded-lg p-4 border border-gray-100" data-aos="fade-up">
-                      <h4 className="text-sm font-medium mb-3">Recent Transactions</h4>
-                      <div className="space-y-3"  data-aos="fade-up" data-aos-delay="100">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
-                            <span className="text-sm">Grocery Shopping</span>
+
+                    <div
+                      className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-200 shadow-sm hover:shadow-md transition-all"
+                      data-aos="fade-up"
+                      data-aos-delay="600"
+                    >
+                      <h4 className="text-sm font-medium mb-4 flex items-center text-gray-700">
+                        <Clock className="h-4 w-4 mr-2 text-green-600" />
+                        Recent Timesheets
+                      </h4>
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                              <span className="text-xs font-medium">WD</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900">Web Development</span>
+                              <p className="text-xs text-gray-500">Today, 10:30 AM - 2:45 PM</p>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">$85.32</span>
+                          <span className="text-sm font-bold text-gray-900">4.25h</span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-teal-400 rounded-full"></div>
-                            <span className="text-sm">Internet Bill</span>
+
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                              <span className="text-xs font-medium">MT</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900">Marketing Tasks</span>
+                              <p className="text-xs text-gray-500">Yesterday, 9:15 AM - 11:30 AM</p>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">$59.99</span>
+                          <span className="text-sm font-bold text-gray-900">2.25h</span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                            <span className="text-sm">Coffee Shop</span>
+
+                        <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                              <span className="text-xs font-medium">RM</span>
+                            </div>
+                            <div>
+                              <span className="text-sm font-medium text-gray-900">Research Meeting</span>
+                              <p className="text-xs text-gray-500">Jul 24, 1:00 PM - 2:30 PM</p>
+                            </div>
                           </div>
-                          <span className="text-sm font-medium">$4.75</span>
+                          <span className="text-sm font-bold text-gray-900">1.5h</span>
                         </div>
                       </div>
                     </div>
@@ -183,96 +377,362 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* How It Works Section */}
+        <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent"></div>
+          <div className="absolute top-20 right-10 w-72 h-72 bg-green-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-72 h-72 bg-green-500/5 rounded-full blur-3xl"></div>
 
-        {/* <section className="w-full py-12 md:py-24 lg:py-32 bg-gray-50">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <div className="inline-block rounded-lg bg-emerald-100 px-3 py-1 text-sm text-emerald-700">
-                  Features
+          <div className="container mx-auto px-4 relative">
+            <div className="text-center mb-20">
+              <div
+                className="inline-flex items-center justify-center bg-white backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-gray-200"
+                data-aos="fade-down"
+              >
+                <span className="text-sm font-medium text-gray-700">How It Works</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 tracking-tight" data-aos="fade-up">
+                Simplify your workflow
+              </h2>
+              <p
+                className="max-w-2xl mx-auto text-gray-600 text-lg leading-relaxed"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                Greenor combines budget management and timesheet tracking in one intuitive platform, making it easier to
+                manage your finances and time.
+              </p>
+            </div>
+
+            {/* Feature 1: Create Budget */}
+            <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
+              <div className="order-2 lg:order-1" data-aos="fade-right" data-aos-delay="100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-green-500 rounded-2xl flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-xl">1</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900">Create Budget</h3>
                 </div>
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-emerald-950">
-                  Everything you need.
-                  <br />
-                  Nothing you don't.
-                </h2>
-                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Financial management and visibility in one place. Experience a flexible toolkit that makes every task
-                  feel like a breeze.
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  Set up your budget categories and allocate funds based on your financial goals and income. Our
+                  intuitive interface makes this process quick and painless.
                 </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Create multiple budget categories</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Set monthly or annual budget limits</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Track progress with visual indicators</span>
+                  </li>
+                </ul>
+                <button className="text-green-600 font-medium flex items-center hover:text-green-700 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+              <div className="order-1 lg:order-2 relative" data-aos="fade-left" data-aos-delay="200">
+                <div className="absolute -inset-4 bg-gradient-to-r from-green-500/10 via-green-500/10 to-green-500/10 rounded-3xl blur-xl opacity-70"></div>
+                <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
+                  <Image
+                    src="https://placehold.co/600x400/ffffff/5a5a5a?text=Create+Budget"
+                    alt="Create Budget Interface"
+                    className="rounded-xl w-full h-auto"
+                    width={0}
+                    height={0}
+                  />
+                </div>
               </div>
             </div>
-            <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-2 lg:gap-12">
-              <div className="grid gap-6">
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5 text-emerald-600" />
-                    <h3 className="text-xl font-bold">Budget Management</h3>
-                  </div>
-                  <p className="text-gray-500">
-                    Create and manage budgets for different time periods. Track your spending against your budget in
-                    real-time.
-                  </p>
-                </div>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-5 w-5 text-emerald-600" />
-                    <h3 className="text-xl font-bold">Expense Tracking</h3>
-                  </div>
-                  <p className="text-gray-500">
-                    Record and categorize expenses with ease. Add notes, attach receipts, and never lose track of where
-                    your money goes.
-                  </p>
-                </div>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <PieChart className="h-5 w-5 text-emerald-600" />
-                    <h3 className="text-xl font-bold">Insightful Analytics</h3>
-                  </div>
-                  <p className="text-gray-500">
-                    Visualize your spending patterns with beautiful charts and graphs. Gain insights to make better
-                    financial decisions.
-                  </p>
-                </div>
-                <div className="grid gap-1">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-emerald-600" />
-                    <h3 className="text-xl font-bold">Time Tracking</h3>
-                  </div>
-                  <p className="text-gray-500">
-                    Track time spent on different projects and categories. Connect time investments to financial
-                    outcomes.
-                  </p>
+
+            {/* Feature 2: Add Expenses */}
+            <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
+              <div className="order-2" data-aos="fade-left" data-aos-delay="100">
+                <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-green-500/10 via-green-500/10 to-green-500/10 rounded-3xl blur-xl opacity-70"></div>
+                  <Image
+                    src="https://placehold.co/600x400/ffffff/5a5a5a?text=Add+Expenses"
+                    alt="Add Expenses Interface"
+                    className="rounded-xl w-full h-auto relative"
+                    width={0}
+                    height={0}
+                  />
                 </div>
               </div>
-              <div className="flex items-center justify-center">
-                <div className="relative w-full aspect-square overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50 to-teal-100 p-2">
-                  <div className="absolute inset-0 bg-white/40 backdrop-blur-sm rounded-lg">
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4/5">
-                      <div className="bg-white rounded-lg shadow-xl p-4">
-                        <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-semibold text-emerald-800">Expense Distribution</h3>
-                          <span className="text-xs text-gray-500">July 2023</span>
+              <div className="order-1" data-aos="fade-right" data-aos-delay="200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-xl">2</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900">Add Expenses</h3>
+                </div>
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  Easily record and categorize your expenses as they happen. Attach receipts, add notes, and keep
+                  everything organized in one place for easy reference.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Quick expense entry with smart categorization</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Upload receipt photos directly from your phone</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Automatic budget updates and alerts</span>
+                  </li>
+                </ul>
+                <button className="text-green-600 font-medium flex items-center hover:text-green-700 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+
+            {/* Feature 3: Record Timesheets */}
+            <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div className="order-2 lg:order-1" data-aos="fade-right" data-aos-delay="100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl flex items-center justify-center shadow-md">
+                    <span className="text-white font-bold text-xl">3</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-900">Record Timesheets</h3>
+                </div>
+                <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+                  Track your working hours with precision and ease. Log time by project, client, or task to maintain
+                  accurate records and improve your productivity.
+                </p>
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Simple time tracking with start/stop functionality</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Categorize time entries by project or client</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Generate detailed time reports for billing</span>
+                  </li>
+                </ul>
+                <button className="text-green-600 font-medium flex items-center hover:text-green-700 transition-colors">
+                  Learn more
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+              <div className="order-1 lg:order-2 relative" data-aos="fade-left" data-aos-delay="200">
+                <div className="absolute -inset-4 bg-gradient-to-r from-green-500/10 via-emerald-500/10 to-green-500/10 rounded-3xl blur-xl opacity-70"></div>
+                <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
+                  <Image
+                    src="https://placehold.co/600x400/ffffff/5a5a5a?text=Record+Timesheets"
+                    alt="Timesheet Recording Interface"
+                    className="rounded-xl w-full h-auto"
+                    width={0}
+                    height={0}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="w-full py-24 bg-white relative overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-green-500/5 rounded-full"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/5 rounded-full"></div>
+
+          <div className="container mx-auto px-4 relative">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-20">
+              <div
+                className="inline-flex items-center justify-center bg-gray-50 backdrop-blur-md rounded-full px-4 py-1.5 mb-2 border border-gray-200"
+                data-aos="fade-down"
+              >
+                <span className="text-sm font-medium text-gray-700">Premium Features</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900" data-aos="fade-up">
+                Everything you need.
+                <br />
+                <span className="bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+                  Nothing you don&apos;t.
+                </span>
+              </h2>
+              <p
+                className="max-w-[900px] text-gray-600 text-lg leading-relaxed mt-4"
+                data-aos="fade-up"
+                data-aos-delay="100"
+              >
+                Financial management and time tracking in one place. Experience a flexible toolkit that makes every task
+                feel like a breeze, designed with your needs in mind.
+              </p>
+            </div>
+
+            <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 lg:grid-cols-2 lg:gap-16">
+              <div className="grid gap-8">
+                <div className="group relative" data-aos="fade-right" data-aos-delay="100">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-100 flex items-center justify-center border border-gray-200">
+                        <BarChart3 className="h-6 w-6 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">Budget Management</h3>
+                    </div>
+                    <p className="text-gray-600 pl-16">
+                      Create and manage budgets for different time periods. Track your spending against your budget in
+                      real-time with visual indicators and alerts.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="group relative" data-aos="fade-right" data-aos-delay="100">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-100 flex items-center justify-center border border-gray-200">
+                        <NotebookIcon className="h-6 w-6 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">Expense Recording</h3>
+                    </div>
+                    <p className="text-gray-600 pl-16">
+                      Create and manage your expense for a particular budget. Track your spending against your budget in
+                      real-time with visual indicators and alerts.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="group relative" data-aos="fade-right" data-aos-delay="200">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-100 flex items-center justify-center border border-gray-200">
+                        <Clock className="h-6 w-6 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">Timesheet Tracking</h3>
+                    </div>
+                    <p className="text-gray-600 pl-16">
+                      Log your hours with precision and ease. Track time by project, client, or task to maintain
+                      accurate records and improve your productivity.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="group relative" data-aos="fade-right" data-aos-delay="300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-green-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+                  <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-100 to-green-100 flex items-center justify-center border border-gray-200">
+                        <PieChart className="h-6 w-6 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900">Insightful Analytics</h3>
+                    </div>
+                    <p className="text-gray-600 pl-16">
+                      Visualize your spending patterns and time allocation with beautiful interactive charts and graphs.
+                      Gain insights to make better decisions with our comprehensive reporting tools.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center" data-aos="fade-left" data-aos-delay="200">
+                <div className="relative w-full max-w-md aspect-square">
+                  {/* Glowing background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-green-500/10 via-green-500/10 to-emerald-500/10 rounded-3xl blur-3xl transform -rotate-6"></div>
+
+                  {/* Main feature showcase */}
+                  <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
+                    {/* Header with title and date */}
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-gray-900 flex items-center">
+                        <Sparkles className="h-5 w-5 mr-2 text-green-600" />
+                        Weekly Report
+                      </h3>
+                      <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full border border-gray-200">
+                        July 2023
+                      </span>
+                    </div>
+
+                    {/* Chart visualization */}
+                    <div className="aspect-square bg-gradient-to-br from-gray-50 to-white rounded-xl flex items-center justify-center border border-gray-200 shadow-inner p-4 mb-6">
+                      <div className="relative">
+                        {/* Stylized donut chart with glow effects */}
+                        <div className="w-40 h-40 rounded-full relative">
+                          <div className="absolute inset-0 rounded-full border-[16px] border-green-500/70 opacity-80"></div>
+                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-t-emerald-500/70 opacity-80"></div>
+                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-l-teal-500/70 opacity-80"></div>
+
+                          {/* Inner circle */}
+                          <div className="absolute inset-[16px] rounded-full bg-white border border-gray-200 flex items-center justify-center">
+                            <div className="text-center">
+                              <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-green-500">
+                                32.5h
+                              </span>
+                              <span className="text-xs text-gray-500">Total Hours</span>
+                            </div>
+                          </div>
+
+                          {/* Glow effects */}
+                          <div className="absolute -inset-4 bg-green-500/5 rounded-full blur-xl"></div>
                         </div>
-                        <div className="aspect-square bg-white rounded-lg flex items-center justify-center">
-                          <div className="w-32 h-32 rounded-full border-8 border-emerald-500 relative">
-                            <div className="absolute inset-0 border-8 border-transparent border-t-teal-400 rounded-full transform rotate-45"></div>
-                            <div className="absolute inset-0 border-8 border-transparent border-r-blue-400 rounded-full transform rotate-45"></div>
-                          </div>
+                      </div>
+                    </div>
+
+                    {/* Category legend */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-900">Development</span>
+                          <span className="block text-xs text-gray-500">15.5h • 48%</span>
                         </div>
-                        <div className="grid grid-cols-3 gap-2 mt-4">
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-                            <span className="text-xs">Housing</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-teal-400 rounded-full"></div>
-                            <span className="text-xs">Food</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                            <span className="text-xs">Transport</span>
-                          </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-900">Marketing</span>
+                          <span className="block text-xs text-gray-500">8.0h • 25%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-900">Meetings</span>
+                          <span className="block text-xs text-gray-500">6.0h • 18%</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                        <div>
+                          <span className="text-xs font-medium text-gray-900">Other</span>
+                          <span className="block text-xs text-gray-500">3.0h • 9%</span>
                         </div>
                       </div>
                     </div>
@@ -283,144 +743,197 @@ export default function LandingPage() {
           </div>
         </section>
 
+        {/* Old Way vs New Way Section */}
+        <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/20 to-transparent"></div>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-emerald-900 text-white">
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Ready for smarter, more efficient budgeting?
-                </h2>
-                <p className="mx-auto max-w-[700px] text-emerald-100 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Try Greenor  today. It's free to Join Waitlist.
-                </p>
+          <div className="container mx-auto px-4 relative">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 tracking-tight" data-aos="fade-up">
+                Maximize Your Productivity
+              </h2>
+              <p className="max-w-2xl mx-auto text-gray-600 text-lg" data-aos="fade-up" data-aos-delay="100">
+                Managing your budget, expense and time shouldn&apos;t be complicated. See how Greenor simplifies your
+                workflow.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div
+                className="relative bg-white p-8 rounded-2xl border border-gray-200 shadow-md"
+                data-aos="fade-right"
+                data-aos-delay="200"
+              >
+                <h3 className="text-2xl font-bold mb-6 text-gray-900">Old Way</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mt-0.5 border border-red-200">
+                      <X className="h-3 w-3 text-red-500" />
+                    </div>
+                    <span className="text-gray-700">Connect up to 8 different software tools</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mt-0.5 border border-red-200">
+                      <X className="h-3 w-3 text-red-500" />
+                    </div>
+                    <span className="text-gray-700">Manually track time in one system and expenses in another</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mt-0.5 border border-red-200">
+                      <X className="h-3 w-3 text-red-500" />
+                    </div>
+                    <span className="text-gray-700">Waste hours reconciling data between systems</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mt-0.5 border border-red-200">
+                      <X className="h-3 w-3 text-red-500" />
+                    </div>
+                    <span className="text-gray-700">Pay for multiple subscriptions</span>
+                  </li>
+                </ul>
               </div>
-              <div className="mx-auto w-full max-w-sm space-y-2">
-                <div className="flex flex-col gap-2 min-[400px]:flex-row justify-center">
-                  <button className="bg-white text-emerald-900 hover:bg-emerald-50">
-                    Join Waitlist
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </button>
-                  <button variant="outline" className="border-white text-white hover:bg-emerald-800">
-                    Learn more
-                  </button>
-                </div>
+
+              <div
+                className="relative bg-white p-8 rounded-2xl border border-gray-200 shadow-md"
+                data-aos="fade-left"
+                data-aos-delay="300"
+              >
+                <h3 className="text-2xl font-bold mb-6 text-gray-900">Greenor Way</h3>
+                <ul className="space-y-4">
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Use 1 platform for all your budget and time tracking needs</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Seamlessly connect time entries with expenses</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Get unified reports and insights across all your data</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-100 to-green-100 rounded-full flex items-center justify-center mt-0.5 border border-green-200">
+                      <CheckCircle2 className="h-3 w-3 text-green-600" />
+                    </div>
+                    <span className="text-gray-700">Save money with a single subscription</span>
+                  </li>
+                </ul>
               </div>
+            </div>
+
+            <div className="flex justify-center mt-12">
+              <button
+                className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-full px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1"
+                data-aos="fade-up"
+                data-aos-delay="400"
+              >
+                <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
+                <span className="relative z-10 flex items-center">
+                  Join Waitlist
+                  <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </button>
             </div>
           </div>
         </section>
-         */}
       </main>
 
-      {/* <footer className="border-t bg-white">
-        <div className="container flex flex-col gap-4 py-10 md:flex-row md:gap-8 md:py-12">
-          <div className="flex flex-col gap-2 md:gap-4 lg:flex-1">
-            <div className="flex items-center gap-2">
-              <DollarSign className="h-6 w-6 text-emerald-600" />
-              <span className="text-xl font-bold">Greenor </span>
+
+      <footer className="border-t border-gray-200 bg-white">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col justify-between md:flex-row gap-10">
+            <div className="col-span-2">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
+                  <DollarSign className="h-6 w-6 text-white z-10" />
+                </div>
+                <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
+                  Greenor
+                </span>
+              </div>
+              <p className="text-gray-500 mb-6 max-w-sm">
+                Modern budgeting and expense tracking for everyone. Take control of your finances with powerful,
+                intuitive tools designed for real people.
+              </p>
+              <div className="flex items-center gap-4">
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
+                >
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
+                >
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                </a>
+                <a
+                  href="#"
+                  className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
+                >
+                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fillRule="evenodd"
+                      d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                </a>
+              </div>
             </div>
-            <p className="text-sm text-gray-500">Modern budgeting and expense tracking for everyone.</p>
-          </div>
-          <div className="grid flex-1 grid-cols-2 gap-8 sm:grid-cols-4">
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Product</h3>
-              <ul className="space-y-2">
+
+            <div>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Quick links</h3>
+              <ul className="space-y-3">
                 <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Features
+                  <Link href="#" className="text-gray-500 hover:text-green-600 transition-colors">
+                    Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
+                  <Link href="/pricing" className="text-gray-500 hover:text-green-600 transition-colors">
                     Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    FAQ
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Company</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Blog
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Careers
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Legal</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Privacy
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Terms
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Cookie Policy
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Support</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Help Center
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#" className="text-sm text-gray-500 hover:text-emerald-600 transition-colors">
-                    Community
                   </Link>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        <div className="border-t py-6">
-          <div className="container flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-xs text-gray-500">© {new Date().getFullYear()} Greenor . All rights reserved.</p>
-            <div className="flex gap-4">
-              <Link href="#" className="text-xs text-gray-500 hover:text-emerald-600 transition-colors">
+        <div className="border-t border-gray-200 py-8">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-sm text-gray-500">© {new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <div className="flex gap-6">
+              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-xs text-gray-500 hover:text-emerald-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
                 Terms of Service
               </Link>
-              <Link href="#" className="text-xs text-gray-500 hover:text-emerald-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
                 Cookie Policy
               </Link>
             </div>
           </div>
         </div>
-      </footer> */}
+      </footer>
     </div>
   )
 }
