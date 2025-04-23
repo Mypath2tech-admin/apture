@@ -36,11 +36,14 @@ export default function SignIn() {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-8 transform transition-all duration-500 hover:shadow-2xl">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center">
-              <div className="bg-emerald-500 p-2 rounded-lg">
-                <DollarSign className="h-6 w-6 text-white" />
-              </div>
-              <span className="font-bold text-xl text-gray-800 ml-2">BudgetTime</span>
+            <div className="inline-flex items-center  gap-2 justify-center">
+            <div className="relative w-10 h-10 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
+              <DollarSign className="h-6 w-6 text-white z-10" />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+              Greenor
+            </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mt-4">Welcome back</h1>
             <p className="text-gray-600 mt-2">Sign in to your account</p>

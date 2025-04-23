@@ -1,0 +1,326 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  url  	    = env("DATABASE_URL")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enum for user roles
+enum UserRole {
+  ADMIN
+  USER
+  ORGANIZATION_ADMIN
+  ORGANIZATION_MEMBER
+}
+
+// Enum for invitation status
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
+
+// Main User model
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  username          String?
+  passwordHash      String
+  firstName         String?
+  lastName          String?
+  role              UserRole            @default(USER)
+  isActive          Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Profile information
+  profileImage      String?
+  phoneNumber       String?
+  
+  // For password reset functionality
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  
+  // Relations
+  organization      Organization?       @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  
+  // If user is an organization admin
+  ownedOrganization Organization?       @relation("OrganizationOwner")
+  
+  // User's budgets, expenses, and timesheets
+  budgets           Budget[]
+  expenses          Expense[]
+  timesheets        Timesheet[]
+  
+  // Invitations received
+  invitations       UserInvitation[]
+  
+  // Notifications
+  notifications     Notification[]
+  
+  // Audit logs for this user
+  auditLogs         AuditLog[]
+}
+
+// Organization model
+model Organization {
+  id                String              @id @default(cuid())
+  name              String
+  email             String?             @unique
+  description       String?
+  logo              String?
+  website           String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  isActive          Boolean             @default(true)
+  
+  // Relations
+  owner             User?               @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  ownerId           String?             @unique
+  
+  members           User[]
+  invitations       UserInvitation[]
+  
+  // Organization's budgets, expenses, and timesheets
+  budgets           Budget[]
+  expenses          Expense[]
+  timesheets        Timesheet[]
+  
+  // Billing information
+  subscription      Subscription?
+}
+
+// User invitation model
+model UserInvitation {
+  id                String              @id @default(cuid())
+  email             String
+  token             String              @unique
+  status            InvitationStatus    @default(PENDING)
+  role              UserRole            @default(ORGANIZATION_MEMBER)
+  expiresAt         DateTime
+  createdAt         DateTime            @default(now())
+  
+  // Relations
+  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String
+  
+  user              User?               @relation(fields: [userId], references: [id])
+  userId            String?
+}
+
+// Budget model
+model Budget {
+  id                String              @id @default(cuid())
+  name              String
+  description       String?
+  amount            Float
+  startDate         DateTime
+  endDate           DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User?               @relation(fields: [userId], references: [id])
+  userId            String?
+  
+  organization      Organization?       @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  
+  // Budget categories
+  categories        BudgetCategory[]
+  
+  // Expenses linked to this budget
+  expenses          Expense[]
+  
+  // Budget can be linked to a specific project
+  project           Project?            @relation(fields: [projectId], references: [id])
+  projectId         String?
+  
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// Budget category model
+model BudgetCategory {
+  id                String              @id @default(cuid())
+  name              String
+  description       String?
+  allocatedAmount   Float
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  budget            Budget              @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId          String
+  
+  // Expenses in this category
+  expenses          Expense[]
+  
+  @@index([budgetId])
+}
+
+// Expense model
+model Expense {
+  id                String              @id @default(cuid())
+  title             String
+  description       String?
+  amount            Float
+  date              DateTime
+  receiptUrl        String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User?               @relation(fields: [userId], references: [id])
+  userId            String?
+  
+  organization      Organization?       @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  
+  budget            Budget?             @relation(fields: [budgetId], references: [id])
+  budgetId          String?
+  
+  category          BudgetCategory?     @relation(fields: [categoryId], references: [id])
+  categoryId        String?
+  
+  // Expense can be linked to a timesheet entry
+  timesheetEntry    TimesheetEntry?     @relation(fields: [timesheetEntryId], references: [id])
+  timesheetEntryId  String?
+  
+  // Expense can be linked to a project
+  project           Project?            @relation(fields: [projectId], references: [id])
+  projectId         String?
+  
+  @@index([userId])
+  @@index([organizationId])
+  @@index([budgetId])
+  @@index([categoryId])
+}
+
+// Timesheet model
+model Timesheet {
+  id                String              @id @default(cuid())
+  name              String
+  description       String?
+  startDate         DateTime
+  endDate           DateTime?
+  status            String              @default("DRAFT") // DRAFT, SUBMITTED, APPROVED, REJECTED
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  user              User?               @relation(fields: [userId], references: [id])
+  userId            String?
+  
+  organization      Organization?       @relation(fields: [organizationId], references: [id])
+  organizationId    String?
+  
+  // Timesheet entries
+  entries           TimesheetEntry[]
+  
+  // Timesheet can be linked to a project
+  project           Project?            @relation(fields: [projectId], references: [id])
+  projectId         String?
+  
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// Timesheet entry model
+model TimesheetEntry {
+  id                String              @id @default(cuid())
+  description       String
+  startTime         DateTime
+  endTime           DateTime
+  duration          Float               // Duration in hours
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  timesheet         Timesheet           @relation(fields: [timesheetId], references: [id], onDelete: Cascade)
+  timesheetId       String
+  
+  // Related expenses
+  expenses          Expense[]
+  
+  @@index([timesheetId])
+}
+
+// Project model
+model Project {
+  id                String              @id @default(cuid())
+  name              String
+  description       String?
+  startDate         DateTime
+  endDate           DateTime?
+  status            String              @default("ACTIVE") // ACTIVE, COMPLETED, ON_HOLD, CANCELLED
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  budgets           Budget[]
+  expenses          Expense[]
+  timesheets        Timesheet[]
+}
+
+// Subscription model for organizations
+model Subscription {
+  id                String              @id @default(cuid())
+  plan              String              // FREE, PRO, BUSINESS
+  status            String              @default("ACTIVE") // ACTIVE, CANCELLED, PAST_DUE
+  startDate         DateTime            @default(now())
+  endDate           DateTime?
+  trialEndsAt       DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  
+  // Relations
+  organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organizationId    String              @unique
+}
+
+// Notification model
+model Notification {
+  id                String              @id @default(cuid())
+  title             String
+  message           String
+  isRead            Boolean             @default(false)
+  type              String              // INFO, WARNING, ERROR, SUCCESS
+  createdAt         DateTime            @default(now())
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId            String
+  
+  @@index([userId])
+}
+
+// Audit log for tracking important actions
+model AuditLog {
+  id                String              @id @default(cuid())
+  action            String              // CREATE, UPDATE, DELETE, LOGIN, etc.
+  entity            String              // User, Organization, Budget, etc.
+  entityId          String
+  details           String?             // JSON string with details
+  ipAddress         String?
+  userAgent         String?
+  createdAt         DateTime            @default(now())
+  
+  // Relations
+  user              User                @relation(fields: [userId], references: [id])
+  userId            String
+  
+  @@index([userId])
+  @@index([entity, entityId])
+}
