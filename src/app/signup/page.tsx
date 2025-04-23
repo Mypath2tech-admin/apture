@@ -2,27 +2,98 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { DollarSign, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { DollarSign, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { useAuthStore } from "@/lib/store/authStore"
 
 export default function SignUp() {
+  const router = useRouter()
+  const { register, isLoading, error, clearError, isAuthenticated } = useAuthStore()
+
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+  })
+  const [formErrors, setFormErrors] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
   })
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, router])
+
+  const validateForm = () => {
+    let valid = true
+    const errors = {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+    }
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = "First name is required"
+      valid = false
+    }
+
+    if (!formData.lastName.trim()) {
+      errors.lastName = "Last name is required"
+      valid = false
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = "Email is required"
+      valid = false
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid"
+      valid = false
+    }
+
+    if (!formData.password) {
+      errors.password = "Password is required"
+      valid = false
+    } else if (formData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters"
+      valid = false
+    }
+
+    setFormErrors(errors)
+    return valid
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error when user types
+    if (error) clearError()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission - would connect to authentication service
-    console.log("Form submitted:", formData)
+
+    if (!validateForm()) return
+
+    try {
+      await register(formData)
+      // Show success message and redirect to login
+      alert("Registration successful! Please check your email to verify your account.")
+      router.push("/signin")
+    } catch (err) {
+      // Error is handled by the store
+      console.error("Registration failed:", err)
+    }
   }
 
   return (
@@ -50,21 +121,47 @@ export default function SignUp() {
             <p className="text-gray-600 mt-2">Start managing your finances and time today</p>
           </div>
 
+          {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
+
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
-                placeholder="Enter your full name"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                  First Name
+                </label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  required
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border ${
+                    formErrors.firstName ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  placeholder="First name"
+                />
+                {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                  Last Name
+                </label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  required
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border ${
+                    formErrors.lastName ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  placeholder="Last name"
+                />
+                {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
+              </div>
             </div>
 
             <div>
@@ -78,9 +175,12 @@ export default function SignUp() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                className={`w-full px-4 py-2 border ${
+                  formErrors.email ? "border-red-500" : "border-gray-300"
+                } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                 placeholder="Enter your email"
               />
+              {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
             </div>
 
             <div>
@@ -95,7 +195,9 @@ export default function SignUp() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className={`w-full px-4 py-2 border ${
+                    formErrors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                   placeholder="Create a password"
                 />
                 <button
@@ -106,15 +208,27 @@ export default function SignUp() {
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+              {formErrors.password ? (
+                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+              )}
             </div>
 
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200"
+                disabled={isLoading}
+                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
               >
-                Create Account
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Creating Account...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </button>
             </div>
 
@@ -145,4 +259,3 @@ export default function SignUp() {
     </div>
   )
 }
-

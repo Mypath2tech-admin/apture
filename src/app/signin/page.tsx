@@ -2,26 +2,48 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { DollarSign, ArrowLeft, Eye, EyeOff } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { DollarSign, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { useAuthStore } from "@/lib/store/authStore"
 
 export default function SignIn() {
+  const router = useRouter()
+  const { login, isLoading, error, clearError, isAuthenticated } = useAuthStore()
+
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   })
+  const [rememberMe, setRememberMe] = useState(false)
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/dashboard")
+    }
+  }, [isAuthenticated, router])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error when user types
+    if (error) clearError()
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Handle form submission - would connect to authentication service
-    console.log("Form submitted:", formData)
+
+    try {
+      await login(formData.email, formData.password)
+      // Redirect will happen automatically due to the useEffect
+    } catch (err) {
+      // Error is handled by the store
+      console.error("Login failed:", err)
+    }
   }
 
   return (
@@ -36,18 +58,20 @@ export default function SignIn() {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-8 transform transition-all duration-500 hover:shadow-2xl">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center  gap-2 justify-center">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
-              <DollarSign className="h-6 w-6 text-white z-10" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
-              Greenor
-            </span>
+            <div className="inline-flex items-center gap-2 justify-center">
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
+                <DollarSign className="h-6 w-6 text-white z-10" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+                Greenor
+              </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mt-4">Welcome back</h1>
             <p className="text-gray-600 mt-2">Sign in to your account</p>
           </div>
+
+          {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -71,7 +95,7 @@ export default function SignIn() {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <Link href="#" className="text-sm text-emerald-600 hover:text-emerald-700">
+                <Link href="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700">
                   Forgot password?
                 </Link>
               </div>
@@ -101,6 +125,8 @@ export default function SignIn() {
                 id="remember-me"
                 name="remember-me"
                 type="checkbox"
+                checked={rememberMe}
+                onChange={() => setRememberMe(!rememberMe)}
                 className="h-4 w-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
@@ -111,9 +137,17 @@ export default function SignIn() {
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200"
+                disabled={isLoading}
+                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
               >
-                Sign In
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                    Signing In...
+                  </>
+                ) : (
+                  "Sign In"
+                )}
               </button>
             </div>
           </form>
@@ -131,4 +165,3 @@ export default function SignIn() {
     </div>
   )
 }
-
