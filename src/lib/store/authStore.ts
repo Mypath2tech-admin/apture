@@ -85,9 +85,8 @@ export const useAuthStore = create<AuthState>()(
 
                     const newUser = await response.json()
                     set({ isLoading: false })
-
-                    // Note: We don't set the user as authenticated here
-                    // They need to verify email or login first
+                    console.log("This is new user", newUser)
+                 
                 } catch (error) {
                     set({
                         error: error instanceof Error ? error.message : "An unknown error occurred",
@@ -143,6 +142,7 @@ export const useAuthStore = create<AuthState>()(
                         isAuthenticated: false,
                         isLoading: false,
                     })
+                    console.log(error)
                 }
             },
 
