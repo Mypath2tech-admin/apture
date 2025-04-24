@@ -11,7 +11,7 @@ import { useAuthStore } from "@/lib/store/authStore"
 export default function SignUp() {
   const router = useRouter()
   const [signingFor, setSigningFor] = useState<"user" | "organization">("user")
-  const { register, isLoading, error, clearError, isAuthenticated } = useAuthStore()
+  const { register, isLoading, error, isAuthenticated } = useAuthStore()
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -84,7 +84,7 @@ export default function SignUp() {
     setFormData((prev) => ({ ...prev, [name]: value }))
 
     // Clear error when user types
-    if (error) clearError()
+    
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
