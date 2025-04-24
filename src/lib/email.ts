@@ -3,6 +3,7 @@ import type { User } from "../../generated/prisma"
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
+    service:"gmail",
     host: process.env.EMAIL_SERVER_HOST,
     port: Number(process.env.EMAIL_SERVER_PORT),
     secure: process.env.EMAIL_SERVER_SECURE === "true",

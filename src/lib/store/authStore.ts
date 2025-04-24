@@ -1,3 +1,4 @@
+import { toast } from "react-toastify"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
@@ -31,6 +32,9 @@ interface RegisterData {
     lastName: string
     email: string
     password: string
+    organizationName?:string
+    organizationPhone?:number
+    OrganizationEmail?:string
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -72,26 +76,28 @@ export const useAuthStore = create<AuthState>()(
             register: async (userData: RegisterData) => {
                 set({ isLoading: true, error: null })
                 try {
+                    console.log(userData)
                     const response = await fetch("/api/auth/register", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify(userData),
                     })
 
-                    if (!response.ok) {
-                        const errorData = await response.json()
-                        throw new Error(errorData.error || "Failed to register")
-                    }
+                
 
                     const newUser = await response.json()
                     set({ isLoading: false })
                     console.log("This is new user", newUser)
-                 
+                    if(response.ok){
+                    toast.success("Successfuly Registered, Check your email to proceed")
+                }
                 } catch (error) {
                     set({
                         error: error instanceof Error ? error.message : "An unknown error occurred",
                         isLoading: false,
                     })
+                    toast.error(`Failed to register ${error}`)
+                 
                 }
             },
 

@@ -10,6 +10,7 @@ import { useAuthStore } from "@/lib/store/authStore"
 
 export default function SignUp() {
   const router = useRouter()
+  const [signingFor, setSigningFor] = useState<"user" | "organization">("user")
   const { register, isLoading, error, clearError, isAuthenticated } = useAuthStore()
 
   const [showPassword, setShowPassword] = useState(false)
@@ -18,12 +19,18 @@ export default function SignUp() {
     lastName: "",
     email: "",
     password: "",
+    organizationName: "",
+    organizationEmail: "",
+    organizationPhone: 0,
   })
   const [formErrors, setFormErrors] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: "",
+    // organizationName: "",
+    // organizationEmail:"",
+    // organizationPhone: "",
   })
 
   // Redirect if already authenticated
@@ -87,8 +94,7 @@ export default function SignUp() {
 
     try {
       await register(formData)
-      // Show success message and redirect to login
-      alert("Registration successful! Please check your email to verify your account.")
+      
       router.push("/signin")
     } catch (err) {
       // Error is handled by the store
@@ -210,102 +216,81 @@ export default function SignUp() {
                 <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
               )}
             </div>
-            <div className="flex gap-2">
-              <div>
-
-                <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
-                    placeholder="Create a password"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                {formErrors.password ? (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
-                ) : (
-                  <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-                )}
-              </div>
-
-              <div>
-
-                <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
-                      } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
-                    placeholder="Create a password"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                  </button>
-                </div>
-                {formErrors.password ? (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
-                ) : (
-                  <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-                )}
-              </div>
-            </div>
-            <div>
-
-              <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
+            <div className="flex items-center gap-6 mb-4">
+              <label className="flex items-center gap-2">
                 <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
-                  placeholder="Create a password"
+                  type="radio"
+                  name="signingFor"
+                  value="user"
+                  checked={signingFor === "user"}
+                  onChange={() => setSigningFor("user")}
                 />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {formErrors.password ? (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
-              ) : (
-                <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-              )}
+                Personal Use
+              </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="signingFor"
+                  value="organization"
+                  checked={signingFor === "organization"}
+                  onChange={() => setSigningFor("organization")}
+                />
+                Organization
+              </label>
             </div>
+            {signingFor === "organization" && (
+              <>
+                <div>
+                  <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Organization Name
+                  </label>
+                  <input
+                    id="organizationName"
+                    name="organizationName"
+                    type="text"
+                    value={formData.organizationName}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    placeholder="Your organization name"
+                  />
+                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationName}</p>} */}
+                </div>
+                <div>
+                  <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
+                    Organization Email Address
+                  </label>
+                  <input
+                    id="organizationEmail"
+                    name="organizationEmail"
+                    type="text"
+                    value={formData.organizationEmail}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    placeholder="j.smith@company.com"
+                  />
+                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationEmail}</p>} */}
+                </div>
+
+
+                <div>
+                  <label htmlFor="organizationPhone" className="block text-sm font-medium text-gray-700 mb-1">
+                    Organization Phone Number
+                  </label>
+                  <input
+                    id="organizationPhone"
+                    name="organizationPhone"
+                    type="tel"
+                    value={formData.organizationPhone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    placeholder="Phone number for organization"
+                  />
+                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>} */}
+                </div>
+              </>
+            )}
+
+
 
             <div className="pt-2">
               <button
