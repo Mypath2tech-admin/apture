@@ -136,9 +136,8 @@ export default function SignUp() {
                   required
                   value={formData.firstName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${
-                    formErrors.firstName ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  className={`w-full px-4 py-2 border ${formErrors.firstName ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                   placeholder="First name"
                 />
                 {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
@@ -155,9 +154,8 @@ export default function SignUp() {
                   required
                   value={formData.lastName}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${
-                    formErrors.lastName ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  className={`w-full px-4 py-2 border ${formErrors.lastName ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                   placeholder="Last name"
                 />
                 {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
@@ -175,9 +173,8 @@ export default function SignUp() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border ${
-                  formErrors.email ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                className={`w-full px-4 py-2 border ${formErrors.email ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                 placeholder="Enter your email"
               />
               {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
@@ -195,9 +192,104 @@ export default function SignUp() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${
-                    formErrors.password ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  placeholder="Create a password"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                </button>
+              </div>
+              {formErrors.password ? (
+                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <div>
+
+                <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                    placeholder="Create a password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {formErrors.password ? (
+                  <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+                )}
+              </div>
+
+              <div>
+
+                <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                    placeholder="Create a password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {formErrors.password ? (
+                  <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                ) : (
+                  <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+                )}
+              </div>
+            </div>
+            <div>
+
+              <label htmlFor="user" className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
                   placeholder="Create a password"
                 />
                 <button

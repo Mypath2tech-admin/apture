@@ -1,26 +1,55 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import prisma from "@/lib/prisma"
+import { sendWelcomeEmail } from "@/lib/email"
 
 export async function POST(request: NextRequest) {
   try {
     const { email, token } = await request.json()
 
-    // In a real implementation, you would verify the token against what's stored in the database
-    // For now, we'll just simulate a successful verification
+    if (!email || !token) {
+      return NextResponse.json({ error: "Email and token are required" }, { status: 400 })
+    }
 
-    // Update user to mark as verified
-    const user = await prisma.user.update({
+    // Find user by email
+    const user = await prisma.user.findUnique({
       where: { email },
-      data: {
-        isActive: true,
-      },
     })
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
+
+    // Check if user is already verified
+    if (user.emailVerified) {
+      return NextResponse.json({
+        success: true,
+        message: "Email already verified",
+      })
+    }
+
+    // Verify token
+    if (user.verificationToken !== token) {
+      return NextResponse.json({ error: "Invalid verification token" }, { status: 400 })
+    }
+
+    // Check if token is expired
+    if (user.verificationTokenExpiry && user.verificationTokenExpiry < new Date()) {
+      return NextResponse.json({ error: "Verification token has expired" }, { status: 400 })
+    }
+
+    // Update user to mark as verified
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data: {
+        isActive: true,
+        emailVerified: true,
+        verificationToken: null,
+        verificationTokenExpiry: null,
+      },
+    })
+
+    // Send welcome email
+    await sendWelcomeEmail(updatedUser)
 
     return NextResponse.json({
       success: true,

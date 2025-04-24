@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+  url      = env("DATABASE_URL")
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String           @id @default(cuid())
+  email                   String           @unique
+  username                String?
+  passwordHash            String
+  firstName               String?
+  lastName                String?
+  role                    UserRole         @default(USER)
+  isActive                Boolean          @default(true)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  profileImage            String?
+  phoneNumber             String?
+  resetToken              String?
+  resetTokenExpiry        DateTime?
+  organizationId          String?
+  verificationToken       String?
+  verificationTokenExpiry DateTime?
+  emailVerified           Boolean          @default(false)
+  auditLogs               AuditLog[]
+  budgets                 Budget[]
+  expenses                Expense[]
+  notifications           Notification[]
+  ownedOrganization       Organization?    @relation("OrganizationOwner")
+  timesheets              Timesheet[]
+  organization            Organization?    @relation(fields: [organizationId], references: [id])
+  invitations             UserInvitation[]
+}
+
+model Organization {
+  id           String           @id @default(cuid())
+  name         String
+  email        String?          @unique
+  description  String?
+  logo         String?
+  website      String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  isActive     Boolean          @default(true)
+  ownerId      String?          @unique
+  budgets      Budget[]
+  expenses     Expense[]
+  owner        User?            @relation("OrganizationOwner", fields: [ownerId], references: [id])
+  subscription Subscription?
+  timesheets   Timesheet[]
+  members      User[]
+  invitations  UserInvitation[]
+}
+
+model UserInvitation {
+  id             String           @id @default(cuid())
+  email          String
+  token          String           @unique
+  status         InvitationStatus @default(PENDING)
+  role           UserRole         @default(ORGANIZATION_MEMBER)
+  expiresAt      DateTime
+  createdAt      DateTime         @default(now())
+  organizationId String
+  userId         String?
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?            @relation(fields: [userId], references: [id])
+}
+
+model Budget {
+  id             String           @id @default(cuid())
+  name           String
+  description    String?
+  amount         Float
+  startDate      DateTime
+  endDate        DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         String?
+  organizationId String?
+  projectId      String?
+  organization   Organization?    @relation(fields: [organizationId], references: [id])
+  project        Project?         @relation(fields: [projectId], references: [id])
+  user           User?            @relation(fields: [userId], references: [id])
+  categories     BudgetCategory[]
+  expenses       Expense[]
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model BudgetCategory {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  allocatedAmount Float
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  budgetId        String
+  budget          Budget    @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  expenses        Expense[]
+
+  @@index([budgetId])
+}
+
+model Expense {
+  id               String          @id @default(cuid())
+  title            String
+  description      String?
+  amount           Float
+  date             DateTime
+  receiptUrl       String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  userId           String?
+  organizationId   String?
+  budgetId         String?
+  categoryId       String?
+  timesheetEntryId String?
+  projectId        String?
+  budget           Budget?         @relation(fields: [budgetId], references: [id])
+  category         BudgetCategory? @relation(fields: [categoryId], references: [id])
+  organization     Organization?   @relation(fields: [organizationId], references: [id])
+  project          Project?        @relation(fields: [projectId], references: [id])
+  timesheetEntry   TimesheetEntry? @relation(fields: [timesheetEntryId], references: [id])
+  user             User?           @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([budgetId])
+  @@index([categoryId])
+}
+
+model Timesheet {
+  id             String           @id @default(cuid())
+  name           String
+  description    String?
+  startDate      DateTime
+  endDate        DateTime?
+  status         String           @default("DRAFT")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userId         String?
+  organizationId String?
+  projectId      String?
+  organization   Organization?    @relation(fields: [organizationId], references: [id])
+  project        Project?         @relation(fields: [projectId], references: [id])
+  user           User?            @relation(fields: [userId], references: [id])
+  entries        TimesheetEntry[]
+
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model TimesheetEntry {
+  id          String    @id @default(cuid())
+  description String
+  startTime   DateTime
+  endTime     DateTime
+  duration    Float
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  timesheetId String
+  expenses    Expense[]
+  timesheet   Timesheet @relation(fields: [timesheetId], references: [id], onDelete: Cascade)
+
+  @@index([timesheetId])
+}
+
+model Project {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime?
+  status      String      @default("ACTIVE")
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  budgets     Budget[]
+  expenses    Expense[]
+  timesheets  Timesheet[]
+}
+
+model Subscription {
+  id             String       @id @default(cuid())
+  plan           String
+  status         String       @default("ACTIVE")
+  startDate      DateTime     @default(now())
+  endDate        DateTime?
+  trialEndsAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  organizationId String       @unique
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  type      String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  entity    String
+  entityId  String
+  details   String?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity, entityId])
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  ORGANIZATION_ADMIN
+  ORGANIZATION_MEMBER
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}

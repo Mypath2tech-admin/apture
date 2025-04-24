@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Aos from "./Aos";
@@ -24,12 +25,14 @@ export default function RootLayout({
 }>) {
   return (
     <>
-    <Aos/>
+      <Aos />
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
-          {children}
+          <Suspense>
+            {children}
+          </Suspense>
         </body>
       </html></>
 

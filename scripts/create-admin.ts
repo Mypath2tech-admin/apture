@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import prisma from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 import { v4 as uuidv4 } from "uuid"
 
@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 // Run with: npx ts-node scripts/create-admin.ts
 
 async function main() {
-    const prisma = new PrismaClient()
+   
 
     try {
         // Check if admin already exists
@@ -34,9 +34,9 @@ async function main() {
                 id: uuidv4(),
                 email,
                 passwordHash,
-                firstName: "Admin",
-                lastName: "User",
-                username: "admin",
+                firstName: "Saka",
+                lastName: "Moshood",
+                username: "saka_ceo",
                 role: "ADMIN",
                 isActive: true,
             },

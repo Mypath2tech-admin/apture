@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
 import bcrypt from "bcryptjs"
 import { v4 as uuidv4 } from "uuid"
+import prisma from "@/lib/prisma"
+import { sendVerificationEmail } from "@/lib/email"
 
-const prisma = new PrismaClient()
+// Token expiration time (24 hours)
+const TOKEN_EXPIRATION = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,7 +28,11 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10)
 
-    // Create user
+    // Generate verification token
+    const verificationToken = uuidv4()
+    const verificationTokenExpiry = new Date(Date.now() + TOKEN_EXPIRATION)
+
+    // Create user with verification token
     const user = await prisma.user.create({
       data: {
         id: uuidv4(),
@@ -36,21 +42,27 @@ export async function POST(request: NextRequest) {
         passwordHash,
         role: "USER", // Default role
         username: email.split("@")[0], // Default username from email
+        isActive: false, // User is inactive until email is verified
+        verificationToken,
+        verificationTokenExpiry,
+        emailVerified: false,
       },
     })
 
-    // Create verification token
-    // In a real app, you would send an email with this token
-    const verificationToken = uuidv4()
+    // Generate verification URL
+    const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${verificationToken}&email=${encodeURIComponent(email)}`
 
-    // Return success response (excluding password)
+    // Send verification email
+    await sendVerificationEmail(user, verificationUrl)
+
+    // Return success response (excluding sensitive data)
     return NextResponse.json({
       id: user.id,
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      verificationToken, // In production, don't return this
+      message: "Registration successful. Please check your email to verify your account.",
     })
   } catch (error) {
     console.error("Registration error:", error)
