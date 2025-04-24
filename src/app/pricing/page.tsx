@@ -1,86 +1,15 @@
 "use client"
-import { useState } from "react"
+
 import Link from "next/link"
-import { Check, DollarSign, Shield, Zap, Star, Menu, X } from "lucide-react"
+import { Check, DollarSign, Shield, Zap, Star } from "lucide-react"
+import Header from "@/components/navbar"
 
 export default function PricingPageWhiteGreen() {
-  const [menuOpen, setMenuOpen] = useState(false)
+  
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-800">
-      <header className="backdrop-blur-xl sticky top-0 z-50 bg-white/90 border-b border-gray-100">
-        <div className="container mx-auto px-4 flex h-20 items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative w-10 h-10 flex items-center justify-center">
-              <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
-              <DollarSign className="h-6 w-6 text-white z-10" />
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-              Greenor
-            </span>
-          </div>
-          <nav className="hidden md:flex gap-8 items-center justify-center">
-            <Link
-              href="/"
-              className="text-sm font-medium text-gray-600 hover:text-green-600 transition-colors relative group"
-            >
-              Home
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-
-            <Link
-              href="/pricing"
-              className="text-sm font-medium text-gray-800 hover:text-green-600 transition-colors relative group"
-            >
-              Pricing
-              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-green-600 to-green-400"></span>
-            </Link>
-          </nav>
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-gray-600 hover:text-green-600 transition-all duration-300"
-            >
-              Log in
-            </Link>
-            <button className="relative overflow-hidden group bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md hover:shadow-lg">
-              <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
-              <span className="font-medium flex items-center">
-                Join Waitlist
-                <svg
-                  className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </span>
-            </button>
-          </div>
-          <button className="md:hidden text-gray-800" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-        {/* Mobile menu */}
-        {menuOpen && (
-          <div className="md:hidden bg-white shadow-lg px-4 py-4 flex flex-col gap-4">
-            <Link href="/" className="text-sm font-medium hover:text-green-600 transition-colors">
-              Home
-            </Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-green-600 transition-colors">
-              Pricing
-            </Link>
-            <Link href="/login" className="text-sm font-medium hover:text-green-600 transition-colors">
-              Log in
-            </Link>
-            <button className="bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 p-2 px-4 rounded-full text-white w-full">
-              Join Waitlist
-            </button>
-          </div>
-        )}
-      </header>
-
+     <Header/>
       <main className="flex-1">
         <section className="w-full py-20 md:py-28 lg:py-32 relative overflow-hidden isolate">
           {/* Gradient Background */}
