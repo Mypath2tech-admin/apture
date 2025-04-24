@@ -17,7 +17,7 @@ export default function Header() {
   
   const handleLogout = async () => {
     await logout()
-    router.push('/sigin')
+    router.push('/signin')
   }
   
   return (
@@ -86,7 +86,7 @@ export default function Header() {
           ) : (
             <>
               <Link
-                href="/sigin"
+                href="/signin"
                 className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900 transition-all duration-300"
               >
                 Log in
@@ -138,7 +138,7 @@ export default function Header() {
             </button>
           ) : (
             <>
-              <Link href="/sigin" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              <Link href="/signin" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 Log in
               </Link>
               <button className="bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 p-2 px-4 rounded-full text-white w-full">
