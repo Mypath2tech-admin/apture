@@ -71,9 +71,9 @@ export default function Header() {
                     <User className="w-4 h-4" />
                   )}
                 </div>
-                <span className="text-sm font-medium text-gray-800">
+                <Link href='/dashboard' className="text-sm font-medium text-gray-800">
                   {user?.firstName || user?.username || user?.email.split('@')[0]}
-                </span>
+                </Link>
               </div>
               <button 
                 onClick={handleLogout}
