@@ -3,10 +3,16 @@
 import { useState } from 'react'
 import { Bell, Search, User } from 'lucide-react'
 import Link from 'next/link'
-
+import { useAuthStore } from "@/lib/store/authStore"
+import {useRouter} from 'next/navigation'
 export default function DashboardHeader() {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
-  
+  const { logout } = useAuthStore()
+  const router = useRouter()
+  const handleLogout = async () => {
+    await logout()
+    router.push('/signin')
+  }
   return (
     <header className="bg-white border-b border-gray-200 z-10">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -62,17 +68,19 @@ export default function DashboardHeader() {
                   <Link 
                     href="/dashboard/settings" 
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setIsProfileOpen(false)}
+                    onClick={() => {
+                     
+                      setIsProfileOpen(false) }
+                    }
                   >
                     Settings
                   </Link>
-                  <Link 
-                    href="/api/auth/logout" 
+                  <button 
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setIsProfileOpen(false)}
+                    onClick={handleLogout}
                   >
                     Sign out
-                  </Link>
+                  </button>
                 </div>
               )}
             </div>

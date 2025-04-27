@@ -55,7 +55,7 @@ export default function Dashboard() {
         return <DashboardSkeleton />
     }
 
-    const isOrgAdmin = user?.role === "ORGANIZATION_ADMIN" || user?.role === "ADMIN"
+    const isOrgAdmin = user?.role === "ORGANIZATION_ADMIN" || user?.role === "ADMIN" || user?.role === "ORGANIZATION_MEMBER"
 
     return (
         <div>
