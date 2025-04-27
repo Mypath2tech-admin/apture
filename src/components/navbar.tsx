@@ -77,7 +77,7 @@ export default function Header() {
               </div>
               <button 
                 onClick={handleLogout}
-                className="flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 transition-all duration-300"
+                className="flex items-center text-sm relative cursor-pointer z-30 font-medium text-gray-700 hover:text-gray-900 transition-all duration-300"
               >
                 <LogOut className="w-4 h-4 mr-1" />
                 Logout

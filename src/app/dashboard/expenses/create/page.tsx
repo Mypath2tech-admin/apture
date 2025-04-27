@@ -8,6 +8,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
 import { toast } from "react-toastify"
+import { PlusCircle, X } from "lucide-react"
 import type { Budget, ExpenseCategory } from "@/types/dashboard"
 
 interface ExpenseFormData {
@@ -34,6 +35,12 @@ export default function CreateExpense() {
 
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
   const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+
+  // New state for category creation
+  const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
+  const [newCategoryName, setNewCategoryName] = useState("")
+  const [newCategoryDescription, setNewCategoryDescription] = useState("")
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
 
   const [formData, setFormData] = useState<ExpenseFormData>({
     title: "",
@@ -105,12 +112,72 @@ export default function CreateExpense() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
+
+    // Special handling for category selection
+    if (name === "categoryId" && value === "new") {
+      setShowNewCategoryForm(true)
+      return
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setFormData((prev) => ({ ...prev, receipt: e.target.files?.[0] || null }))
+    }
+  }
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!newCategoryName.trim()) {
+      toast.error("Category name is required")
+      return
+    }
+
+    if (!formData.budgetId) {
+      toast.error("Please select a budget for the new category")
+      return
+    }
+
+    setIsCreatingCategory(true)
+
+    try {
+      const response = await fetch("/api/categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newCategoryName,
+          description: newCategoryDescription,
+          budgetId: formData.budgetId,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create category")
+      }
+
+      const newCategory = await response.json()
+
+      // Add the new category to the list and select it
+      setCategories((prev) => [...prev, newCategory])
+      setFormData((prev) => ({ ...prev, categoryId: newCategory.id }))
+
+      // Reset the form
+      setShowNewCategoryForm(false)
+      setNewCategoryName("")
+      setNewCategoryDescription("")
+
+      toast.success("Category created successfully")
+    } catch (err) {
+      console.error("Failed to create category:", err)
+      toast.error(err instanceof Error ? err.message : "Failed to create category")
+    } finally {
+      setIsCreatingCategory(false)
     }
   }
 
@@ -248,36 +315,6 @@ export default function CreateExpense() {
               />
             </div>
 
-            {/* Only show category selection for admin users */}
-            {userRole === "ADMIN" || userRole === "ORGANIZATION_ADMIN" ? (
-              <div>
-                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
-                  Category
-                </label>
-                <select
-                  id="categoryId"
-                  name="categoryId"
-                  value={formData.categoryId}
-                  onChange={handleChange}
-                  className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
-                  disabled={isLoadingCategories}
-                >
-                  <option value="">Select a category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-                {isLoadingCategories && <p className="mt-1 text-sm text-gray-500">Loading categories...</p>}
-              </div>
-            ) : (
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Category</label>
-                <p className="mt-1 text-sm text-gray-500">Categories are assigned by administrators</p>
-              </div>
-            )}
-
             <div>
               <label htmlFor="budgetId" className="block text-sm font-medium text-gray-700">
                 Budget
@@ -299,6 +336,112 @@ export default function CreateExpense() {
               </select>
               {isLoadingBudgets && <p className="mt-1 text-sm text-gray-500">Loading budgets...</p>}
             </div>
+
+            {/* Only show category selection for admin users */}
+            {userRole === "ADMIN" || userRole === "ORGANIZATION_ADMIN" ? (
+              <div>
+                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+
+                {showNewCategoryForm ? (
+                  <div className="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="text-sm font-medium text-gray-700">Add New Category</h4>
+                      <button
+                        type="button"
+                        onClick={() => setShowNewCategoryForm(false)}
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <X size={18} />
+                        <span className="sr-only">Close</span>
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <label htmlFor="newCategoryName" className="block text-xs font-medium text-gray-700">
+                          Category Name
+                        </label>
+                        <input
+                          type="text"
+                          id="newCategoryName"
+                          value={newCategoryName}
+                          onChange={(e) => setNewCategoryName(e.target.value)}
+                          className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-xs"
+                          placeholder="Enter category name"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label htmlFor="newCategoryDescription" className="block text-xs font-medium text-gray-700">
+                          Description (optional)
+                        </label>
+                        <input
+                          type="text"
+                          id="newCategoryDescription"
+                          value={newCategoryDescription}
+                          onChange={(e) => setNewCategoryDescription(e.target.value)}
+                          className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-xs"
+                          placeholder="Enter description"
+                        />
+                      </div>
+
+                      {!formData.budgetId && <p className="text-xs text-amber-600">Please select a budget first</p>}
+
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={handleCreateCategory}
+                          disabled={isCreatingCategory || !formData.budgetId}
+                          className="inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                        >
+                          {isCreatingCategory ? "Creating..." : "Create Category"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-1">
+                    <select
+                      id="categoryId"
+                      name="categoryId"
+                      value={formData.categoryId}
+                      onChange={handleChange}
+                      className="block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                      disabled={isLoadingCategories}
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                      <option value="new">+ Add new category</option>
+                    </select>
+
+                    {isLoadingCategories && <p className="mt-1 text-sm text-gray-500">Loading categories...</p>}
+                  </div>
+                )}
+
+                {!showNewCategoryForm && (
+                  <button
+                    type="button"
+                    onClick={() => setShowNewCategoryForm(true)}
+                    className="mt-1 inline-flex items-center text-sm text-green-600 hover:text-green-700"
+                  >
+                    <PlusCircle size={16} className="mr-1" />
+                    Create new category
+                  </button>
+                )}
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <p className="mt-1 text-sm text-gray-500">Categories are assigned by administrators</p>
+              </div>
+            )}
 
             <div>
               <label htmlFor="receipt" className="block text-sm font-medium text-gray-700">
