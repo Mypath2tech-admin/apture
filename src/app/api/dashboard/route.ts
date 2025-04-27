@@ -28,6 +28,18 @@ interface RecentExpense {
   category: string
 }
 
+interface OrganizationData {
+  id: string
+  name: string
+  logo: string | null
+  email: string | null
+  website: string | null
+  description: string | null
+  memberCount: number
+  totalBudgets: number
+  totalExpenses: number
+}
+
 interface DashboardData {
   totalBudget: number
   totalExpenses: number
@@ -38,6 +50,7 @@ interface DashboardData {
   timesheetChange: BudgetChange
   recentBudgets: RecentBudget[]
   recentExpenses: RecentExpense[]
+  organization?: OrganizationData
 }
 
 // Define type for user with organization
@@ -46,6 +59,9 @@ interface UserWithOrganization extends User {
     id: string
     name: string
     logo: string | null
+    email: string | null
+    website: string | null
+    description: string | null
   } | null
 }
 
@@ -93,6 +109,9 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             logo: true,
+            email: true,
+            website: true,
+            description: true,
           },
         },
       },
@@ -116,7 +135,13 @@ export async function GET(request: NextRequest) {
         role: user.role,
         profileImage: user.profileImage,
         phoneNumber: user.phoneNumber,
-        organization: user.organization,
+        organization: user.organization
+          ? {
+              id: user.organization.id,
+              name: user.organization.name,
+              logo: user.organization.logo,
+            }
+          : null,
         createdAt: user.createdAt,
       },
       dashboardData,
@@ -152,8 +177,39 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
     recentExpenses: [],
   }
 
+  // Check if user belongs to an organization and fetch organization data
+  if (user.organizationId && user.organization) {
+    // Get organization member count
+    const memberCount = await prisma.user.count({
+      where: { organizationId: user.organizationId },
+    })
+
+    // Get organization total budgets
+    const totalBudgets = await prisma.budget.count({
+      where: { organizationId: user.organizationId },
+    })
+
+    // Get organization total expenses
+    const totalExpenses = await prisma.expense.count({
+      where: { organizationId: user.organizationId },
+    })
+
+    // Add organization data to dashboard
+    dashboardData.organization = {
+      id: user.organization.id,
+      name: user.organization.name,
+      logo: user.organization.logo,
+      email: user.organization.email,
+      website: user.organization.website,
+      description: user.organization.description,
+      memberCount,
+      totalBudgets,
+      totalExpenses,
+    }
+  }
+
   // Get data based on user role
-  if (user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN") {
+  if (user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN" || user.role === "ORGANIZATION_MEMBER") {
     // For organization admins, get org-wide data
     if (user.organizationId) {
       // Get total budget amount
@@ -184,10 +240,7 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
       )
 
       // Get team members count
-      const membersCount = await prisma.user.count({
-        where: { organizationId: user.organizationId },
-      })
-      dashboardData.teamMembers = membersCount
+      dashboardData.teamMembers = dashboardData.organization?.memberCount || 0
 
       // Get recent budgets
       const recentBudgets = await prisma.budget.findMany({
@@ -238,8 +291,99 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
         category: expense.category?.name || "Uncategorized",
       }))
     }
+  } else if (user.organizationId) {
+    // For organization members, get personal data but include organization context
+    // Get total budget amount for user within organization
+    const budgets = await prisma.budget.findMany({
+      where: {
+        userId: user.id,
+        organizationId: user.organizationId,
+      },
+      select: { amount: true },
+    })
+    dashboardData.totalBudget = budgets.reduce((sum, budget) => sum + Number(budget.amount), 0)
+
+    // Get total expenses for user within organization
+    const expenses = await prisma.expense.findMany({
+      where: {
+        userId: user.id,
+        organizationId: user.organizationId,
+      },
+      select: { amount: true },
+    })
+    dashboardData.totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+
+    // Get timesheet hours for user within organization
+    const timesheetEntries = await prisma.timesheetEntry.findMany({
+      where: {
+        timesheet: {
+          userId: user.id,
+          organizationId: user.organizationId,
+        },
+      },
+      select: { duration: true },
+    })
+    dashboardData.timesheetHours = Math.round(timesheetEntries.reduce((sum, entry) => sum + Number(entry.duration), 0))
+
+    // Team members is the organization's member count
+    dashboardData.teamMembers = dashboardData.organization?.memberCount || 0
+
+    // Get recent budgets for user within organization
+    const recentBudgets = await prisma.budget.findMany({
+      where: {
+        userId: user.id,
+        organizationId: user.organizationId,
+      },
+      select: {
+        id: true,
+        name: true,
+        amount: true,
+        expenses: { select: { amount: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    })
+
+    // Calculate spent amount and progress for each budget
+    dashboardData.recentBudgets = recentBudgets.map((budget) => {
+      const spent = budget.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+      const progress = Number(budget.amount) > 0 ? Math.round((spent / Number(budget.amount)) * 100) : 0
+      return {
+        id: budget.id,
+        name: budget.name,
+        amount: `$${Number(budget.amount).toFixed(2)}`,
+        spent: `$${spent.toFixed(2)}`,
+        progress,
+      }
+    })
+
+    // Get recent expenses for user within organization
+    const recentExpenses = await prisma.expense.findMany({
+      where: {
+        userId: user.id,
+        organizationId: user.organizationId,
+      },
+      select: {
+        id: true,
+        title: true,
+        amount: true,
+        date: true,
+        category: { select: { name: true } },
+      },
+      orderBy: { date: "desc" },
+      take: 3,
+    })
+
+    // Format expense data
+    dashboardData.recentExpenses = recentExpenses.map((expense) => ({
+      id: expense.id,
+      name: expense.title,
+      amount: `$${Number(expense.amount).toFixed(2)}`,
+      date: expense.date.toISOString().split("T")[0],
+      category: expense.category?.name || "Uncategorized",
+    }))
   } else {
-    // For regular users, get personal data
+    // For regular users without organization, get personal data
     // Get total budget amount
     const budgets = await prisma.budget.findMany({
       where: { userId: user.id },
