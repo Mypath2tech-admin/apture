@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
-import {toast} from "react-toastify"
+import { toast } from "react-toastify"
 
 interface Budget {
   id: string
@@ -15,7 +15,8 @@ interface Budget {
   remaining: number
   progress: number
   startDate: string
-  endDate: string
+  endDate?: string
+  description?: string
 }
 
 export default function Budgets() {
@@ -88,20 +89,24 @@ export default function Budgets() {
                   <h4 className="text-xs font-medium uppercase text-gray-500">Remaining</h4>
                   <p className="mt-1 text-xl font-semibold text-gray-900">${budget.remaining.toLocaleString()}</p>
                 </div>
-                <div>
-                  <h4 className="text-xs font-medium uppercase text-gray-500">Period</h4>
-                  <p className="mt-1 text-sm text-gray-900">
-                    {new Date(budget.startDate).toLocaleDateString()} -{" "}
-                    {new Date(budget.endDate).toLocaleDateString()}
-                  </p>
-                </div>
+                {budget.endDate ? (
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-gray-500">Period</h4>
+                    <p className="mt-1 text-sm text-gray-900">
+                      {new Date(budget.startDate).toLocaleDateString()} -{" "}
+                      {new Date(budget.endDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-gray-500">Created</h4>
+                    <p className="mt-1 text-sm text-gray-900">{new Date(budget.startDate).toLocaleDateString()}</p>
+                  </div>
+                )}
                 <div className="md:col-span-4 mt-2">
                   <div className="flex items-center">
                     <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-600 rounded-full"
-                        style={{ width: `${budget.progress}%` }}
-                      />
+                      <div className="h-full bg-green-600 rounded-full" style={{ width: `${budget.progress}%` }} />
                     </div>
                     <span className="ml-3 text-sm font-medium text-gray-900">{budget.progress}%</span>
                   </div>

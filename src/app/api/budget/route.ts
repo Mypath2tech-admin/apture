@@ -3,44 +3,44 @@ import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import prisma from "@/lib/prisma"
 import type { Budget, BudgetCategory } from "../../../types/dashboard"
-import { Prisma, UserRole } from "../../../../generated/prisma"
+import { type Prisma, UserRole } from "../../../../generated/prisma"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
 // Define interfaces for JWT token payload and query parameters
 interface JwtPayload {
-  userId: string;
+  userId: string
 }
 
 interface BudgetQueryParams {
-  search?: string;
-  startDate?: string;
-  endDate?: string;
-  minAmount?: number;
-  maxAmount?: number;
-  sortBy: string;
-  sortOrder: "asc" | "desc";
+  search?: string
+  startDate?: string
+  endDate?: string
+  minAmount?: number
+  maxAmount?: number
+  sortBy: string
+  sortOrder: "asc" | "desc"
 }
 
 // Define interface for the where clause in budget queries
 interface BudgetWhereClause {
-  organizationId?: string;
-  userId?: string;
+  organizationId?: string
+  userId?: string
   name?: {
-    contains: string;
-    mode: Prisma.QueryMode;
-  };
+    contains: string
+    mode: Prisma.QueryMode
+  }
   startDate?: {
-    gte: Date;
-  };
+    gte: Date
+  }
   endDate?: {
-    lte: Date;
-  };
+    lte: Date
+  }
   amount?: {
-    gte?: number;
-    lte?: number;
-  };
-  projectId?: string;
+    gte?: number
+    lte?: number
+  }
+  projectId?: string
 }
 
 export async function GET(request: NextRequest) {
@@ -59,8 +59,8 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       include: {
-        organization: true
-      }
+        organization: true,
+      },
     })
 
     if (!user) {
@@ -76,14 +76,17 @@ export async function GET(request: NextRequest) {
       minAmount: searchParams.get("minAmount") ? Number(searchParams.get("minAmount")) : undefined,
       maxAmount: searchParams.get("maxAmount") ? Number(searchParams.get("maxAmount")) : undefined,
       sortBy: searchParams.get("sortBy") || "createdAt",
-      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc"
+      sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
     }
 
     // Build where clause
     const where: BudgetWhereClause = {}
 
     // Filter by organization or user
-    if ((user.role === UserRole.ORGANIZATION_ADMIN || user.role === UserRole.ORGANIZATION_MEMBER) && user.organizationId) {
+    if (
+      (user.role === UserRole.ORGANIZATION_ADMIN || user.role === UserRole.ORGANIZATION_MEMBER) &&
+      user.organizationId
+    ) {
       where.organizationId = user.organizationId
     } else if (user.role === UserRole.USER) {
       where.userId = user.id
@@ -126,20 +129,27 @@ export async function GET(request: NextRequest) {
     }
 
     // Create a type-safe sort object based on the queryParams
-    type SortField = keyof Prisma.BudgetOrderByWithRelationInput;
-    
+    type SortField = keyof Prisma.BudgetOrderByWithRelationInput
+
     // Validate that the sortBy field is actually a valid field to sort by
     const validSortFields: SortField[] = [
-      'id', 'name', 'amount', 'startDate', 'endDate', 'createdAt', 'updatedAt', 'description'
-    ];
-    
-    const sortField = validSortFields.includes(queryParams.sortBy as SortField) 
-      ? queryParams.sortBy as SortField 
-      : 'createdAt';
-    
+      "id",
+      "name",
+      "amount",
+      "startDate",
+      "endDate",
+      "createdAt",
+      "updatedAt",
+      "description",
+    ]
+
+    const sortField = validSortFields.includes(queryParams.sortBy as SortField)
+      ? (queryParams.sortBy as SortField)
+      : "createdAt"
+
     const orderBy: Prisma.BudgetOrderByWithRelationInput = {
-      [sortField]: queryParams.sortOrder
-    };
+      [sortField]: queryParams.sortOrder,
+    }
 
     // Get budgets with expenses and categories
     const budgets = await prisma.budget.findMany({
@@ -150,9 +160,9 @@ export async function GET(request: NextRequest) {
             amount: true,
           },
         },
-        categories: true
+        categories: true,
       },
-      orderBy
+      orderBy,
     })
 
     // Calculate spent, remaining, and progress
@@ -162,11 +172,11 @@ export async function GET(request: NextRequest) {
       const progress = budget.amount > 0 ? (spent / Number(budget.amount)) * 100 : 0
 
       // Map database categories to BudgetCategory type
-      const categories: BudgetCategory[] = budget.categories.map(cat => ({
+      const categories: BudgetCategory[] = budget.categories.map((cat) => ({
         id: cat.id,
         name: cat.name,
         allocatedAmount: Number(cat.allocatedAmount),
-        description: cat.description || undefined
+        description: cat.description || undefined,
       }))
 
       return {
@@ -174,7 +184,7 @@ export async function GET(request: NextRequest) {
         name: budget.name,
         amount: Number(budget.amount),
         startDate: budget.startDate.toISOString(),
-        endDate: budget.endDate ? budget.endDate.toISOString() : '',
+        endDate: budget.endDate ? budget.endDate.toISOString() : undefined,
         description: budget.description || undefined,
         createdAt: budget.createdAt.toISOString(),
         updatedAt: budget.updatedAt.toISOString(),
@@ -184,7 +194,7 @@ export async function GET(request: NextRequest) {
         spent,
         remaining,
         progress: Math.round(progress),
-        categories
+        categories: categories.length > 0 ? categories : undefined,
       }
     })
 
@@ -196,17 +206,17 @@ export async function GET(request: NextRequest) {
 }
 
 interface CreateBudgetBody {
-  name: string;
-  amount: number;
-  startDate: string;
-  endDate?: string;
-  description?: string;
-  projectId?: string;
+  name: string
+  amount: number
+  startDate: string
+  endDate?: string
+  description?: string
+  projectId?: string
   categories?: Array<{
-    name: string;
-    allocatedAmount: number;
-    description?: string;
-  }>;
+    name: string
+    allocatedAmount: number
+    description?: string
+  }>
 }
 
 export async function POST(request: NextRequest) {
@@ -230,7 +240,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    const body = await request.json() as CreateBudgetBody
+    const body = (await request.json()) as CreateBudgetBody
     const { name, amount, startDate, endDate, description, projectId, categories } = body
 
     // Validate required fields
@@ -249,25 +259,28 @@ export async function POST(request: NextRequest) {
         userId: user.id,
         organizationId: user.organizationId,
         projectId,
-        categories: categories && categories.length > 0 ? {
-          create: categories.map(cat => ({
-            name: cat.name,
-            allocatedAmount: Number(cat.allocatedAmount),
-            description: cat.description
-          }))
-        } : undefined
+        categories:
+          categories && categories.length > 0
+            ? {
+                create: categories.map((cat) => ({
+                  name: cat.name,
+                  allocatedAmount: Number(cat.allocatedAmount),
+                  description: cat.description,
+                })),
+              }
+            : undefined,
       },
       include: {
-        categories: true
-      }
+        categories: true,
+      },
     })
 
     // Map categories to the proper type
-    const mappedCategories: BudgetCategory[] = budget.categories.map(cat => ({
+    const mappedCategories: BudgetCategory[] = budget.categories.map((cat) => ({
       id: cat.id,
       name: cat.name,
       allocatedAmount: Number(cat.allocatedAmount),
-      description: cat.description || undefined
+      description: cat.description || undefined,
     }))
 
     // Create response object that matches our updated Budget interface
@@ -276,7 +289,7 @@ export async function POST(request: NextRequest) {
       name: budget.name,
       amount: Number(budget.amount),
       startDate: budget.startDate.toISOString(),
-      endDate: budget.endDate ? budget.endDate.toISOString() : '',
+      endDate: budget.endDate ? budget.endDate.toISOString() : undefined,
       description: budget.description || undefined,
       createdAt: budget.createdAt.toISOString(),
       updatedAt: budget.updatedAt.toISOString(),
@@ -286,7 +299,7 @@ export async function POST(request: NextRequest) {
       spent: 0, // New budget, so spent is 0
       remaining: Number(budget.amount), // New budget, so remaining is the full amount
       progress: 0, // New budget, so progress is 0
-      categories: mappedCategories
+      categories: mappedCategories.length > 0 ? mappedCategories : undefined,
     }
 
     return NextResponse.json(response)

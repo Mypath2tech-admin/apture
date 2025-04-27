@@ -1,19 +1,26 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useParams } from 'next/navigation'
-import { Plus, ArrowLeft, Pencil, Trash2 } from 'lucide-react'
-import PageHeader from '@/components/dashboard/PageHeader'
-import DashboardCard from '@/components/dashboard/DashboardCard'
-import Link from 'next/link'
-import {toast} from 'react-toastify'
+import { useState, useEffect } from "react"
+import { useParams } from "next/navigation"
+import { Plus, ArrowLeft, Pencil } from "lucide-react"
+import PageHeader from "@/components/dashboard/PageHeader"
+import DashboardCard from "@/components/dashboard/DashboardCard"
+import Link from "next/link"
+import { toast } from "react-toastify"
 
 interface Expense {
   id: string
   title: string
   amount: number
   date: string
-  category: { id: string, name: string }
+  category?: { id: string; name: string }
+}
+
+interface BudgetCategory {
+  id: string
+  name: string
+  allocatedAmount: number
+  description?: string
 }
 
 interface Budget {
@@ -24,8 +31,9 @@ interface Budget {
   remaining: number
   progress: number
   startDate: string
-  endDate: string
-  description: string
+  endDate?: string
+  description?: string
+  categories?: BudgetCategory[]
   expenses: Expense[]
 }
 
@@ -33,39 +41,25 @@ export default function BudgetDetail() {
   const params = useParams()
   const [budget, setBudget] = useState<Budget | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasTimeframe, setHasTimeframe] = useState(false)
 
   useEffect(() => {
     const fetchBudget = async () => {
       setIsLoading(true)
       try {
         const res = await fetch(`/api/budget/${params.id}`)
-        if (!res.ok) throw new Error('Failed to fetch budget')
+        if (!res.ok) throw new Error("Failed to fetch budget")
 
         const data = await res.json()
 
-        const formattedBudget: Budget = {
-          id: data.id,
-          name: data.name,
-          amount: data.amount,
-          spent: data.spent,
-          remaining: data.remaining,
-          progress: data.progress,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          description: data.description,
-          expenses: data.expenses.map((exp: Expense) => ({
-            id: exp.id,
-            title: exp.title,
-            amount: exp.amount,
-            date: exp.date,
-            category: exp.category,
-          })),
-        }
+        // Check if budget has a valid end date (indicating it has a timeframe)
+        const hasValidTimeframe = data.endDate && data.endDate !== ""
+        setHasTimeframe(hasValidTimeframe)
 
-        setBudget(formattedBudget)
+        setBudget(data)
       } catch (error) {
-        console.error('Failed to fetch budget:', error)
-        toast.error('Failed to load budget.')
+        console.error("Failed to fetch budget:", error)
+        toast.error("Failed to load budget.")
       } finally {
         setIsLoading(false)
       }
@@ -88,7 +82,9 @@ export default function BudgetDetail() {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-semibold text-gray-900">Budget not found</h2>
-        <p className="mt-2 text-gray-600">The budget you're looking for doesn't exist or you don't have access to it.</p>
+        <p className="mt-2 text-gray-600">
+          The budget you&apos;re looking for doesn&apos;t exist or you don&apos;t have access to it.
+        </p>
         <div className="mt-6">
           <Link
             href="/dashboard/budgets"
@@ -104,9 +100,9 @@ export default function BudgetDetail() {
 
   return (
     <div>
-      <PageHeader 
+      <PageHeader
         title={budget.name}
-        description="Detailed budget overview"
+        description={budget.description || "Detailed budget overview"}
         action={
           <div className="flex space-x-3">
             <Link
@@ -133,15 +129,15 @@ export default function BudgetDetail() {
           <div className="space-y-4">
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Total Budget</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">₦{budget.amount.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">${budget.amount.toLocaleString()}</p>
             </div>
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Spent</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">₦{budget.spent.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">${budget.spent.toLocaleString()}</p>
             </div>
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Remaining</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">₦{budget.remaining.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">${budget.remaining.toLocaleString()}</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">
@@ -158,19 +154,72 @@ export default function BudgetDetail() {
         {/* Budget Details */}
         <DashboardCard title="Budget Details" className="lg:col-span-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h4 className="text-xs font-medium uppercase text-gray-500">Period</h4>
-              <p className="mt-1 text-sm text-gray-900">
-                {new Date(budget.startDate).toLocaleDateString()} - {new Date(budget.endDate).toLocaleDateString()}
-              </p>
-            </div>
-            <div className="md:col-span-2">
-              <h4 className="text-xs font-medium uppercase text-gray-500">Description</h4>
-              <p className="mt-1 text-sm text-gray-900">{budget.description || "No description provided."}</p>
-            </div>
+            {hasTimeframe && (
+              <div>
+                <h4 className="text-xs font-medium uppercase text-gray-500">Period</h4>
+                <p className="mt-1 text-sm text-gray-900">
+                  {new Date(budget.startDate).toLocaleDateString()}
+                  {budget.endDate && ` - ${new Date(budget.endDate).toLocaleDateString()}`}
+                </p>
+              </div>
+            )}
+
+            {budget.description && (
+              <div className={hasTimeframe ? "md:col-span-1" : "md:col-span-2"}>
+                <h4 className="text-xs font-medium uppercase text-gray-500">Description</h4>
+                <p className="mt-1 text-sm text-gray-900">{budget.description}</p>
+              </div>
+            )}
           </div>
         </DashboardCard>
       </div>
+
+      {/* Budget Categories - Only show if budget has categories */}
+      {budget.categories && budget.categories.length > 0 && (
+        <DashboardCard title="Budget Categories" className="mb-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-300">
+              <thead>
+                <tr>
+                  <th className="py-3.5 pl-4 text-left text-sm font-semibold text-gray-900">Category</th>
+                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Description</th>
+                  <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Allocated</th>
+                  <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Spent</th>
+                  <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Remaining</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {budget.categories.map((category) => {
+                  // Calculate spent amount for this category
+                  const categoryExpenses = budget.expenses.filter(
+                    (exp) => exp.category && exp.category.id === category.id,
+                  )
+                  const categorySpent = categoryExpenses.reduce((sum, exp) => sum + exp.amount, 0)
+                  const categoryRemaining = category.allocatedAmount - categorySpent
+
+                  return (
+                    <tr key={category.id}>
+                      <td className="whitespace-nowrap py-4 pl-4 text-sm font-medium text-gray-900">{category.name}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {category.description || "-"}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
+                        ${category.allocatedAmount.toLocaleString()}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
+                        ${categorySpent.toLocaleString()}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
+                        ${categoryRemaining.toLocaleString()}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </DashboardCard>
+      )}
 
       {/* Budget Expenses */}
       <DashboardCard
@@ -190,7 +239,9 @@ export default function BudgetDetail() {
             <thead>
               <tr>
                 <th className="py-3.5 pl-4 text-left text-sm font-semibold text-gray-900">Expense</th>
-                <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Category</th>
+                {budget.categories && budget.categories.length > 0 && (
+                  <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Category</th>
+                )}
                 <th className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date</th>
                 <th className="px-3 py-3.5 text-right text-sm font-semibold text-gray-900">Amount</th>
               </tr>
@@ -198,24 +249,27 @@ export default function BudgetDetail() {
             <tbody className="divide-y divide-gray-200">
               {budget.expenses.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-sm text-gray-500">
+                  <td
+                    colSpan={budget.categories && budget.categories.length > 0 ? 4 : 3}
+                    className="py-8 text-center text-sm text-gray-500"
+                  >
                     No expenses found.
                   </td>
                 </tr>
               ) : (
                 budget.expenses.map((expense) => (
                   <tr key={expense.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 text-sm font-medium text-gray-900">
-                      {expense.title}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {expense.category.name}
-                    </td>
+                    <td className="whitespace-nowrap py-4 pl-4 text-sm font-medium text-gray-900">{expense.title}</td>
+                    {budget.categories && budget.categories.length > 0 && (
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {expense.category ? expense.category.name : "-"}
+                      </td>
+                    )}
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {new Date(expense.date).toLocaleDateString()}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
-                      ₦{expense.amount.toLocaleString()}
+                      ${expense.amount.toLocaleString()}
                     </td>
                   </tr>
                 ))

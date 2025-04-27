@@ -1,21 +1,20 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import PageHeader from '@/components/dashboard/PageHeader'
-import DashboardCard from '@/components/dashboard/DashboardCard'
-import Link from 'next/link'
+import type React from "react"
 
-interface Budget {
-  id: string
-  name: string
-}
+import { useState, useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import PageHeader from "@/components/dashboard/PageHeader"
+import DashboardCard from "@/components/dashboard/DashboardCard"
+import Link from "next/link"
+import { toast } from "react-toastify"
+import type { Budget, ExpenseCategory } from "@/types/dashboard"
 
 interface ExpenseFormData {
-  name: string
+  title: string
   amount: string
   date: string
-  category: string
+  categoryId: string
   budgetId: string
   description: string
   receipt?: File | null
@@ -24,86 +23,157 @@ interface ExpenseFormData {
 export default function CreateExpense() {
   const router = useRouter()
   const searchParams = useSearchParams()
+
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
+
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [isLoadingBudgets, setIsLoadingBudgets] = useState(true)
-  
+
+  const [categories, setCategories] = useState<ExpenseCategory[]>([])
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
+
   const [formData, setFormData] = useState<ExpenseFormData>({
-    name: '',
-    amount: '',
-    date: new Date().toISOString().split('T')[0], // Today's date as default
-    category: '',
-    budgetId: searchParams.get('budgetId') || '',
-    description: '',
-    receipt: null
+    title: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0], // Today's date as default
+    categoryId: "",
+    budgetId: searchParams.get("budgetId") || "",
+    description: "",
+    receipt: null,
   })
 
+  // Fetch user role
   useEffect(() => {
-    const fetchBudgets = async () => {
-      setIsLoadingBudgets(true)
+    const fetchUserRole = async () => {
       try {
-        // In a real app, you would fetch this data from your API
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate network delay
-        
-        // Mock data - in a real app, this would come from your API
-        const mockBudgets: Budget[] = [
-          { id: '1', name: 'Q2 Marketing' },
-          { id: '2', name: 'Office Supplies' },
-          { id: '3', name: 'Development Tools' },
-          { id: '4', name: 'Team Building' },
-        ]
-        
-        setBudgets(mockBudgets)
+        const response = await fetch("/api/users/me")
+        if (response.ok) {
+          const userData = await response.json()
+          setUserRole(userData.role)
+        }
       } catch (error) {
-        console.error('Failed to fetch budgets:', error)
-      } finally {
-        setIsLoadingBudgets(false)
+        console.error("Error fetching user data:", error)
       }
     }
 
-    fetchBudgets()
+    fetchUserRole()
   }, [])
+
+  // Fetch categories and budgets when the component mounts
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Always fetch budgets
+        const budgetsResponse = await fetch("/api/budget")
+
+        if (!budgetsResponse.ok) {
+          throw new Error("Failed to fetch budgets")
+        }
+
+        const budgetsData = await budgetsResponse.json()
+        setBudgets(budgetsData)
+        setIsLoadingBudgets(false)
+
+        // Only fetch categories if user is admin or organization admin
+        if (userRole === "ADMIN" || userRole === "ORGANIZATION_ADMIN") {
+          const categoriesResponse = await fetch("/api/categories")
+
+          if (!categoriesResponse.ok) {
+            throw new Error("Failed to fetch categories")
+          }
+
+          const categoriesData = await categoriesResponse.json()
+          setCategories(categoriesData)
+        }
+
+        setIsLoadingCategories(false)
+      } catch (err) {
+        console.error("Error fetching data:", err)
+        setError(err instanceof Error ? err.message : "Failed to load data")
+        setIsLoadingBudgets(false)
+        setIsLoadingCategories(false)
+      }
+    }
+
+    if (userRole !== null) {
+      fetchData()
+    }
+  }, [userRole])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFormData(prev => ({ ...prev, receipt: e.target.files?.[0] || null }))
+      setFormData((prev) => ({ ...prev, receipt: e.target.files?.[0] || null }))
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
 
     try {
-      // In a real app, you would submit this data to your API
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate network delay
-      
-      console.log('Expense created:', formData)
-      
-      // Redirect to the budget detail page if a budget was selected
-      if (formData.budgetId) {
-        router.push(`/dashboard/budgets/${formData.budgetId}`)
-      } else {
-        router.push('/dashboard/expenses')
+      // Create request payload
+      const payload = {
+        title: formData.title,
+        amount: Number.parseFloat(formData.amount),
+        date: formData.date,
+        categoryId: formData.categoryId || undefined, // Allow undefined for non-admin users
+        budgetId: formData.budgetId || undefined,
+        description: formData.description || undefined,
+        // We'll handle file upload separately if needed
       }
-    } catch (error) {
-      console.error('Failed to create expense:', error)
+
+      const response = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create expense")
+      }
+
+      const data = await response.json()
+      console.log(data)
+      setSuccessMessage("Expense created successfully!")
+
+      // Redirect after a brief delay to show success message
+      setTimeout(() => {
+        // Redirect to the budget detail page if a budget was selected
+        if (formData.budgetId) {
+          router.push(`/dashboard/budgets/${formData.budgetId}`)
+        } else {
+          router.push("/dashboard/expenses")
+        }
+      }, 1500)
+    } catch (err) {
+      console.error("Failed to create expense:", err)
+      setError(err instanceof Error ? err.message : "Failed to create expense")
+      toast.error(err instanceof Error ? err.message : "Failed to create expense")
+    } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
     <div>
-      <PageHeader 
-        title="Add Expense" 
+      <PageHeader
+        title="Add Expense"
         description="Record a new expense"
         action={
-          <Link 
+          <Link
             href={formData.budgetId ? `/dashboard/budgets/${formData.budgetId}` : "/dashboard/expenses"}
             className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
           >
@@ -113,20 +183,32 @@ export default function CreateExpense() {
       />
 
       <DashboardCard title="Expense Details">
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-600">{successMessage}</p>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="col-span-2">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Expense Name
+              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                Expense Title
               </label>
               <input
                 type="text"
-                name="name"
-                id="name"
+                name="title"
+                id="title"
                 required
-                value={formData.name}
+                value={formData.title}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
               />
             </div>
 
@@ -146,7 +228,7 @@ export default function CreateExpense() {
                   value={formData.amount}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="block w-full pl-7 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full pl-7 rounded-md p-2 border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -162,32 +244,39 @@ export default function CreateExpense() {
                 required
                 value={formData.date}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
               />
             </div>
 
-            <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-              <select
-                id="category"
-                name="category"
-                required
-                value={formData.category}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
-              >
-                <option value="">Select a category</option>
-                <option value="Marketing">Marketing</option>
-                <option value="Operations">Operations</option>
-                <option value="Technology">Technology</option>
-                <option value="Facilities">Facilities</option>
-                <option value="Meals">Meals</option>
-                <option value="Travel">Travel</option>
-                <option value="Other">Other</option>
-              </select>
-            </div>
+            {/* Only show category selection for admin users */}
+            {userRole === "ADMIN" || userRole === "ORGANIZATION_ADMIN" ? (
+              <div>
+                <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
+                  Category
+                </label>
+                <select
+                  id="categoryId"
+                  name="categoryId"
+                  value={formData.categoryId}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  disabled={isLoadingCategories}
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {isLoadingCategories && <p className="mt-1 text-sm text-gray-500">Loading categories...</p>}
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Category</label>
+                <p className="mt-1 text-sm text-gray-500">Categories are assigned by administrators</p>
+              </div>
+            )}
 
             <div>
               <label htmlFor="budgetId" className="block text-sm font-medium text-gray-700">
@@ -198,17 +287,17 @@ export default function CreateExpense() {
                 name="budgetId"
                 value={formData.budgetId}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
                 disabled={isLoadingBudgets}
               >
                 <option value="">Select a budget (optional)</option>
-                {budgets.map(budget => (
-                  <option key={budget.id} value={budget.id}>{budget.name}</option>
+                {budgets.map((budget) => (
+                  <option key={budget.id} value={budget.id}>
+                    {budget.name}
+                  </option>
                 ))}
               </select>
-              {isLoadingBudgets && (
-                <p className="mt-1 text-sm text-gray-500">Loading budgets...</p>
-              )}
+              {isLoadingBudgets && <p className="mt-1 text-sm text-gray-500">Loading budgets...</p>}
             </div>
 
             <div>
@@ -246,7 +335,7 @@ export default function CreateExpense() {
               disabled={isSubmitting}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
             >
-              {isSubmitting ? 'Saving...' : 'Save Expense'}
+              {isSubmitting ? "Saving..." : "Save Expense"}
             </button>
           </div>
         </form>

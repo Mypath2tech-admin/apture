@@ -3,7 +3,7 @@ export interface Budget {
   name: string
   amount: number
   startDate: string
-  endDate: string
+  endDate?: string
   description?: string
   createdAt: string
   updatedAt: string
@@ -17,13 +17,6 @@ export interface Budget {
   expenses?: Expense[]
 }
 
-export interface BudgetCategory {
-  id: string
-  name: string
-  allocatedAmount: number
-  description?: string
-}
-
 export interface Expense {
   id: string
   title: string
@@ -31,14 +24,13 @@ export interface Expense {
   date: string
   description?: string
   receipt?: string
-  status: "PENDING" | "APPROVED" | "REJECTED"
-  categoryId: string
+  categoryId?: string
   budgetId?: string
   userId: string
   organizationId?: string
   createdAt: string
   updatedAt: string
-  category: {
+  category?: {
     id: string
     name: string
   }
@@ -49,6 +41,15 @@ export interface Expense {
 }
 
 export interface ExpenseCategory {
+  id: string
+  name: string
+  description?: string
+  organizationId?: string
+  budgetId?: string
+  budgetName?: string
+}
+
+export interface BudgetCategory {
   id: string
   name: string
 }
@@ -74,4 +75,25 @@ export interface ExpenseFilters {
   status?: "PENDING" | "APPROVED" | "REJECTED"
   sortBy?: "title" | "amount" | "date" | "category" | "status"
   sortOrder?: "asc" | "desc"
+}
+
+export interface DashboardStats {
+  totalExpenses: number
+  totalBudgets: number
+  totalCategories: number
+  recentExpenses: Expense[]
+  expensesByCategory: {
+    categoryName: string
+    amount: number
+  }[]
+  monthlyExpenses: {
+    month: string
+    amount: number
+  }[]
+  budgetUtilization: {
+    budgetName: string
+    allocated: number
+    spent: number
+    remaining: number
+  }[]
 }

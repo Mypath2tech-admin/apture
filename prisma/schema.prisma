@@ -5,13 +5,13 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = "postgresql://greenor-database_owner:npg_juznvA7k6Ldr@ep-crimson-truth-a4lnd89i-pooler.us-east-1.aws.neon.tech/greenor-database?sslmode=require"
 }
 
 model User {
   id                      String           @id @default(cuid())
   email                   String           @unique
-  username                String?          @unique
+  username                String?
   passwordHash            String
   firstName               String?
   lastName                String?
@@ -225,6 +225,21 @@ model AuditLog {
 
   @@index([userId])
   @@index([entity, entityId])
+}
+
+model expensecategory {
+  id             String   @id @db.VarChar(255)
+  name           String   @db.VarChar(255)
+  description    String?
+  organizationid String?  @db.VarChar(255)
+  createdat      DateTime @default(now()) @db.Timestamp(6)
+  updatedat      DateTime @default(now()) @db.Timestamp(6)
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
 }
 
 enum UserRole {

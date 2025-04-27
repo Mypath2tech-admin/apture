@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")?.value
@@ -27,10 +27,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
-
+    const params = await context.params
+    const { id } = params
     // Get budget with expenses
     const budget = await prisma.budget.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         expenses: {
           include: {
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await  cookies()
     const token = cookieStore.get("auth-token")?.value
@@ -117,8 +118,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     // Get budget
+    const params = await context.params
+    const { id } = params
     const budget = await prisma.budget.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!budget) {
@@ -135,7 +138,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     // Update budget
     const updatedBudget = await prisma.budget.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         amount: amount !== undefined ? Number(amount) : undefined,
@@ -152,7 +155,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")?.value
@@ -174,10 +177,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
-
+    const params = await context.params
+    const { id } = params
     // Get budget
     const budget = await prisma.budget.findUnique({
-      where: { id: params.id },
+      where: { id },
     })
 
     if (!budget) {
@@ -195,7 +199,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
 
     // Delete budget
     await prisma.budget.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
