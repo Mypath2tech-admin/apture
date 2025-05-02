@@ -5,13 +5,14 @@ import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/store/authStore"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import PageHeader from "@/components/dashboard/PageHeader"
-import { Eye } from "lucide-react"
+import { Eye, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import type { DashboardData } from "@/types/dashboard"
 import { DollarSign, TrendingUp, Users, Clock } from "lucide-react"
 import { StatItem } from "@/components/dashboard/DashboardStats"
 import DashboardStats from "@/components/dashboard/DashboardStats"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
 export default function Dashboard() {
   const router = useRouter()
@@ -77,12 +78,22 @@ export default function Dashboard() {
     return null
   }
 
+  // Generate welcome message based on user and organization
+  const getWelcomeMessage = () => {
+    const userName = user?.firstName || user?.email?.split("@")[0] || "User"
+
+    if (user?.organization && viewType === "organization") {
+      return `Welcome ${userName}, you are viewing ${user.organization.name} organization dashboard`
+    } else if (user?.organization) {
+      return `Welcome ${userName}, you are logged into ${user.organization.name} organization`
+    } else {
+      return `Welcome back, ${userName}`
+    }
+  }
+
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        description={`Welcome back, ${user?.firstName || user?.email?.split("@")[0] || "User"}`}
-      />
+      <PageHeader title="Dashboard" description={getWelcomeMessage()} />
 
       {user?.organizationId && canViewOrgData && (
         <div className="mb-6">
@@ -101,6 +112,16 @@ export default function Dashboard() {
         </div>
       )}
 
+      {dashboardData?.shouldMaskFinancials && (
+        <div className="mb-6 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-yellow-800 text-sm flex items-center">
+          <Info className="h-5 w-5 mr-2 flex-shrink-0" />
+          <p>
+            Financial details are masked for organization members. Contact your administrator if you need access to
+            detailed financial information.
+          </p>
+        </div>
+      )}
+
       {isLoadingData ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
@@ -110,15 +131,15 @@ export default function Dashboard() {
           <DashboardStats className="mb-6">
             <StatItem
               title="Total Budget"
-              value={`$${dashboardData.totalBudget.toFixed(2)}`}
+              value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalBudget.toFixed(2)}`}
               icon={<DollarSign className="h-6 w-6" />}
-              change={dashboardData.budgetChange}
+              change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.budgetChange}
             />
             <StatItem
               title="Total Expenses"
-              value={`$${dashboardData.totalExpenses.toFixed(2)}`}
+              value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalExpenses.toFixed(2)}`}
               icon={<TrendingUp className="h-6 w-6" />}
-              change={dashboardData.expenseChange}
+              change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
             />
             <StatItem
               title="Timesheet Hours"
@@ -154,13 +175,12 @@ export default function Dashboard() {
                         <div className="flex items-center mt-1">
                           <div className="w-32 bg-gray-200 rounded-full h-2.5">
                             <div
-                              className={`h-2.5 rounded-full ${
-                                budget.progress > 90
+                              className={`h-2.5 rounded-full ${budget.progress > 90
                                   ? "bg-red-500"
                                   : budget.progress > 70
                                     ? "bg-yellow-500"
                                     : "bg-green-500"
-                              }`}
+                                }`}
                               style={{ width: `${Math.min(budget.progress, 100)}%` }}
                             ></div>
                           </div>
@@ -168,7 +188,22 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium">{budget.amount}</div>
+                        <div className="text-sm font-medium">
+                          {budget.isMasked ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>{budget.amount}</span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Financial details are masked</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            budget.amount
+                          )}
+                        </div>
                         <div className="text-xs text-gray-500">Spent: {budget.spent}</div>
                       </div>
                     </div>
@@ -197,7 +232,22 @@ export default function Dashboard() {
                         <div className="text-xs text-gray-500 mt-1">{expense.date}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm font-medium">{expense.amount}</div>
+                        <div className="text-sm font-medium">
+                          {expense.isMasked ? (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span>{expense.amount}</span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Financial details are masked</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          ) : (
+                            expense.amount
+                          )}
+                        </div>
                         <div className="text-xs text-gray-500">{expense.category}</div>
                       </div>
                     </div>

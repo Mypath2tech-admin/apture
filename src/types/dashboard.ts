@@ -112,6 +112,7 @@ export interface ExpenseFilters {
 
 
 export interface DashboardData {
+  shouldMaskFinancials: boolean
   totalBudget: number
   totalExpenses: number
   timesheetHours: number
@@ -129,6 +130,7 @@ export interface DashboardData {
     isPositive: boolean
   }
   recentBudgets: {
+    isMasked: boolean
     id: string
     name: string
     amount: string
@@ -136,6 +138,7 @@ export interface DashboardData {
     progress: number
   }[]
   recentExpenses: {
+    isMasked: boolean
     id: string
     name: string
     amount: string

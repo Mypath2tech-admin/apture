@@ -7,6 +7,7 @@ import type { User, UserRole } from "../../../../generated/prisma"
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
 // Define types for the dashboard data
+// Define types for the dashboard data
 interface BudgetChange {
   value: string
   isPositive: boolean
@@ -18,6 +19,7 @@ interface RecentBudget {
   amount: string
   spent: string
   progress: number
+  isMasked: boolean
 }
 
 interface RecentExpense {
@@ -26,6 +28,7 @@ interface RecentExpense {
   amount: string
   date: string
   category: string
+  isMasked: boolean
 }
 
 interface OrganizationData {
@@ -52,6 +55,7 @@ interface DashboardData {
   recentExpenses: RecentExpense[]
   organization?: OrganizationData
   viewingOrgData: boolean // Flag to indicate if viewing org-wide data
+  shouldMaskFinancials: boolean // Flag to indicate if financial data should be masked
 }
 
 // Define type for user with organization
@@ -132,8 +136,13 @@ export async function GET(request: NextRequest) {
     const canViewOrgData =
       user.role === "ADMIN" || user.role === "ORGANIZATION_ADMIN" || user.canViewOrgDashboard === true
 
+    // Determine if financial data should be masked
+    // Mask financials for regular organization members
+    const shouldMaskFinancials =
+      user.organizationId !== null && user.role === "ORGANIZATION_MEMBER" && !user.canViewOrgDashboard
+
     // Fetch dashboard data based on user role and permissions
-    const dashboardData = await getDashboardData(user, canViewOrgData && !forcePersonal)
+    const dashboardData = await getDashboardData(user, canViewOrgData && !forcePersonal, shouldMaskFinancials)
 
     // Return user data and dashboard data
     const response: DashboardResponse = {
@@ -166,7 +175,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean): Promise<DashboardData> {
+async function getDashboardData(
+  user: UserWithOrganization,
+  viewOrgData: boolean,
+  shouldMaskFinancials: boolean,
+): Promise<DashboardData> {
   // Base structure for dashboard data
   const dashboardData: DashboardData = {
     totalBudget: 0,
@@ -188,6 +201,7 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
     recentBudgets: [],
     recentExpenses: [],
     viewingOrgData: viewOrgData,
+    shouldMaskFinancials: shouldMaskFinancials,
   }
 
   // Check if user belongs to an organization and fetch organization data
@@ -271,9 +285,10 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
       return {
         id: budget.id,
         name: budget.name,
-        amount: `$${Number(budget.amount).toFixed(2)}`,
-        spent: `$${spent.toFixed(2)}`,
+        amount: shouldMaskFinancials ? "******" : `$${Number(budget.amount).toFixed(2)}`,
+        spent: shouldMaskFinancials ? "******" : `$${spent.toFixed(2)}`,
         progress,
+        isMasked: shouldMaskFinancials,
       }
     })
 
@@ -295,9 +310,10 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
     dashboardData.recentExpenses = recentExpenses.map((expense) => ({
       id: expense.id,
       name: expense.title,
-      amount: `$${Number(expense.amount).toFixed(2)}`,
+      amount: shouldMaskFinancials ? "******" : `$${Number(expense.amount).toFixed(2)}`,
       date: expense.date.toISOString().split("T")[0],
       category: expense.category?.name || "Uncategorized",
+      isMasked: shouldMaskFinancials,
     }))
   } else if (user.organizationId) {
     // For organization members viewing personal data
@@ -359,9 +375,10 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
       return {
         id: budget.id,
         name: budget.name,
-        amount: `$${Number(budget.amount).toFixed(2)}`,
-        spent: `$${spent.toFixed(2)}`,
+        amount: shouldMaskFinancials ? "******" : `$${Number(budget.amount).toFixed(2)}`,
+        spent: shouldMaskFinancials ? "******" : `$${spent.toFixed(2)}`,
         progress,
+        isMasked: shouldMaskFinancials,
       }
     })
 
@@ -386,9 +403,10 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
     dashboardData.recentExpenses = recentExpenses.map((expense) => ({
       id: expense.id,
       name: expense.title,
-      amount: `$${Number(expense.amount).toFixed(2)}`,
+      amount: shouldMaskFinancials ? "******" : `$${Number(expense.amount).toFixed(2)}`,
       date: expense.date.toISOString().split("T")[0],
       category: expense.category?.name || "Uncategorized",
+      isMasked: shouldMaskFinancials,
     }))
   } else {
     // For regular users without organization, get personal data
@@ -440,6 +458,7 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
         amount: `$${Number(budget.amount).toFixed(2)}`,
         spent: `$${spent.toFixed(2)}`,
         progress,
+        isMasked: false,
       }
     })
 
@@ -464,6 +483,7 @@ async function getDashboardData(user: UserWithOrganization, viewOrgData: boolean
       amount: `$${Number(expense.amount).toFixed(2)}`,
       date: expense.date.toISOString().split("T")[0],
       category: expense.category?.name || "Uncategorized",
+      isMasked: false,
     }))
   }
 

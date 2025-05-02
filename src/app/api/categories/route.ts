@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found", request }, { status: 404 })
     }
 
-    // Only admin and organization admin can fetch categories
-    if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    }
+    // // Only admin and organization admin can fetch categories
+    // if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    // }
 
     // Get categories from BudgetCategory table
     const categories = await prisma.budgetCategory.findMany({
