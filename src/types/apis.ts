@@ -1,15 +1,7 @@
-import type { Prisma } from "../../generated/prisma"
-
-/**
- * Interface for expense query filters
- */
 export interface ExpenseWhereClause {
   userId?: string
   organizationId?: string
-  title?: {
-    contains: string
-    mode: "insensitive" | "default"
-  }
+  title?: { contains: string; mode: "insensitive" }
   date?: {
     gte?: Date
     lte?: Date
@@ -23,9 +15,6 @@ export interface ExpenseWhereClause {
   status?: string
 }
 
-/**
- * Interface for expense query parameters from URL
- */
 export interface ExpenseQueryParams {
   search?: string
   startDate?: string
@@ -39,7 +28,30 @@ export interface ExpenseQueryParams {
   sortOrder?: "asc" | "desc"
 }
 
-/**
- * Type for expense sort options
- */
-export type ExpenseSortField = keyof Prisma.ExpenseOrderByWithRelationInput
+export type ExpenseSortField = "date" | "amount" | "title" | "createdAt" | "updatedAt" | "status"
+
+export interface BudgetWhereClause {
+  userId?: string
+  organizationId?: string
+  name?: { contains: string; mode: "insensitive" }
+  startDate?: {
+    gte?: Date
+    lte?: Date
+  }
+  amount?: {
+    gte?: number
+    lte?: number
+  }
+}
+
+export interface BudgetQueryParams {
+  search?: string
+  startDate?: string
+  endDate?: string
+  minAmount?: number
+  maxAmount?: number
+  sortBy?: string
+  sortOrder?: "asc" | "desc"
+}
+
+export type BudgetSortField = "name" | "amount" | "startDate" | "createdAt" | "updatedAt"

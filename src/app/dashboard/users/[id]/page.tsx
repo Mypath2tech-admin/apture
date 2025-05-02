@@ -36,7 +36,8 @@ export default function UserDetail() {
 
   // Check if user is authorized to access this page
   const isAuthorized = currentUser?.role === "ADMIN" || currentUser?.role === "ORGANIZATION_ADMIN"
-  const hasOrganization = !!currentUser?.organizationId
+  const hasOrganization = !!currentUser?.organization?.id
+  console.log(currentUser)
 
   // Fetch user details
   useEffect(() => {
@@ -44,15 +45,15 @@ export default function UserDetail() {
       const fetchUser = async () => {
         setIsLoadingUser(true)
         setError(null)
-  
+
         try {
           const response = await fetch(`/api/organization/users/${params.id}`)
-  
+
           if (!response.ok) {
             const data = await response.json()
             throw new Error(data.error || "Failed to fetch user")
           }
-  
+
           const data = await response.json()
           setUser(data)
         } catch (err) {
@@ -63,12 +64,12 @@ export default function UserDetail() {
           setIsLoadingUser(false)
         }
       }
-  
+
       fetchUser()
     }
   }, [isLoading, isAuthenticated, isAuthorized, hasOrganization, params.id])
-  
-  
+
+
 
 
 
@@ -328,9 +329,8 @@ export default function UserDetail() {
                   <dt className="text-sm font-medium text-gray-500">Status</dt>
                   <dd className="mt-1">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
-                      }`}
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                        }`}
                     >
                       {user.isActive ? "Active" : "Inactive"}
                     </span>
