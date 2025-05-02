@@ -177,6 +177,7 @@ export async function GET(request: NextRequest) {
         name: cat.name,
         allocatedAmount: Number(cat.allocatedAmount),
         description: cat.description || undefined,
+        budgetId: budget.id, // ✅ add this
       }))
 
       return {
@@ -281,6 +282,7 @@ export async function POST(request: NextRequest) {
       name: cat.name,
       allocatedAmount: Number(cat.allocatedAmount),
       description: cat.description || undefined,
+      budgetId: budget.id, // ✅ add this
     }))
 
     // Create response object that matches our updated Budget interface
@@ -295,10 +297,10 @@ export async function POST(request: NextRequest) {
       updatedAt: budget.updatedAt.toISOString(),
       organizationId: budget.organizationId || undefined,
       userId: budget.userId || undefined,
-      projectId: budget.projectId || undefined,
-      spent: 0, // New budget, so spent is 0
-      remaining: Number(budget.amount), // New budget, so remaining is the full amount
-      progress: 0, // New budget, so progress is 0
+      // projectId: budget.projectId || undefined,
+      // spent: 0, // New budget, so spent is 0
+      // remaining: Number(budget.amount), // New budget, so remaining is the full amount
+      // progress: 0, // New budget, so progress is 0
       categories: mappedCategories.length > 0 ? mappedCategories : undefined,
     }
 

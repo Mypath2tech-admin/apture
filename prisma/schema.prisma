@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://greenor-database_owner:npg_juznvA7k6Ldr@ep-crimson-truth-a4lnd89i-pooler.us-east-1.aws.neon.tech/greenor-database?sslmode=require"
+  url      = env("DIRECT_URL")
 }
 
 model User {
@@ -27,6 +27,7 @@ model User {
   verificationToken       String?
   verificationTokenExpiry DateTime?
   emailVerified           Boolean          @default(false)
+  canViewOrgDashboard     Boolean?         @default(false)
   auditLogs               AuditLog[]
   budgets                 Budget[]
   expenses                Expense[]

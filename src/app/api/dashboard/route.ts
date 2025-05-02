@@ -7,6 +7,7 @@ import type { User, UserRole } from "../../../../generated/prisma"
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
 // Define types for the dashboard data
+// Define types for the dashboard data
 interface BudgetChange {
   value: string
   isPositive: boolean
@@ -18,6 +19,7 @@ interface RecentBudget {
   amount: string
   spent: string
   progress: number
+  isMasked: boolean
 }
 
 interface RecentExpense {
@@ -26,6 +28,7 @@ interface RecentExpense {
   amount: string
   date: string
   category: string
+  isMasked: boolean
 }
 
 interface OrganizationData {
@@ -51,6 +54,8 @@ interface DashboardData {
   recentBudgets: RecentBudget[]
   recentExpenses: RecentExpense[]
   organization?: OrganizationData
+  viewingOrgData: boolean // Flag to indicate if viewing org-wide data
+  shouldMaskFinancials: boolean // Flag to indicate if financial data should be masked
 }
 
 // Define type for user with organization
@@ -76,6 +81,7 @@ interface DashboardResponse {
     role: UserRole
     profileImage: string | null
     phoneNumber: string | null
+    canViewOrgDashboard: boolean
     organization: {
       id: string
       name: string
@@ -94,6 +100,11 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
     }
+
+    // Get view type from query params (personal or organization)
+    const { searchParams } = new URL(request.url)
+    const viewType = searchParams.get("view") || "personal"
+    const forcePersonal = viewType === "personal"
 
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as {
@@ -118,11 +129,20 @@ export async function GET(request: NextRequest) {
     })
 
     if (!user) {
-      return NextResponse.json({ error: "User not found", request }, { status: 404 })
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Fetch dashboard data based on user role
-    const dashboardData = await getDashboardData(user)
+    // Determine if user can view organization data
+    const canViewOrgData =
+      user.role === "ADMIN" || user.role === "ORGANIZATION_ADMIN" || user.canViewOrgDashboard === true
+
+    // Determine if financial data should be masked
+    // Mask financials for regular organization members
+    const shouldMaskFinancials =
+      user.organizationId !== null && user.role === "ORGANIZATION_MEMBER" && !user.canViewOrgDashboard
+
+    // Fetch dashboard data based on user role and permissions
+    const dashboardData = await getDashboardData(user, canViewOrgData && !forcePersonal, shouldMaskFinancials)
 
     // Return user data and dashboard data
     const response: DashboardResponse = {
@@ -135,6 +155,7 @@ export async function GET(request: NextRequest) {
         role: user.role,
         profileImage: user.profileImage,
         phoneNumber: user.phoneNumber,
+        canViewOrgDashboard: user.canViewOrgDashboard || false,
         organization: user.organization
           ? {
               id: user.organization.id,
@@ -154,7 +175,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-async function getDashboardData(user: UserWithOrganization): Promise<DashboardData> {
+async function getDashboardData(
+  user: UserWithOrganization,
+  viewOrgData: boolean,
+  shouldMaskFinancials: boolean,
+): Promise<DashboardData> {
   // Base structure for dashboard data
   const dashboardData: DashboardData = {
     totalBudget: 0,
@@ -175,6 +200,8 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
     },
     recentBudgets: [],
     recentExpenses: [],
+    viewingOrgData: viewOrgData,
+    shouldMaskFinancials: shouldMaskFinancials,
   }
 
   // Check if user belongs to an organization and fetch organization data
@@ -208,91 +235,88 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
     }
   }
 
-  // Get data based on user role
-  if (user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN" || user.role === "ORGANIZATION_MEMBER") {
-    // For organization admins, get org-wide data
-    if (user.organizationId) {
-      // Get total budget amount
-      const budgets = await prisma.budget.findMany({
-        where: { organizationId: user.organizationId },
-        select: { amount: true },
-      })
-      dashboardData.totalBudget = budgets.reduce((sum, budget) => sum + Number(budget.amount), 0)
+  // If user can view org data and viewOrgData is true, show organization-wide data
+  if (viewOrgData && user.organizationId) {
+    // Get total budget amount for the organization
+    const budgets = await prisma.budget.findMany({
+      where: { organizationId: user.organizationId },
+      select: { amount: true },
+    })
+    dashboardData.totalBudget = budgets.reduce((sum, budget) => sum + Number(budget.amount), 0)
 
-      // Get total expenses
-      const expenses = await prisma.expense.findMany({
-        where: { organizationId: user.organizationId },
-        select: { amount: true },
-      })
-      dashboardData.totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+    // Get total expenses for the organization
+    const expenses = await prisma.expense.findMany({
+      where: { organizationId: user.organizationId },
+      select: { amount: true },
+    })
+    dashboardData.totalExpenses = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
 
-      // Get timesheet hours
-      const timesheetEntries = await prisma.timesheetEntry.findMany({
-        where: {
-          timesheet: {
-            organizationId: user.organizationId,
-          },
+    // Get timesheet hours for the organization
+    const timesheetEntries = await prisma.timesheetEntry.findMany({
+      where: {
+        timesheet: {
+          organizationId: user.organizationId,
         },
-        select: { duration: true },
-      })
-      dashboardData.timesheetHours = Math.round(
-        timesheetEntries.reduce((sum, entry) => sum + Number(entry.duration), 0),
-      )
+      },
+      select: { duration: true },
+    })
+    dashboardData.timesheetHours = Math.round(timesheetEntries.reduce((sum, entry) => sum + Number(entry.duration), 0))
 
-      // Get team members count
-      dashboardData.teamMembers = dashboardData.organization?.memberCount || 0
+    // Get team members count
+    dashboardData.teamMembers = dashboardData.organization?.memberCount || 0
 
-      // Get recent budgets
-      const recentBudgets = await prisma.budget.findMany({
-        where: { organizationId: user.organizationId },
-        select: {
-          id: true,
-          name: true,
-          amount: true,
-          expenses: { select: { amount: true } },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 3,
-      })
+    // Get recent budgets for the organization
+    const recentBudgets = await prisma.budget.findMany({
+      where: { organizationId: user.organizationId },
+      select: {
+        id: true,
+        name: true,
+        amount: true,
+        expenses: { select: { amount: true } },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    })
 
-      // Calculate spent amount and progress for each budget
-      dashboardData.recentBudgets = recentBudgets.map((budget) => {
-        const spent = budget.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
-        const progress = Number(budget.amount) > 0 ? Math.round((spent / Number(budget.amount)) * 100) : 0
-        return {
-          id: budget.id,
-          name: budget.name,
-          amount: `$${Number(budget.amount).toFixed(2)}`,
-          spent: `$${spent.toFixed(2)}`,
-          progress,
-        }
-      })
+    // Calculate spent amount and progress for each budget
+    dashboardData.recentBudgets = recentBudgets.map((budget) => {
+      const spent = budget.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+      const progress = Number(budget.amount) > 0 ? Math.round((spent / Number(budget.amount)) * 100) : 0
+      return {
+        id: budget.id,
+        name: budget.name,
+        amount: shouldMaskFinancials ? "******" : `$${Number(budget.amount).toFixed(2)}`,
+        spent: shouldMaskFinancials ? "******" : `$${spent.toFixed(2)}`,
+        progress,
+        isMasked: shouldMaskFinancials,
+      }
+    })
 
-      // Get recent expenses
-      const recentExpenses = await prisma.expense.findMany({
-        where: { organizationId: user.organizationId },
-        select: {
-          id: true,
-          title: true,
-          amount: true,
-          date: true,
-          category: { select: { name: true } },
-        },
-        orderBy: { date: "desc" },
-        take: 3,
-      })
+    // Get recent expenses for the organization
+    const recentExpenses = await prisma.expense.findMany({
+      where: { organizationId: user.organizationId },
+      select: {
+        id: true,
+        title: true,
+        amount: true,
+        date: true,
+        category: { select: { name: true } },
+      },
+      orderBy: { date: "desc" },
+      take: 3,
+    })
 
-      // Format expense data
-      dashboardData.recentExpenses = recentExpenses.map((expense) => ({
-        id: expense.id,
-        name: expense.title,
-        amount: `$${Number(expense.amount).toFixed(2)}`,
-        date: expense.date.toISOString().split("T")[0],
-        category: expense.category?.name || "Uncategorized",
-      }))
-    }
+    // Format expense data
+    dashboardData.recentExpenses = recentExpenses.map((expense) => ({
+      id: expense.id,
+      name: expense.title,
+      amount: shouldMaskFinancials ? "******" : `$${Number(expense.amount).toFixed(2)}`,
+      date: expense.date.toISOString().split("T")[0],
+      category: expense.category?.name || "Uncategorized",
+      isMasked: shouldMaskFinancials,
+    }))
   } else if (user.organizationId) {
-    // For organization members, get personal data but include organization context
+    // For organization members viewing personal data
     // Get total budget amount for user within organization
     const budgets = await prisma.budget.findMany({
       where: {
@@ -351,9 +375,10 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
       return {
         id: budget.id,
         name: budget.name,
-        amount: `$${Number(budget.amount).toFixed(2)}`,
-        spent: `$${spent.toFixed(2)}`,
+        amount: shouldMaskFinancials ? "******" : `$${Number(budget.amount).toFixed(2)}`,
+        spent: shouldMaskFinancials ? "******" : `$${spent.toFixed(2)}`,
         progress,
+        isMasked: shouldMaskFinancials,
       }
     })
 
@@ -378,9 +403,10 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
     dashboardData.recentExpenses = recentExpenses.map((expense) => ({
       id: expense.id,
       name: expense.title,
-      amount: `$${Number(expense.amount).toFixed(2)}`,
+      amount: shouldMaskFinancials ? "******" : `$${Number(expense.amount).toFixed(2)}`,
       date: expense.date.toISOString().split("T")[0],
       category: expense.category?.name || "Uncategorized",
+      isMasked: shouldMaskFinancials,
     }))
   } else {
     // For regular users without organization, get personal data
@@ -432,6 +458,7 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
         amount: `$${Number(budget.amount).toFixed(2)}`,
         spent: `$${spent.toFixed(2)}`,
         progress,
+        isMasked: false,
       }
     })
 
@@ -456,6 +483,7 @@ async function getDashboardData(user: UserWithOrganization): Promise<DashboardDa
       amount: `$${Number(expense.amount).toFixed(2)}`,
       date: expense.date.toISOString().split("T")[0],
       category: expense.category?.name || "Uncategorized",
+      isMasked: false,
     }))
   }
 

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PieChart, DollarSign, Clock, Users, User, Settings, Menu, X, Plus, BarChart4 } from 'lucide-react'
+import { Home, PieChart, DollarSign, Clock, Users, User, Menu, X, Plus } from 'lucide-react'
 
 // Type for navigation items
 type NavItem = {
@@ -25,10 +25,10 @@ export default function DashboardSidebar() {
     { name: 'Budgets', href: '/dashboard/budgets', icon: PieChart, userTypes: ['user', 'organization'] },
     { name: 'Expenses', href: '/dashboard/expenses', icon: DollarSign, userTypes: ['user', 'organization'] },
     { name: 'Timesheets', href: '/dashboard/timesheets', icon: Clock, userTypes: ['user', 'organization'] },
-    { name: 'Reports', href: '/dashboard/reports', icon: BarChart4, userTypes: ['user', 'organization'] },
+    // { name: 'Reports', href: '/dashboard/reports', icon: BarChart4, userTypes: ['user', 'organization'] },
     { name: 'Team Members', href: '/dashboard/users', icon: Users, userTypes: ['organization'] },
     { name: 'Profile', href: '/dashboard/profile', icon: User, userTypes: ['user', 'organization'] },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings, userTypes: ['user', 'organization'] },
+    // { name: 'Settings', href: '/dashboard/settings', icon: Settings, userTypes: ['user', 'organization'] },
   ]
 
   // Filter navigation items based on user type
@@ -92,8 +92,8 @@ export default function DashboardSidebar() {
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                      ? 'bg-green-50 text-green-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-green-50 text-green-700'
+                    : 'text-gray-700 hover:bg-gray-100'
                     }`}
                 >
                   <item.icon
@@ -108,12 +108,13 @@ export default function DashboardSidebar() {
 
           {/* Quick actions */}
           <div className="p-4 border-t border-gray-200">
-            <button
+            <Link href={'budgets/create'} ><button
               className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             >
               <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
               New Budget
-            </button>
+            </button></Link>
+
           </div>
         </div>
       </aside>
