@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import prisma from "@/lib/prisma"
-import type { ExpenseWhereClause, ExpenseQueryParams, ExpenseSortField } from "../../../types/apis"
+import type { ExpenseWhereClause, ExpenseQueryParams, ExpenseSortField } from "@/types/apis"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
-    const user = await prisma.user.findUnique({ where: { id: decoded.userId } })
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      include: { organization: true },
+    })
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
@@ -33,6 +36,7 @@ export async function GET(request: NextRequest) {
       maxAmount: searchParams.get("maxAmount") ? Number(searchParams.get("maxAmount")) : undefined,
       categoryId: searchParams.get("categoryId") || undefined,
       budgetId: searchParams.get("budgetId") || undefined,
+      status: searchParams.get("status") || undefined,
       sortBy: searchParams.get("sortBy") || "date",
       sortOrder: (searchParams.get("sortOrder") as "asc" | "desc") || "desc",
     }
@@ -40,11 +44,15 @@ export async function GET(request: NextRequest) {
     // Build where clause
     const where: ExpenseWhereClause = {}
 
-    if (user.role === "ORGANIZATION_ADMIN" && user.organizationId) {
+    // IMPORTANT CHANGE: If user belongs to an organization, show all organization expenses
+    if (user.organizationId) {
+      // Show all expenses from the user's organization
       where.organizationId = user.organizationId
-    } else if (user.role === "USER") {
+    } else if (user.role !== "ADMIN") {
+      // Non-admin users without an organization only see their own expenses
       where.userId = user.id
     }
+    // Global admins can see all expenses (no filter)
 
     if (queryParams.search) {
       where.title = { contains: queryParams.search, mode: "insensitive" }
@@ -62,22 +70,40 @@ export async function GET(request: NextRequest) {
       if (queryParams.maxAmount !== undefined) where.amount.lte = queryParams.maxAmount
     }
 
-    if (queryParams.categoryId) {
+    if (queryParams.categoryId && queryParams.categoryId !== "all") {
       where.categoryId = queryParams.categoryId
     }
 
-    if (queryParams.budgetId) {
+    if (queryParams.budgetId && queryParams.budgetId !== "all") {
       where.budgetId = queryParams.budgetId
     }
 
-    const sortBy = (queryParams.sortBy as ExpenseSortField) || "date"
+    if (queryParams.status && queryParams.status !== "all") {
+      where.status = queryParams.status
+    }
+
+    // Validate sort field
+    const validSortFields = ["date", "amount", "title", "createdAt", "updatedAt", "status"]
+    const sortBy = validSortFields.includes(queryParams.sortBy || "")
+      ? (queryParams.sortBy as ExpenseSortField)
+      : "date"
+
     const sortOrder = queryParams.sortOrder || "desc"
+
+    console.log("Expense query where clause:", JSON.stringify(where, null, 2))
+    console.log("Sorting by:", sortBy, sortOrder)
 
     const expenses = await prisma.expense.findMany({
       where,
       include: {
         category: true,
         budget: {
+          select: { id: true, name: true },
+        },
+        user: {
+          select: { id: true, firstName: true, lastName: true, email: true },
+        },
+        organization: {
           select: { id: true, name: true },
         },
       },
@@ -95,6 +121,7 @@ export async function GET(request: NextRequest) {
       budgetId: expense.budgetId || undefined,
       userId: expense.userId,
       organizationId: expense.organizationId || undefined,
+      // status: expense.status || "PENDING",
       createdAt: expense.createdAt.toISOString(),
       updatedAt: expense.updatedAt.toISOString(),
       category: expense.category
@@ -109,6 +136,23 @@ export async function GET(request: NextRequest) {
             name: expense.budget.name,
           }
         : undefined,
+      user: expense.user
+        ? {
+            id: expense.user.id,
+            name:
+              `${expense.user.firstName || ""} ${expense.user.lastName || ""}`.trim() ||
+              expense.user.email.split("@")[0],
+            email: expense.user.email,
+          }
+        : undefined,
+      organization: expense.organization
+        ? {
+            id: expense.organization.id,
+            name: expense.organization.name,
+          }
+        : undefined,
+      // Add a flag to indicate if the current user can edit this expense
+      canEdit: user.role === "ADMIN" || user.role === "ORGANIZATION_ADMIN" || expense.userId === user.id,
     }))
 
     return NextResponse.json(formattedExpenses)
@@ -136,6 +180,7 @@ export async function POST(request: NextRequest) {
     // Get user
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
+      include: { organization: true },
     })
 
     if (!user) {
@@ -250,6 +295,9 @@ export async function POST(request: NextRequest) {
       finalCategoryId = defaultCategory.id
     }
 
+    // Set default status based on user role
+    // const finalStatus = status || (user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN" ? "APPROVED" : "PENDING")
+
     // Create expense
     const expense = await prisma.expense.create({
       data: {
@@ -262,10 +310,25 @@ export async function POST(request: NextRequest) {
         budgetId,
         userId: user.id,
         organizationId: user.organizationId,
+        // status: finalStatus,
       },
       include: {
         category: true,
         budget: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        },
+        organization: {
           select: {
             id: true,
             name: true,
@@ -285,6 +348,7 @@ export async function POST(request: NextRequest) {
       budgetId: expense.budgetId || undefined,
       userId: expense.userId,
       organizationId: expense.organizationId || undefined,
+      // status: expense.status,
       createdAt: expense.createdAt.toISOString(),
       updatedAt: expense.updatedAt.toISOString(),
       category: expense.category
@@ -297,6 +361,21 @@ export async function POST(request: NextRequest) {
         ? {
             id: expense.budget.id,
             name: expense.budget.name,
+          }
+        : undefined,
+      user: expense.user
+        ? {
+            id: expense.user.id,
+            name:
+              `${expense.user.firstName || ""} ${expense.user.lastName || ""}`.trim() ||
+              expense.user.email.split("@")[0],
+            email: expense.user.email,
+          }
+        : undefined,
+      organization: expense.organization
+        ? {
+            id: expense.organization.id,
+            name: expense.organization.name,
           }
         : undefined,
     })

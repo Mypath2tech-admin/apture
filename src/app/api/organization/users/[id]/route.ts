@@ -1,7 +1,10 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
+import jwt from "jsonwebtoken"
 import prisma from "@/lib/prisma"
 
+
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
 // GET a specific user in the organization
 export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
@@ -16,14 +19,15 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
         }
 
         // Verify token
-        // const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
 
         // Get current user with organization
         const currentUser = await prisma.user.findUnique({
-            where: { id },
+            where: { id: decoded.userId },
             include: { organization: true },
         })
 
+        console.log(currentUser)
         if (!currentUser) {
             return NextResponse.json({ error: "User not found" }, { status: 404 })
         }
@@ -83,11 +87,11 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         }
 
         // Verify token
-        // const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
 
         // Get current user with organization
         const currentUser = await prisma.user.findUnique({
-            where: { id },
+            where: { id: decoded.userId },
             include: { organization: true },
         })
 
@@ -172,11 +176,11 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
         }
 
         // Verify token
-        // const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string }
 
         // Get current user with organization
         const currentUser = await prisma.user.findUnique({
-            where: { id },
+            where: { id: decoded.userId },
             include: { organization: true },
         })
 

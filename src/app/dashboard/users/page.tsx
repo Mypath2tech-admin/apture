@@ -320,7 +320,7 @@ export default function OrganizationUsers() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
-                            href={`/dashboard/organization/users/${orgUser.id}`}
+                            href={`/dashboard/users/${orgUser.id}`}
                             className="text-green-600 hover:text-green-900"
                           >
                             View

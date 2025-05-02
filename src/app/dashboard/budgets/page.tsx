@@ -6,6 +6,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
 import { toast } from "react-toastify"
+import { useAuthStore } from "@/lib/store/authStore"
 
 interface Budget {
   id: string
@@ -22,6 +23,8 @@ interface Budget {
 export default function Budgets() {
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState<boolean>(true)
+  const {user} = useAuthStore()
+  console.log(user)
 
   useEffect(() => {
     const fetchBudgets = async () => {
@@ -41,19 +44,28 @@ export default function Budgets() {
     fetchBudgets()
   }, [])
 
+  // Check if user has permission to create a budget
+  const canCreateBudget = user?.role === "ADMIN" || user?.role === "ORGANIZATION_ADMIN"
+
   return (
     <div>
       <PageHeader
         title="Budgets"
         description="Manage and track your budgets"
         action={
-          <Link
-            href="/dashboard/budgets/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Create Budget
-          </Link>
+          canCreateBudget ? (
+            <Link
+              href="/dashboard/budgets/create"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            >
+              <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Create Budget
+            </Link>
+          ) : (
+            <div className="text-sm text-gray-500">
+              You don&apos;t have permission to create budgets
+            </div>
+          )
         }
       />
 

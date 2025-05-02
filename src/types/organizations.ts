@@ -9,8 +9,13 @@ export interface OrganizationUser {
   isActive?: boolean
   createdAt?: string
   updatedAt?: string
+  organization?:UserOrg
 }
-
+export interface UserOrg{
+  id:string
+  logo:string
+  name:string
+}
 export interface AddUserFormData {
   email: string
   firstName: string
