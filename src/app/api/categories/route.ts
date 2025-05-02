@@ -99,10 +99,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Only admin and organization admin can create categories
-    if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    }
+    // // Only admin and organization admin can create categories
+    // if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    // }
 
     const body = await request.json()
     const { name, description, budgetId } = body

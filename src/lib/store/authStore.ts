@@ -17,6 +17,8 @@ interface User {
         logo: string | null
     } | null
     createdAt: string
+    canViewOrgDashboard? : boolean
+    organizationId?: string
 }
 
 interface DashboardData {

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PieChart, DollarSign, Clock, Users, User, Settings, Menu, X, Plus, BarChart4 } from 'lucide-react'
+import { Home, PieChart, DollarSign, Clock, Users, User, Menu, X, Plus } from 'lucide-react'
 
 // Type for navigation items
 type NavItem = {
@@ -25,10 +25,10 @@ export default function DashboardSidebar() {
     { name: 'Budgets', href: '/dashboard/budgets', icon: PieChart, userTypes: ['user', 'organization'] },
     { name: 'Expenses', href: '/dashboard/expenses', icon: DollarSign, userTypes: ['user', 'organization'] },
     { name: 'Timesheets', href: '/dashboard/timesheets', icon: Clock, userTypes: ['user', 'organization'] },
-    { name: 'Reports', href: '/dashboard/reports', icon: BarChart4, userTypes: ['user', 'organization'] },
+    // { name: 'Reports', href: '/dashboard/reports', icon: BarChart4, userTypes: ['user', 'organization'] },
     { name: 'Team Members', href: '/dashboard/users', icon: Users, userTypes: ['organization'] },
     { name: 'Profile', href: '/dashboard/profile', icon: User, userTypes: ['user', 'organization'] },
-    { name: 'Settings', href: '/dashboard/settings', icon: Settings, userTypes: ['user', 'organization'] },
+    // { name: 'Settings', href: '/dashboard/settings', icon: Settings, userTypes: ['user', 'organization'] },
   ]
 
   // Filter navigation items based on user type

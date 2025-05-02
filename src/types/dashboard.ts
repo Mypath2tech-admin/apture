@@ -1,43 +1,48 @@
+export interface User {
+  id: string
+  email: string
+  firstName?: string
+  lastName?: string
+  role: "ADMIN" | "USER" | "ORGANIZATION_ADMIN" | "ORGANIZATION_MEMBER"
+  organizationId?: string
+  organization?: Organization
+  canViewOrgDashboard?: boolean
+}
+
+export interface Organization {
+  id: string
+  name: string
+  email?: string
+  description?: string
+  logo?: string
+  website?: string
+  memberCount?: number
+  totalBudgets?: number
+  totalExpenses?: number
+}
+
 export interface Budget {
   id: string
   name: string
+  description?: string
   amount: number
   startDate: string
   endDate?: string
-  description?: string
-  createdAt: string
-  updatedAt: string
-  organizationId?: string
   userId?: string
-  projectId?: string
-  spent: number
-  remaining: number
-  progress: number
+  organizationId?: string
   categories?: BudgetCategory[]
   expenses?: Expense[]
-}
-
-export interface Expense {
-  id: string
-  title: string
-  amount: number
-  date: string
-  description?: string
-  receipt?: string
-  categoryId?: string
-  budgetId?: string
-  userId: string
-  organizationId?: string
   createdAt: string
   updatedAt: string
-  category?: {
-    id: string
-    name: string
-  }
-  budget?: {
-    id: string
-    name: string
-  }
+}
+
+export interface BudgetCategory {
+  id: string
+  name: string
+  description?: string
+  allocatedAmount: number
+  budgetId: string
+  expenses?: Expense[]
 }
 
 export interface ExpenseCategory {
@@ -49,32 +54,27 @@ export interface ExpenseCategory {
   budgetName?: string
 }
 
-export interface BudgetCategory {
+export interface Expense {
   id: string
-  name: string
-}
-
-export interface BudgetFilters {
-  search?: string
-  startDate?: string
-  endDate?: string
-  minAmount?: number
-  maxAmount?: number
-  sortBy?: "name" | "amount" | "startDate" | "endDate" | "progress"
-  sortOrder?: "asc" | "desc"
-}
-
-export interface ExpenseFilters {
-  search?: string
-  startDate?: string
-  endDate?: string
-  minAmount?: number
-  maxAmount?: number
+  title: string
+  description?: string
+  amount: number
+  date: string
+  receipt?: string
   categoryId?: string
+  category?: {
+    id: string
+    name: string
+  }
   budgetId?: string
-  status?: "PENDING" | "APPROVED" | "REJECTED"
-  sortBy?: "title" | "amount" | "date" | "category" | "status"
-  sortOrder?: "asc" | "desc"
+  budget?: {
+    id: string
+    name: string
+  }
+  userId: string
+  organizationId?: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface DashboardStats {
@@ -96,4 +96,52 @@ export interface DashboardStats {
     spent: number
     remaining: number
   }[]
+}
+export interface ExpenseFilters {
+  search?: string
+  startDate?: string
+  endDate?: string
+  minAmount?: number
+  maxAmount?: number
+  categoryId?: string
+  budgetId?: string
+  status?: "PENDING" | "APPROVED" | "REJECTED"
+  sortBy?: "title" | "amount" | "date" | "category" | "status"
+  sortOrder?: "asc" | "desc"
+}
+
+
+export interface DashboardData {
+  totalBudget: number
+  totalExpenses: number
+  timesheetHours: number
+  teamMembers: number
+  budgetChange: {
+    value: string
+    isPositive: boolean
+  }
+  expenseChange: {
+    value: string
+    isPositive: boolean
+  }
+  timesheetChange: {
+    value: string
+    isPositive: boolean
+  }
+  recentBudgets: {
+    id: string
+    name: string
+    amount: string
+    spent: string
+    progress: number
+  }[]
+  recentExpenses: {
+    id: string
+    name: string
+    amount: string
+    date: string
+    category: string
+  }[]
+  organization?: Organization
+  viewingOrgData: boolean
 }

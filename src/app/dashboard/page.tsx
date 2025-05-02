@@ -1,215 +1,247 @@
 "use client"
-import { useState } from "react"
-import { DollarSign, TrendingUp, Users, Clock } from "lucide-react"
-import PageHeader from "@/components/dashboard/PageHeader"
-import DashboardStats, { StatItem } from "@/components/dashboard/DashboardStats"
-import DashboardCard from "@/components/dashboard/DashboardCard"
-import Link from "next/link"
-import { useAuthStore } from "@/lib/store/authStore"
-import { useEffect } from "react"
+
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useAuthStore } from "@/lib/store/authStore"
+import DashboardCard from "@/components/dashboard/DashboardCard"
+import PageHeader from "@/components/dashboard/PageHeader"
+import { Eye } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import type { DashboardData } from "@/types/dashboard"
+import { DollarSign, TrendingUp, Users, Clock } from "lucide-react"
+import { StatItem } from "@/components/dashboard/DashboardStats"
+import DashboardStats from "@/components/dashboard/DashboardStats"
 
 export default function Dashboard() {
-    const { 
-        fetchDashboardData, 
-        fetchUserDetails, 
-        isAuthenticated, 
-        isLoading, 
-        dashboardData, 
-        user 
-    } = useAuthStore()
-    const [hasFetched, setHasFetched] = useState(false)
-    
-    const router = useRouter()
-    useEffect(() => {
-        // Handle redirect if not authenticated
-        if (!isAuthenticated && !isLoading) {
-            router.push("/signin")
-            return
-        }
+  const router = useRouter()
+  const { user, isAuthenticated, isLoading } = useAuthStore()
 
-        // Only fetch data once after authentication is confirmed
-        if (isAuthenticated && !isLoading && !hasFetched) {
-            // Mark that we've started fetching to prevent additional fetches
-            setHasFetched(true)
-            
-            // Fetch data
-            if (!user) {
-                fetchUserDetails()
-            }
-            fetchDashboardData()
-        }
-    }, [
-        isAuthenticated, 
-        isLoading, 
-        hasFetched, 
-        user, 
-        fetchUserDetails, 
-        fetchDashboardData, 
-        router
-    ])
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
+  const [isLoadingData, setIsLoadingData] = useState(true)
+  const [viewType, setViewType] = useState<"personal" | "organization">("personal")
+  const [error, setError] = useState<string | null>(null)
 
-    // Show loading state
-    if (isLoading || !dashboardData) {
-        return <DashboardSkeleton />
+  // Check if user can view organization data
+  const canViewOrgData =
+    user?.role === "ADMIN" || user?.role === "ORGANIZATION_ADMIN" || user?.canViewOrgDashboard === true
+
+  // Fetch dashboard data
+  const fetchDashboardData = async (view: "personal" | "organization" = "personal") => {
+    setIsLoadingData(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/dashboard?view=${view}`)
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || "Failed to fetch dashboard data")
+      }
+
+      const data = await response.json()
+      setDashboardData(data.dashboardData)
+    } catch (err) {
+      console.error("Error fetching dashboard data:", err)
+      setError(err instanceof Error ? err.message : "Failed to load dashboard data")
+    } finally {
+      setIsLoadingData(false)
     }
+  }
 
-    const isOrgAdmin = user?.role === "ORGANIZATION_ADMIN" || user?.role === "ADMIN" || user?.role === "ORGANIZATION_MEMBER"
+  // Handle tab change
+  const handleViewChange = (value: string) => {
+    const newViewType = value as "personal" | "organization"
+    setViewType(newViewType)
+    fetchDashboardData(newViewType)
+  }
 
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      fetchDashboardData(viewType)
+    }
+  }, [isLoading, isAuthenticated, viewType])
+
+  // Show loading state while checking authentication
+  if (isLoading) {
     return (
-        <div>
-            <PageHeader
-                title="Dashboard"
-                description={`Welcome back! ${user?.firstName} Here's an overview of your finances.`}
-                action={
-                    <Link
-                        href="/dashboard/budgets/create"
-                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                        Create Budget
-                    </Link>
-                }
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+      </div>
+    )
+  }
+
+  // If not authenticated, redirect to login
+  if (!isLoading && !isAuthenticated) {
+    router.push("/signin")
+    return null
+  }
+
+  return (
+    <div>
+      <PageHeader
+        title="Dashboard"
+        description={`Welcome back, ${user?.firstName || user?.email?.split("@")[0] || "User"}`}
+      />
+
+      {user?.organizationId && canViewOrgData && (
+        <div className="mb-6">
+          <Tabs defaultValue={viewType} onValueChange={handleViewChange}>
+            <TabsList>
+              <TabsTrigger value="personal" className="flex items-center">
+                <Eye className="mr-2 h-4 w-4" />
+                Personal View
+              </TabsTrigger>
+              <TabsTrigger value="organization" className="flex items-center">
+                <Eye className="mr-2 h-4 w-4" />
+                Organization View
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      )}
+
+      {isLoadingData ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        </div>
+      ) : dashboardData ? (
+        <>
+          <DashboardStats className="mb-6">
+            <StatItem
+              title="Total Budget"
+              value={`$${dashboardData.totalBudget.toFixed(2)}`}
+              icon={<DollarSign className="h-6 w-6" />}
+              change={dashboardData.budgetChange}
             />
+            <StatItem
+              title="Total Expenses"
+              value={`$${dashboardData.totalExpenses.toFixed(2)}`}
+              icon={<TrendingUp className="h-6 w-6" />}
+              change={dashboardData.expenseChange}
+            />
+            <StatItem
+              title="Timesheet Hours"
+              value={dashboardData.timesheetHours.toString()}
+              icon={<Clock className="h-6 w-6" />}
+              change={dashboardData.timesheetChange}
+            />
+            <StatItem
+              title="Team Members"
+              value={dashboardData.teamMembers.toString()}
+              icon={<Users className="h-6 w-6" />}
+            />
+          </DashboardStats>
 
-            <DashboardStats className="mb-6">
-                <StatItem
-                    title="Total Budget"
-                    value={`$${dashboardData.totalBudget.toFixed(2)}`}
-                    icon={<DollarSign className="h-6 w-6" />}
-                    change={dashboardData.budgetChange}
-                />
-                <StatItem
-                    title="Total Expenses"
-                    value={`$${dashboardData.totalExpenses.toFixed(2)}`}
-                    icon={<TrendingUp className="h-6 w-6" />}
-                    change={dashboardData.expenseChange}
-                />
-                <StatItem
-                    title="Timesheet Hours"
-                    value={dashboardData.timesheetHours.toString()}
-                    icon={<Clock className="h-6 w-6" />}
-                    change={dashboardData.timesheetChange}
-                />
-                {isOrgAdmin && (
-                    <StatItem
-                        title="Team Members"
-                        value={dashboardData.teamMembers.toString()}
-                        icon={<Users className="h-6 w-6" />}
-                    />
-                )}
-            </DashboardStats>
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                <DashboardCard
-                    title="Recent Budgets"
-                    action={
-                        <Link href="/dashboard/budgets" className="text-sm font-medium text-green-600 hover:text-green-500">
-                            View all
-                        </Link>
-                    }
-                >
-                    {dashboardData.recentBudgets.length === 0 ? (
-                        <EmptyState message="No budgets found" actionLink="/dashboard/budgets/create" actionText="Create Budget" />
-                    ) : (
-                        <div className="space-y-4">
-                            {dashboardData.recentBudgets.map((budget) => (
-                                <div key={budget.id} className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-sm font-medium text-gray-900">{budget.name}</h4>
-                                        <div className="mt-1 flex items-center space-x-2">
-                                            <span className="text-sm text-gray-500">
-                                                {budget.spent} of {budget.amount}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div className="h-full bg-green-600 rounded-full" style={{ width: `${budget.progress}%` }} />
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </DashboardCard>
-
-                <DashboardCard
-                    title="Recent Expenses"
-                    action={
-                        <Link href="/dashboard/expenses" className="text-sm font-medium text-green-600 hover:text-green-500">
-                            View all
-                        </Link>
-                    }
-                >
-                    {dashboardData.recentExpenses.length === 0 ? (
-                        <EmptyState message="No expenses found" actionLink="/dashboard/expenses/create" actionText="Add Expense" />
-                    ) : (
-                        <div className="space-y-4">
-                            {dashboardData.recentExpenses.map((expense) => (
-                                <div key={expense.id} className="flex items-center justify-between">
-                                    <div>
-                                        <h4 className="text-sm font-medium text-gray-900">{expense.name}</h4>
-                                        <div className="mt-1 flex items-center space-x-2">
-                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800">
-                                                {expense.category}
-                                            </span>
-                                            <span className="text-sm text-gray-500">{expense.date}</span>
-                                        </div>
-                                    </div>
-                                    <span className="text-sm font-medium text-gray-900">{expense.amount}</span>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </DashboardCard>
-            </div>
-        </div>
-    )
-}
-
-// Helper components remain unchanged
-function DashboardSkeleton() {
-    return (
-        <div>
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <Skeleton className="h-8 w-48 mb-2" />
-                    <Skeleton className="h-4 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <DashboardCard title="Recent Budgets">
+              {dashboardData.recentBudgets.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No budgets found</p>
+                  <Button
+                    onClick={() => router.push("/dashboard/budgets/create")}
+                    className="mt-4 bg-green-600 hover:bg-green-700"
+                  >
+                    Create Budget
+                  </Button>
                 </div>
-                <Skeleton className="h-10 w-32" />
-            </div>
+              ) : (
+                <div className="space-y-4">
+                  {dashboardData.recentBudgets.map((budget) => (
+                    <div key={budget.id} className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium">{budget.name}</h4>
+                        <div className="flex items-center mt-1">
+                          <div className="w-32 bg-gray-200 rounded-full h-2.5">
+                            <div
+                              className={`h-2.5 rounded-full ${
+                                budget.progress > 90
+                                  ? "bg-red-500"
+                                  : budget.progress > 70
+                                    ? "bg-yellow-500"
+                                    : "bg-green-500"
+                              }`}
+                              style={{ width: `${Math.min(budget.progress, 100)}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-gray-500 ml-2">{budget.progress}%</span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium">{budget.amount}</div>
+                        <div className="text-xs text-gray-500">Spent: {budget.spent}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DashboardCard>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {[1, 2, 3, 4].map((i) => (
-                    <Skeleton key={i} className="h-32 rounded-lg" />
-                ))}
-            </div>
+            <DashboardCard title="Recent Expenses">
+              {dashboardData.recentExpenses.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">No expenses found</p>
+                  <Button
+                    onClick={() => router.push("/dashboard/expenses/create")}
+                    className="mt-4 bg-green-600 hover:bg-green-700"
+                  >
+                    Add Expense
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {dashboardData.recentExpenses.map((expense) => (
+                    <div key={expense.id} className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-medium">{expense.name}</h4>
+                        <div className="text-xs text-gray-500 mt-1">{expense.date}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium">{expense.amount}</div>
+                        <div className="text-xs text-gray-500">{expense.category}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </DashboardCard>
+          </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Skeleton className="h-64 rounded-lg" />
-                <Skeleton className="h-64 rounded-lg" />
-            </div>
+          {dashboardData.viewingOrgData && dashboardData.organization && (
+            <DashboardCard title="Organization Overview" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-green-800">Organization</h4>
+                  <p className="text-lg font-semibold mt-1">{dashboardData.organization.name}</p>
+                  {dashboardData.organization.description && (
+                    <p className="text-sm text-gray-600 mt-1">{dashboardData.organization.description}</p>
+                  )}
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-green-800">Team Size</h4>
+                  <p className="text-lg font-semibold mt-1">{dashboardData.organization.memberCount} members</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {dashboardData.organization.totalBudgets} budgets · {dashboardData.organization.totalExpenses}{" "}
+                    expenses
+                  </p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-green-800">Contact</h4>
+                  <p className="text-sm mt-1">{dashboardData.organization.email || "No email provided"}</p>
+                  <p className="text-sm mt-1">{dashboardData.organization.website || "No website provided"}</p>
+                </div>
+              </div>
+            </DashboardCard>
+          )}
+        </>
+      ) : error ? (
+        <div className="text-center py-8">
+          <p className="text-red-500">{error}</p>
+          <Button onClick={() => fetchDashboardData(viewType)} className="mt-4 bg-green-600 hover:bg-green-700">
+            Try Again
+          </Button>
         </div>
-    )
-}
-
-function EmptyState({
-    message,
-    actionLink,
-    actionText,
-}: {
-    message: string
-    actionLink: string
-    actionText: string
-}) {
-    return (
-        <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-gray-500 mb-4">{message}</p>
-            <Link
-                href={actionLink}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-                {actionText}
-            </Link>
-        </div>
-    )
+      ) : null}
+    </div>
+  )
 }
