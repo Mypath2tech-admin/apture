@@ -10,6 +10,7 @@ import Link from "next/link"
 import { toast } from "react-toastify"
 import { Switch } from "@/components/ui/switch"
 import { type User, UserRole } from "../../../../../generated/prisma"
+import { DatePickerDemo } from "@/components/ui/date-picker"
 
 interface CategoryInput {
   name: string
@@ -68,12 +69,13 @@ export default function CreateBudget() {
     }
 
     fetchCurrentUser()
-    
+
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+    console.log(formData)
   }
 
   const handleToggleTimeframe = (checked: boolean) => {
@@ -150,7 +152,7 @@ export default function CreateBudget() {
   return (
     <div>
       <PageHeader
-        title={`Create Budget ${currentUser?.firstName}`}
+        title={`Create a Budget ${currentUser?.firstName}`}
         description="Set up a new budget to track your expenses"
         action={
           <Link
@@ -216,7 +218,7 @@ export default function CreateBudget() {
                   <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
                     Start Date *
                   </label>
-                  <input
+                  {/* <input
                     type="date"
                     name="startDate"
                     id="startDate"
@@ -224,21 +226,33 @@ export default function CreateBudget() {
                     value={formData.startDate}
                     onChange={handleChange}
                     className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
-                  />
+                  /> */}
+                  <DatePickerDemo
+                    name="startDate"
+                    id="startDate"
+                    required={formData.hasTimeframe}
+                    value={formData.startDate}
+                    onChange={handleChange} />
                 </div>
 
                 <div>
                   <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
                     End Date
                   </label>
-                  <input
+                  {/* <input
                     type="date"
                     name="endDate"
                     id="endDate"
                     value={formData.endDate}
                     onChange={handleChange}
                     className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
-                  />
+                  /> */}
+                  <DatePickerDemo
+                      name="endDate"
+                      id="endDate"
+                      required={formData.hasTimeframe}
+                      value={formData.endDate}
+                      onChange={handleChange} />
                 </div>
               </>
             )}

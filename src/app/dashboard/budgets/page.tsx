@@ -1,12 +1,36 @@
 "use client"
 
-import { Plus } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import {
+  PlusCircle,
+  Search,
+  DollarSign,
+  ArrowUpRight,
+  Download,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  Eye,
+} from "lucide-react"
 import PageHeader from "@/components/dashboard/PageHeader"
-import DashboardCard from "@/components/dashboard/DashboardCard"
-import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "react-toastify"
-import { useAuthStore } from "@/lib/store/authStore"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface Budget {
   id: string
@@ -18,21 +42,30 @@ interface Budget {
   startDate: string
   endDate?: string
   description?: string
+  categories?: { id: string; name: string }[]
+  createdBy?: { name: string; email: string }
+  organization?: { name: string }
+  canEdit?: boolean
 }
 
 export default function Budgets() {
+  const router = useRouter()
   const [budgets, setBudgets] = useState<Budget[]>([])
+  const [filteredBudgets, setFilteredBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState<boolean>(true)
-  const {user} = useAuthStore()
-  console.log(user)
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [sortBy, setSortBy] = useState<string>("newest")
+  const [viewType, setViewType] = useState<string>("all")
 
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
+        setLoading(true)
         const res = await fetch("/api/budget")
         if (!res.ok) throw new Error("Failed to fetch budgets")
         const data = await res.json()
         setBudgets(data)
+        setFilteredBudgets(data)
       } catch (error) {
         console.error("Error fetching budgets:", error)
         toast.error("Failed to load budgets.")
@@ -44,90 +77,289 @@ export default function Budgets() {
     fetchBudgets()
   }, [])
 
-  // Check if user has permission to create a budget
-  const canCreateBudget = user?.role === "ADMIN" || user?.role === "ORGANIZATION_ADMIN"
+  useEffect(() => {
+    // Filter and sort budgets
+    let result = [...budgets]
+
+    // Apply search filter
+    if (searchQuery) {
+      result = result.filter(
+        (budget) =>
+          budget.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          budget.description?.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    }
+
+    // Apply view type filter
+    if (viewType === "active") {
+      result = result.filter((budget) => budget.progress < 100)
+    } else if (viewType === "completed") {
+      result = result.filter((budget) => budget.progress >= 100)
+    }
+
+    // Apply sorting
+    if (sortBy === "newest") {
+      result.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
+    } else if (sortBy === "oldest") {
+      result.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    } else if (sortBy === "highest") {
+      result.sort((a, b) => b.amount - a.amount)
+    } else if (sortBy === "lowest") {
+      result.sort((a, b) => a.amount - b.amount)
+    } else if (sortBy === "progress") {
+      result.sort((a, b) => b.progress - a.progress)
+    }
+
+    setFilteredBudgets(result)
+  }, [budgets, searchQuery, sortBy, viewType])
+
+ 
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this budget?")) {
+      try {
+        const res = await fetch(`/api/budget/${id}`, {
+          method: "DELETE",
+        })
+
+        if (!res.ok) throw new Error("Failed to delete budget")
+
+        setBudgets(budgets.filter((budget) => budget.id !== id))
+        toast.success("Budget deleted successfully")
+      } catch (error) {
+        console.error("Error deleting budget:", error)
+        toast.error("Failed to delete budget")
+      }
+    }
+  }
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Budgets"
-        description="Manage and track your budgets"
+        description="Manage and track your financial allocations"
         action={
-          canCreateBudget ? (
-            <Link
-              href="/dashboard/budgets/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-              Create Budget
-            </Link>
-          ) : (
-            <div className="text-sm text-gray-500">
-              You don&apos;t have permission to create budgets
-            </div>
-          )
+          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-green-600 hover:bg-green-700">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Create Budget
+          </Button>
         }
       />
 
-      <div className="mt-6 grid grid-cols-1 gap-6">
-        {loading ? (
-          <p className="text-center text-muted-foreground">Loading budgets...</p>
-        ) : budgets.length === 0 ? (
-          <p className="text-center text-muted-foreground">No budgets found.</p>
-        ) : (
-          budgets.map((budget) => (
-            <DashboardCard
-              key={budget.id}
-              title={budget.name}
-              action={
-                <Link
-                  href={`/dashboard/budgets/${budget.id}`}
-                  className="text-sm font-medium text-green-600 hover:text-green-500"
-                >
-                  View Details
-                </Link>
-              }
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div className="relative w-full md:w-72">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="search"
+            placeholder="Search budgets..."
+            className="pl-8"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
+          <Tabs defaultValue="all" className="w-full sm:w-auto" onValueChange={setViewType}>
+            <TabsList className="grid grid-cols-3 w-full sm:w-[300px]">
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="active">Active</TabsTrigger>
+              <TabsTrigger value="completed">Completed</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <Select defaultValue="newest" onValueChange={setSortBy}>
+            <SelectTrigger className="w-full sm:w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">Newest First</SelectItem>
+              <SelectItem value="oldest">Oldest First</SelectItem>
+              <SelectItem value="highest">Highest Amount</SelectItem>
+              <SelectItem value="lowest">Lowest Amount</SelectItem>
+              <SelectItem value="progress">Progress</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button variant="outline" className="w-full sm:w-auto">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="grid grid-cols-1 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="overflow-hidden">
+              <CardHeader className="pb-2">
+                <Skeleton className="h-6 w-1/3" />
+                <Skeleton className="h-4 w-1/4 mt-2" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="space-y-2">
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-6 w-24" />
+                    </div>
+                  ))}
+                </div>
+                <Skeleton className="h-4 w-full mt-6" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : filteredBudgets.length === 0 ? (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-10">
+            <DollarSign className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-medium">No budgets found</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {searchQuery ? "Try adjusting your search or filters" : "Create your first budget to get started"}
+            </p>
+            <Button
+              onClick={() => router.push("/dashboard/budgets/create")}
+              className="bg-green-600 hover:bg-green-700"
             >
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <h4 className="text-xs font-medium uppercase text-gray-500">Total Budget</h4>
-                  <p className="mt-1 text-xl font-semibold text-gray-900">${budget.amount.toLocaleString()}</p>
-                </div>
-                <div>
-                  <h4 className="text-xs font-medium uppercase text-gray-500">Spent</h4>
-                  <p className="mt-1 text-xl font-semibold text-gray-900">${budget.spent.toLocaleString()}</p>
-                </div>
-                <div>
-                  <h4 className="text-xs font-medium uppercase text-gray-500">Remaining</h4>
-                  <p className="mt-1 text-xl font-semibold text-gray-900">${budget.remaining.toLocaleString()}</p>
-                </div>
-                {budget.endDate ? (
+              <PlusCircle className="mr-2 h-4 w-4" />
+              Create Budget
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-6">
+          {filteredBudgets.map((budget) => (
+            <Card key={budget.id} className="overflow-hidden hover:shadow-md transition-shadow">
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="text-xs font-medium uppercase text-gray-500">Period</h4>
-                    <p className="mt-1 text-sm text-gray-900">
-                      {new Date(budget.startDate).toLocaleDateString()} -{" "}
-                      {new Date(budget.endDate).toLocaleDateString()}
+                    <CardTitle className="text-xl font-bold">{budget.name}</CardTitle>
+                    {budget.description && (
+                      <CardDescription className="mt-1 line-clamp-1">{budget.description}</CardDescription>
+                    )}
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon">
+                        <MoreHorizontal className="h-5 w-5" />
+                        <span className="sr-only">Actions</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuItem onClick={() => router.push(`/dashboard/budgets/${budget.id}`)}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        View Details
+                      </DropdownMenuItem>
+                      {budget.canEdit !== false && (
+                        <>
+                          <DropdownMenuItem onClick={() => router.push(`/dashboard/budgets/${budget.id}/edit`)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit Budget
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(budget.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {budget.organization && (
+                  <Badge variant="outline" className="mt-2">
+                    {budget.organization.name}
+                  </Badge>
+                )}
+              </CardHeader>
+
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-2">
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-muted-foreground">Total Budget</h4>
+                    <p className="mt-1 text-2xl font-bold text-green-600">{formatCurrency(budget.amount)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-muted-foreground">Spent</h4>
+                    <p className="mt-1 text-2xl font-bold">{formatCurrency(budget.spent)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-muted-foreground">Remaining</h4>
+                    <p className="mt-1 text-2xl font-bold">{formatCurrency(budget.remaining)}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-medium uppercase text-muted-foreground">
+                      {budget.endDate ? "Period" : "Created"}
+                    </h4>
+                    <p className="mt-1 text-sm">
+                      {budget.endDate ? (
+                        <>
+                          {new Date(budget.startDate).toLocaleDateString()} -{" "}
+                          {new Date(budget.endDate).toLocaleDateString()}
+                        </>
+                      ) : (
+                        new Date(budget.startDate).toLocaleDateString()
+                      )}
                     </p>
                   </div>
-                ) : (
-                  <div>
-                    <h4 className="text-xs font-medium uppercase text-gray-500">Created</h4>
-                    <p className="mt-1 text-sm text-gray-900">{new Date(budget.startDate).toLocaleDateString()}</p>
+                </div>
+
+                <div className="mt-6 space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Budget Utilization</span>
+                    <span className="text-sm font-medium">{budget.progress}%</span>
+                  </div>
+                  <Progress
+                    value={budget.progress}
+                    className="h-2"
+               
+                  />
+                </div>
+
+                {budget.categories && budget.categories.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {budget.categories.map((category) => (
+                      <Badge key={category.id} variant="secondary">
+                        {category.name}
+                      </Badge>
+                    ))}
                   </div>
                 )}
-                <div className="md:col-span-4 mt-2">
-                  <div className="flex items-center">
-                    <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-green-600 rounded-full" style={{ width: `${budget.progress}%` }} />
-                    </div>
-                    <span className="ml-3 text-sm font-medium text-gray-900">{budget.progress}%</span>
-                  </div>
+              </CardContent>
+
+              <CardFooter className="pt-0 pb-4">
+                <div className="flex justify-between items-center w-full">
+                  {budget.createdBy && (
+                    <span className="text-xs text-muted-foreground">
+                      Created by {budget.createdBy.name || budget.createdBy.email}
+                    </span>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-green-600 hover:text-green-700 cursor-pointer hover:bg-green-50"
+                    onClick={() => router.push(`/dashboard/budgets/${budget.id}`)}
+                  >
+                    View Details
+                    <ArrowUpRight className="ml-1 h-4 w-4" />
+                  </Button>
                 </div>
-              </div>
-            </DashboardCard>
-          ))
-        )}
-      </div>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

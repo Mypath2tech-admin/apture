@@ -102,7 +102,7 @@ export default function BudgetDetail() {
     <div>
       <PageHeader
         title={budget.name}
-        description={budget.description || "Detailed budget overview"}
+        // description={budget.description || "Detailed budget overview"}
         action={
           <div className="flex space-x-3">
             <Link
