@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PieChart, DollarSign, Clock, Users, User, Menu, X, Plus } from 'lucide-react'
+import { Home, PieChart, DollarSign, Clock, Users,  Menu, X, Plus } from 'lucide-react'
 
 // Type for navigation items
 type NavItem = {
@@ -25,16 +25,23 @@ export default function DashboardSidebar() {
     { name: 'Budgets', href: '/dashboard/budgets', icon: PieChart, userTypes: ['user', 'organization'] },
     { name: 'Expenses', href: '/dashboard/expenses', icon: DollarSign, userTypes: ['user', 'organization'] },
     { name: 'Timesheets', href: '/dashboard/timesheets', icon: Clock, userTypes: ['user', 'organization'] },
-    // { name: 'Reports', href: '/dashboard/reports', icon: BarChart4, userTypes: ['user', 'organization'] },
     { name: 'Team Members', href: '/dashboard/users', icon: Users, userTypes: ['organization'] },
-    { name: 'Profile', href: '/dashboard/profile', icon: User, userTypes: ['user', 'organization'] },
-    // { name: 'Settings', href: '/dashboard/settings', icon: Settings, userTypes: ['user', 'organization'] },
   ]
 
   // Filter navigation items based on user type
   const filteredNavigation = navigation.filter(item =>
     item.userTypes.includes(userType)
   )
+
+  // Check if a path is active
+  const isPathActive = (path: string) => {
+    // For dashboard root route, only highlight when exactly at /dashboard
+    if (path === '/dashboard') {
+      return pathname === '/dashboard'
+    }
+    // For other routes, highlight when pathname starts with the path
+    return pathname.startsWith(path)
+  }
 
   return (
     <>
@@ -86,7 +93,7 @@ export default function DashboardSidebar() {
           {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
             {filteredNavigation.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
+              const isActive = isPathActive(item.href)
               return (
                 <Link
                   key={item.name}
@@ -108,13 +115,14 @@ export default function DashboardSidebar() {
 
           {/* Quick actions */}
           <div className="p-4 border-t border-gray-200">
-            <Link href={'budgets/create'} ><button
-              className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            >
-              <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
-              New Budget
-            </button></Link>
-
+            <Link href="/dashboard/budgets/create">
+              <button
+                className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              >
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
+                New Budget
+              </button>
+            </Link>
           </div>
         </div>
       </aside>

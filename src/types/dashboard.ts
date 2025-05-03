@@ -55,6 +55,7 @@ export interface ExpenseCategory {
 }
 
 export interface Expense {
+  user: User
   id: string
   title: string
   description?: string

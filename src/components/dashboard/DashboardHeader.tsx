@@ -57,7 +57,7 @@ export default function DashboardHeader() {
               </button>
               
               {isProfileOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg py-1 bg-white border border-gray-300 focus:outline-none">
                   <Link 
                     href="/dashboard/profile" 
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -76,7 +76,7 @@ export default function DashboardHeader() {
                     Settings
                   </Link> */}
                   <button 
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="block px-4 w-full text-left py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={handleLogout}
                   >
                     Sign out
