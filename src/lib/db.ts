@@ -7,7 +7,7 @@ const connectionString = process.env.DATABASE_URL || "";
 const pool = new Pool({ connectionString });
 
 // Helper function to execute SQL queries
-export async function query(text: string, params: any[] = []) {
+export async function query(text: string, params: unknown[] = []) {
   const client = await pool.connect();
   try {
     return await client.query(text, params);
