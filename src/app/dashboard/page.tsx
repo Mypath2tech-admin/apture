@@ -144,7 +144,7 @@ export default function Dashboard() {
               change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
             />
             <StatItem
-              title="Timesheet Hours"
+              title="Timesheet Hours22"
               value={dashboardData.timesheetHours.toString()}
               icon={<Clock className="h-6 w-6" />}
               change={dashboardData.timesheetChange}
