@@ -678,7 +678,7 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 tracking-tight" data-aos="fade-up">
-                Maximize Your Productivity
+                Maximize Your Productivity222
               </h2>
               <p className="max-w-2xl mx-auto text-gray-600 text-lg" data-aos="fade-up" data-aos-delay="100">
                 Managing your budget, expense and time shouldn&apos;t be complicated. See how Greenor simplifies your
