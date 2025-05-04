@@ -16,7 +16,7 @@ export default function PricingPage() {
               <DollarSign className="h-6 w-6 text-white z-10" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
-              Greenor
+              Apture
             </span>
           </div>
           <nav className="hidden md:flex gap-8 items-center justify-center">
@@ -508,7 +508,7 @@ export default function PricingPage() {
                   <DollarSign className="h-6 w-6 text-white z-10" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
-                  Greenor
+                  Apture
                 </span>
               </div>
               <p className="text-white/50 mb-6 max-w-sm">
@@ -573,7 +573,7 @@ export default function PricingPage() {
         </div>
         <div className="border-t border-white/5 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-white/40">© {new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p className="text-sm text-white/40">© {new Date().getFullYear()} Apture. All rights reserved.</p>
             <div className="flex gap-6">
               <Link href="#" className="text-sm text-white/40 hover:text-purple-400 transition-colors">
                 Privacy Policy

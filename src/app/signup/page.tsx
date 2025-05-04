@@ -120,7 +120,7 @@ export default function SignUp() {
                 <DollarSign className="h-6 w-6 text-white z-10" />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
-                Greenor
+                Apture
               </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-800 mt-4">Create your account</h1>

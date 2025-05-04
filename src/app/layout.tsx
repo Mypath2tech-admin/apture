@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Greenor",
+  title: "Apture",
   description: "Your Friendly Budget and expense planner",
 };
 
