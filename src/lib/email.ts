@@ -19,7 +19,7 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
     const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
     const mailOptions = {
-        from: `"Greenor" <${process.env.EMAIL_FROM}>`,
+        from: `"Apture" <${process.env.EMAIL_FROM}>`,
         to: email,
         subject: "Verify Your Email Address",
         html: `
@@ -105,7 +105,7 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
       <body>
         <div class="container">
           <div class="header">
-            <h2 style="color: #10b981;">Greenor</h2>
+            <h2 style="color: #10b981;">Apture</h2>
           </div>
           <div class="content">
             <h1>Verify Your Email Address</h1>
@@ -119,7 +119,7 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
             <p>This link will expire in 24 hours.</p>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Apture. All rights reserved.</p>
             <p>If you didn't create an account, you can safely ignore this email.</p>
           </div>
         </div>
@@ -137,16 +137,16 @@ export const sendWelcomeEmail = async (user: User) => {
     const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
     const mailOptions = {
-        from: `"Greenor" <${process.env.EMAIL_FROM}>`,
+        from: `"Apture" <${process.env.EMAIL_FROM}>`,
         to: email,
-        subject: "Welcome to Greenor!",
+        subject: "Welcome to Apture!",
         html: `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to Greenor</title>
+        <title>Welcome to Apture</title>
         <style>
           body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -222,15 +222,15 @@ export const sendWelcomeEmail = async (user: User) => {
       <body>
         <div class="container">
           <div class="header">
-            <h2 style="color: #10b981;">Greenor</h2>
+            <h2 style="color: #10b981;">Apture</h2>
           </div>
           <div class="content">
-            <h1>Welcome to Greenor!</h1>
+            <h1>Welcome to Apture!</h1>
             <p>Hi ${name},</p>
-            <p>Thank you for verifying your email address. Your account is now active and you can start using Greenor!</p>
+            <p>Thank you for verifying your email address. Your account is now active and you can start using Apture!</p>
             <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
             <div style="margin-top: 30px; text-align: left;">
-              <h3>Here's what you can do with Greenor:</h3>
+              <h3>Here's what you can do with Apture:</h3>
               <div class="feature">
                 <span class="feature-icon">✓</span> Track your expenses and income
               </div>
@@ -246,7 +246,7 @@ export const sendWelcomeEmail = async (user: User) => {
             </div>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Apture. All rights reserved.</p>
             <p>If you have any questions, please contact our support team.</p>
           </div>
         </div>

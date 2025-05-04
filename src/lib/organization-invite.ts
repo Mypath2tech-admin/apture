@@ -33,9 +33,9 @@ export const sendOrganizationInviteEmail = async ({
   const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/signin`
 
   const mailOptions = {
-    from: `"Greenor" <${process.env.EMAIL_FROM}>`,
+    from: `"Apture" <${process.env.EMAIL_FROM}>`,
     to: email,
-    subject: `You've been invited to join ${organizationName} on Greenor`,
+    subject: `You've been invited to join ${organizationName} on Apture`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -135,15 +135,15 @@ export const sendOrganizationInviteEmail = async ({
       <body>
         <div class="container">
           <div class="header">
-            <h2 style="color: #10b981;">Greenor</h2>
+            <h2 style="color: #10b981;">Apture</h2>
           </div>
           <div class="content">
             <h1>You've Been Invited to Join ${organizationName}</h1>
             <p>Hi ${name},</p>
             ${
               inviterName
-                ? `<p>${inviterName} has invited you to join ${organizationName} on Greenor.</p>`
-                : `<p>You have been invited to join ${organizationName} on Greenor.</p>`
+                ? `<p>${inviterName} has invited you to join ${organizationName} on Apture.</p>`
+                : `<p>You have been invited to join ${organizationName} on Apture.</p>`
             }
             
             ${
@@ -166,10 +166,10 @@ export const sendOrganizationInviteEmail = async ({
             
             <p>Please use these credentials to log in. We recommend changing your password after your first login.</p>
             
-            <a href="${loginUrl}" class="button">Log In to Greenor</a>
+            <a href="${loginUrl}" class="button">Log In to Apture</a>
             
             <div style="margin-top: 30px; text-align: left;">
-              <h3>With Greenor, you can:</h3>
+              <h3>With Apture, you can:</h3>
               <div class="feature">
                 <span class="feature-icon">✓</span> Track your expenses and income
               </div>
@@ -185,7 +185,7 @@ export const sendOrganizationInviteEmail = async ({
             </div>
           </div>
           <div class="footer">
-            <p>&copy; ${new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p>&copy; ${new Date().getFullYear()} Apture. All rights reserved.</p>
             <p>If you believe this invitation was sent in error, please ignore this email.</p>
           </div>
         </div>

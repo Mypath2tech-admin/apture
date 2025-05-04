@@ -38,7 +38,7 @@ export default function LandingPage() {
               <DollarSign className="h-6 w-6 text-white z-10" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
-              Greenor
+              Apture
             </span>
           </div>
           <nav className="hidden md:flex gap-8 items-center justify-center">
@@ -485,7 +485,7 @@ export default function LandingPage() {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                Greenor combines budget management and timesheet tracking in one intuitive platform,
+                Apture combines budget management and timesheet tracking in one intuitive platform,
                 making it easier to manage your finances and time.
               </p>
             </div>
@@ -891,7 +891,7 @@ export default function LandingPage() {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                Managing your budget, expense and time shouldn&apos;t be complicated. See how Greenor simplifies your workflow.
+                Managing your budget, expense and time shouldn&apos;t be complicated. See how Apture simplifies your workflow.
               </p>
             </div>
 
@@ -935,7 +935,7 @@ export default function LandingPage() {
                 data-aos="fade-left"
                 data-aos-delay="300"
               >
-                <h3 className="text-2xl font-bold mb-6 text-white">Greenor Way</h3>
+                <h3 className="text-2xl font-bold mb-6 text-white">Apture Way</h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
@@ -994,7 +994,7 @@ export default function LandingPage() {
                   <DollarSign className="h-6 w-6 text-white z-10" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-green-400 bg-clip-text text-transparent">
-                  Greenor
+                  Apture
                 </span>
               </div>
               <p className="text-white/50 mb-6 max-w-sm">
@@ -1059,7 +1059,7 @@ export default function LandingPage() {
         </div>
         <div className="border-t border-white/5 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-white/40">© {new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p className="text-sm text-white/40">© {new Date().getFullYear()} Apture. All rights reserved.</p>
             <div className="flex gap-6">
               <Link href="#" className="text-sm text-white/40 hover:text-purple-400 transition-colors">
                 Privacy Policy

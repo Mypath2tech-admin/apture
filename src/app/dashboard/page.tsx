@@ -35,6 +35,8 @@ export default function Dashboard() {
     try {
       const response = await fetch(`/api/dashboard?view=${view}`)
 
+      console.log(response)
+
       if (!response.ok) {
         const data = await response.json()
         throw new Error(data.error || "Failed to fetch dashboard data")

@@ -440,7 +440,7 @@ export default function PricingPageWhiteGreen() {
                 Ready to transform your financial management?
               </h2>
               <p className="text-gray-600 text-xl max-w-2xl">
-                Join thousands of users who have already discovered the power of Greenor. Start your journey today.
+                Join thousands of users who have already discovered the power of Apture. Start your journey today.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
                 <button className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 flex-1">
@@ -475,7 +475,7 @@ export default function PricingPageWhiteGreen() {
                   <DollarSign className="h-6 w-6 text-white z-10" />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-                  Greenor
+                  Apture
                 </span>
               </div>
               <p className="text-gray-500 mb-6 max-w-sm">
@@ -537,7 +537,7 @@ export default function PricingPageWhiteGreen() {
         </div>
         <div className="border-t border-gray-200 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">© {new Date().getFullYear()} Greenor. All rights reserved.</p>
+            <p className="text-sm text-gray-500">© {new Date().getFullYear()} Apture. All rights reserved.</p>
             <div className="flex gap-6">
               <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
                 Privacy Policy
