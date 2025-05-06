@@ -61,20 +61,20 @@ export default function VerifyEmailPage() {
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           {status === "loading" && (
             <>
-              <Loader2 className="h-16 w-16 animate-spin text-green-500" />
+              <Loader2 className="h-16 w-16 animate-spin text-teal-500" />
               <p className="text-lg text-gray-600">Verifying your email...</p>
             </>
           )}
 
           {status === "success" && (
             <>
-              <CheckCircle className="h-16 w-16 text-green-500" />
+              <CheckCircle className="h-16 w-16 text-teal-500" />
               <h2 className="text-xl font-semibold text-gray-900">Verification Successful!</h2>
               <p className="text-gray-600">{message}</p>
               <div className="mt-6">
                 <Link
                   href="/signin"
-                  className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="inline-flex items-center justify-center rounded-md bg-teal-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                 >
                   Sign In
                 </Link>
@@ -90,7 +90,7 @@ export default function VerifyEmailPage() {
               <div className="mt-6 space-y-3">
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center rounded-md bg-green-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="inline-flex items-center justify-center rounded-md bg-teal-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
                 >
                   Sign Up Again
                 </Link>

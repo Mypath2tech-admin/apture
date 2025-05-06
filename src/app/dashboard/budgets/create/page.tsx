@@ -157,7 +157,7 @@ export default function CreateBudget() {
         action={
           <Link
             href="/dashboard/budgets"
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             Cancel
           </Link>
@@ -179,7 +179,7 @@ export default function CreateBudget() {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="e.g., Food stuff for house, Website Development"
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
               />
             </div>
 
@@ -200,7 +200,7 @@ export default function CreateBudget() {
                   value={formData.amount}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="block w-full pl-7 p-2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full pl-7 p-2 rounded-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function CreateBudget() {
                     required={formData.hasTimeframe}
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                   /> */}
                   <DatePickerDemo
                     name="startDate"
@@ -245,7 +245,7 @@ export default function CreateBudget() {
                     id="endDate"
                     value={formData.endDate}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                   /> */}
                   <DatePickerDemo
                       name="endDate"
@@ -267,7 +267,7 @@ export default function CreateBudget() {
                 rows={3}
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
               />
             </div>
           </div>
@@ -289,7 +289,7 @@ export default function CreateBudget() {
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
                     placeholder="e.g., Developer Payment"
-                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                   />
                 </div>
 
@@ -307,7 +307,7 @@ export default function CreateBudget() {
                       step="0.01"
                       value={categoryAmount}
                       onChange={(e) => setCategoryAmount(e.target.value)}
-                      className="block w-full pl-7 p-2 rounded-md border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                      className="block w-full pl-7 p-2 rounded-md border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                     />
                   </div>
                 </div>
@@ -321,7 +321,7 @@ export default function CreateBudget() {
                     id="categoryDescription"
                     value={categoryDescription}
                     onChange={(e) => setCategoryDescription(e.target.value)}
-                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                    className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                   />
                 </div>
               </div>
@@ -330,7 +330,7 @@ export default function CreateBudget() {
                 <button
                   type="button"
                   onClick={handleAddCategory}
-                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                 >
                   Add Category
                 </button>
@@ -367,7 +367,7 @@ export default function CreateBudget() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
             >
               {isSubmitting ? "Creating..." : "Create Budget"}
             </button>

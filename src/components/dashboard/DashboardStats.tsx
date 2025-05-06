@@ -15,7 +15,7 @@ export function StatItem({ title, value, icon, change, className = '' }: StatIte
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
       <div className="flex items-center">
-        <div className="flex-shrink-0 rounded-md bg-green-50 p-3 text-green-600">
+        <div className="flex-shrink-0 rounded-md bg-teal-50 p-3 text-teal-600">
           {icon}
         </div>
         <div className="ml-5 w-0 flex-1">
@@ -30,7 +30,7 @@ export function StatItem({ title, value, icon, change, className = '' }: StatIte
       {change && (
         <div className="mt-4">
           <div className={`flex items-center text-sm ${
-            change.isPositive ? 'text-green-600' : 'text-red-600'
+            change.isPositive ? 'text-teal-600' : 'text-red-600'
           }`}>
             <span className="font-medium">
               {change.isPositive ? '+' : ''}{change.value}

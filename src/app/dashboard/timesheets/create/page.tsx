@@ -125,7 +125,7 @@ export default function CreateTimesheet() {
         action={
           <Link 
             href="/dashboard/timesheets"
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             Cancel
           </Link>
@@ -145,7 +145,7 @@ export default function CreateTimesheet() {
               required
               value={formData.weekStarting}
               onChange={handleWeekChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
             />
           </div>
 
@@ -184,7 +184,7 @@ export default function CreateTimesheet() {
                         step="0.5"
                         value={day.hours}
                         onChange={(e) => handleDayChange(index, 'hours', e.target.value)}
-                        className="block w-20 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                        className="block w-20 rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                       />
                     </td>
                     <td className="px-3 py-4 text-sm text-gray-500">
@@ -193,7 +193,7 @@ export default function CreateTimesheet() {
                         value={day.description}
                         onChange={(e) => handleDayChange(index, 'description', e.target.value)}
                         placeholder="What did you work on?"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                       />
                     </td>
                   </tr>
@@ -223,7 +223,7 @@ export default function CreateTimesheet() {
               value={formData.notes}
               onChange={handleNotesChange}
               placeholder="Any additional information about this week's work"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
             />
           </div>
 
@@ -231,7 +231,7 @@ export default function CreateTimesheet() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Timesheet'}
             </button>

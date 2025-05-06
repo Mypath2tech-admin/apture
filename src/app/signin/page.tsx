@@ -61,7 +61,7 @@ export default function SignIn() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 justify-center">
               <div className="inline-flex items-center justify-center gap-2">
-                <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
+                {/* <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div> */}
                 {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
                 <Image src="/apture.png" width={30} height={30} className="w-full" alt="" />
               </div>
@@ -76,7 +76,7 @@ export default function SignIn() {
           {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
+          <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address
               </label>
@@ -87,9 +87,10 @@ export default function SignIn() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                className={`w-full px-4 py-2 border  rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                 placeholder="Enter your email"
               />
+             
             </div>
 
             <div>

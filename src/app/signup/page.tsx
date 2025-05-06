@@ -36,7 +36,7 @@ export default function SignUp() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      router.push("/signin")
     }
   }, [isAuthenticated, router])
 
@@ -116,7 +116,7 @@ export default function SignUp() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center gap-2">
               <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr  rounded-lg opacity-90"></div>
+                {/* <div className="absolute inset-0 bg-gradient-to-tr  rounded-lg opacity-90"></div> */}
                 <Image src="/apture.png" width={30} height={30} className="w-full" alt="" />
 
               </div>

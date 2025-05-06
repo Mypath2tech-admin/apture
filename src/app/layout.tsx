@@ -28,6 +28,7 @@ export default function RootLayout({
     <>
       <Aos />
       <html lang="en">
+        <link rel="icon" href="/apture.png" sizes="any" />
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
@@ -43,6 +44,7 @@ export default function RootLayout({
             pauseOnHover
             theme="colored"
             transition={Bounce}
+            toastStyle={{ backgroundColor: "teal" }}
           />
           <Suspense>
             {children}

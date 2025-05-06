@@ -53,7 +53,7 @@ export default function LandingPage() {
           </div>
 
           {/* Glowing lines */}
-          <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-600/20 to-transparent"></div>
+          {/* <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-600/20 to-transparent"></div> */}
           <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/20 to-transparent"></div>
 
           <div className="container mx-auto px-4 relative">

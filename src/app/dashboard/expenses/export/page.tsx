@@ -116,7 +116,7 @@ export default function ExportExpenses() {
         action={
           <Link
             href="/dashboard/expenses"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
           >
             <ArrowLeft className="-ml-1 mr-2 h-5 w-5" />
             Back to Expenses
@@ -128,7 +128,7 @@ export default function ExportExpenses() {
         <DashboardCard title="" className="lg:col-span-2">
           {isLoading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
             </div>
           ) : (
             <form onSubmit={handleExport} className="space-y-6">

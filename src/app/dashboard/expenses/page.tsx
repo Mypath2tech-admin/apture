@@ -142,7 +142,7 @@ export default function Expenses() {
   // const getStatusColor = (status: string) => {
   //   switch (status) {
   //     case "APPROVED":
-  //       return "bg-green-100 text-green-800"
+  //       return "bg-teal-100 text-teal-800"
   //     case "PENDING":
   //       return "bg-yellow-100 text-yellow-800"
   //     case "REJECTED":
@@ -165,7 +165,7 @@ export default function Expenses() {
         action={
           <Link
             href="/dashboard/expenses/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
             Add Expense
@@ -392,7 +392,7 @@ export default function Expenses() {
                 {expenses.map((expense) => (
                   <tr key={expense.id}>
                     <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      <Link href={`/dashboard/expenses/${expense.id}`} className="text-green-600 hover:text-green-900">
+                      <Link href={`/dashboard/expenses/${expense.id}`} className="text-teal-600 hover:text-teal-900">
                         {expense.title}
                       </Link>
                     </td>

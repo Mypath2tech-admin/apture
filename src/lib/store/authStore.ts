@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { UserRole } from "../../../generated/prisma"
+import { toast } from "react-toastify"
 
 interface User {
     id: string
@@ -95,12 +96,17 @@ export const useAuthStore = create<AuthState>()(
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ email, password }),
                     })
+                
+
 
                     if (!res.ok) {
+                        
                         const err = await res.json()
+                        toast.error(`Error:${err.error}`)
                         throw new Error(err.error || "Login failed")
+                     
                     }
-
+                    toast.success("Login Successful")
                     const data = await res.json()
                     set({ isAuthenticated: true, user: data.user })
                     await get().fetchDashboardData()
@@ -133,8 +139,10 @@ export const useAuthStore = create<AuthState>()(
                     set({ isLoading: true })
                     await fetch("/api/auth/logout", { method: "POST" })
                     set({ isAuthenticated: false, user: null, dashboardData: null })
+                    toast.error("Logout successful")
                 } catch (error) {
                     console.error("Logout error:", error)
+                    toast.error(`Error:${error}`)
                 } finally {
                     set({ isLoading: false })
                 }
@@ -151,11 +159,13 @@ export const useAuthStore = create<AuthState>()(
 
                     if (!res.ok) {
                         const err = await res.json()
+                        toast.error(`Error:${err.error}`)
                         throw new Error(err.error || "Registration failed")
                     }
+                    toast.success("Regisration successful, check your email to proceed")
 
                     const data = await res.json()
-                    set({ isAuthenticated: true, user: data.user })
+                    set({ isAuthenticated: false, user: data.user })
                 } catch (err) {
                     set({ error: err instanceof Error ? err.message : "Registration failed" })
                 } finally {

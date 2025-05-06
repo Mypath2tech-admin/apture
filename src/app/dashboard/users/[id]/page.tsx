@@ -212,7 +212,7 @@ export default function UserDetail() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
       </div>
     )
   }
@@ -240,7 +240,7 @@ export default function UserDetail() {
         <div className="mt-6 flex justify-center">
           <Link
             href="/dashboard"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             Return to Dashboard
           </Link>
@@ -253,7 +253,7 @@ export default function UserDetail() {
   if (isLoadingUser) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-teal-500"></div>
       </div>
     )
   }
@@ -270,7 +270,7 @@ export default function UserDetail() {
         <div className="mt-6 flex justify-center">
           <Link
             href="/dashboard/users"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Users
@@ -288,7 +288,7 @@ export default function UserDetail() {
         action={
           <Link
             href="/dashboard/users"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Users
@@ -300,8 +300,8 @@ export default function UserDetail() {
         <DashboardCard title="User Information">
           <div className="space-y-6">
             <div className="flex items-center">
-              <div className="flex-shrink-0 h-16 w-16 bg-green-100 rounded-full flex items-center justify-center">
-                <span className="text-xl text-green-800 font-medium">
+              <div className="flex-shrink-0 h-16 w-16 bg-teal-100 rounded-full flex items-center justify-center">
+                <span className="text-xl text-teal-800 font-medium">
                   {user.firstName && user.lastName
                     ? `${user.firstName[0]}${user.lastName[0]}`
                     : user.email[0].toUpperCase()}
@@ -320,7 +320,7 @@ export default function UserDetail() {
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Role</dt>
                   <dd className="mt-1">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-teal-100 text-teal-800">
                       {formatRole(user.role)}
                     </span>
                   </dd>
@@ -329,7 +329,7 @@ export default function UserDetail() {
                   <dt className="text-sm font-medium text-gray-500">Status</dt>
                   <dd className="mt-1">
                     <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${user.isActive ? "bg-teal-100 text-teal-800" : "bg-gray-100 text-gray-800"
                         }`}
                     >
                       {user.isActive ? "Active" : "Inactive"}
@@ -360,7 +360,7 @@ export default function UserDetail() {
               <div className="mt-2 flex items-center">
                 {user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN" ? (
                   <div className="flex items-center">
-                    <Eye className="h-4 w-4 text-green-600 mr-2" />
+                    <Eye className="h-4 w-4 text-teal-600 mr-2" />
                     <span className="text-sm text-gray-500">Default Access (Admin)</span>
                   </div>
                 ) : (
@@ -371,13 +371,13 @@ export default function UserDetail() {
                       <Switch
                         checked={!!user.canViewOrgDashboard}
                         onCheckedChange={toggleDashboardAccess}
-                        className="data-[state=checked]:bg-green-600"
+                        className="data-[state=checked]:bg-teal-600"
                       />
                     )}
                     <span className="ml-2 text-sm text-gray-500 flex items-center">
                       {user.canViewOrgDashboard ? (
                         <>
-                          <Eye className="h-4 w-4 text-green-600 mr-1" /> Can view organization dashboard
+                          <Eye className="h-4 w-4 text-teal-600 mr-1" /> Can view organization dashboard
                         </>
                       ) : (
                         <>
@@ -400,7 +400,7 @@ export default function UserDetail() {
                     onClick={() => setShowPromoteDialog(true)}
                     disabled={isUpdating}
                   >
-                    <UserCheck className="mr-2 h-4 w-4 text-green-600" />
+                    <UserCheck className="mr-2 h-4 w-4 text-teal-600" />
                     Promote to Organization Admin
                   </Button>
                 )}
