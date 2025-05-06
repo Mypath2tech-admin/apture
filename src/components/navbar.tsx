@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { DollarSign, X, Menu, User, LogOut } from "lucide-react"
+import {  X, Menu, User, LogOut } from "lucide-react"
 import { useAuthStore } from "@/lib/store/authStore"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
@@ -26,10 +26,11 @@ export default function Header() {
       <div className="container mx-auto px-4 flex h-20 items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="relative w-10 h-10 flex items-center justify-center">
-            <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
-            <DollarSign className="h-6 w-6 text-white z-10" />
+            <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
+            {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
+            <Image src="/apture.png" width={100} height={100} className="" alt="" />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+          <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
             Apture
           </span>
         </div>
@@ -39,7 +40,7 @@ export default function Header() {
             className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative group"
           >
             Home
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-300 group-hover:w-full"></span>
           </Link>
 
           {isAuthenticated && (
@@ -48,7 +49,7 @@ export default function Header() {
               className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative group"
             >
               Dashboard
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           )}
 
@@ -57,14 +58,14 @@ export default function Header() {
             className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors relative group"
           >
             Pricing
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-green-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-teal-600 to-teal-400 transition-all duration-300 group-hover:w-full"></span>
           </Link>
         </nav>
         <div className="hidden relative z-40 md:flex items-center gap-6">
           {isAuthenticated ? (
             <>
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
                   {user?.profileImage ? (
                     <Image src={user.profileImage} alt="Profile" className="w-full h-full rounded-full object-cover" width={12} height={12} />
                   ) : (
@@ -85,16 +86,16 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link
+              {/* <Link
                 href="/signin"
                 className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900 transition-all duration-300"
               >
                 Log in
-              </Link>
-              <button className="relative overflow-hidden group bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md">
+              </Link> */}
+              <Link  href="/signin" className="relative overflow-hidden group bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md">
                 <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
                 <span className="font-medium flex items-center">
-                  Join Waitlist
+                Log in
                   <svg
                     className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
                     fill="none"
@@ -104,7 +105,7 @@ export default function Header() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </span>
-              </button>
+              </Link>
             </>
           )}
         </div>
@@ -141,7 +142,7 @@ export default function Header() {
               <Link href="/signin" className="text-sm font-medium hover:text-gray-600 transition-colors">
                 Log in
               </Link>
-              <button className="bg-gradient-to-tr from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 p-2 px-4 rounded-full text-white w-full">
+              <button className="bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 p-2 px-4 rounded-full text-white w-full">
                 Join Waitlist
               </button>
             </>
