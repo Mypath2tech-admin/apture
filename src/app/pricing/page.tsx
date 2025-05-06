@@ -337,8 +337,7 @@ export default function PricingPageWhiteteal() {
               </div>
             </div>
           </div>
-        </section>ction>
-
+        </section>
         <section className="w-full py-20 bg-gray-50 relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute -top-40 right-0 w-80 h-80 bg-teal-500/5 rounded-full"></div>
