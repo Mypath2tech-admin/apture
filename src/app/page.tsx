@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import {useState} from 'react'
 import {
   ArrowRight,
   BarChart3,
@@ -24,7 +25,41 @@ import Header from "@/components/navbar"
 
 
 export default function LandingPage() {
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
 
+  // Define pricing for both billing periods
+  const pricing = {
+    monthly: {
+      free: {
+        price: '$0',
+        period: '/month'
+      },
+      pro: {
+        price: '$9.99',
+        period: '/month'
+      },
+      business: {
+        price: '$29.99',
+        period: '/month'
+      }
+    },
+    yearly: {
+      free: {
+        price: '$0',
+        period: '/year'
+      },
+      pro: {
+        price: '$95.88',
+        period: '/year',
+        savings: 'Save $24/year'
+      },
+      business: {
+        price: '$287.88',
+        period: '/year',
+        savings: 'Save $72/year'
+      }
+    }
+  }
   return (
     <div className="flex flex-col min-h-screen text-gray-800 overflow-hidden bg-white">
 

@@ -1,15 +1,55 @@
 "use client"
 
 import Link from "next/link"
-import { Check, DollarSign, Shield, Zap, Star } from "lucide-react"
+import { Check, Shield, Zap, Star } from "lucide-react"
 import Header from "@/components/navbar"
+import Image from 'next/image'
+import { useState } from "react"
+export default function PricingPageWhiteteal() {
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly")
 
-export default function PricingPageWhiteGreen() {
-  
+  // Define pricing for both billing periods
+  const pricing = {
+    monthly: {
+      free: {
+        price: "$0",
+        period: "/month",
+      },
+      pro: {
+        price: "$9.99",
+        period: "/month",
+      },
+      business: {
+        price: "$29.99",
+        period: "/month",
+      },
+    },
+    yearly: {
+      free: {
+        price: "$0",
+        period: "/year",
+      },
+      pro: {
+        price: "$95.88",
+        period: "/year",
+        saving: "Save $24/year",
+      },
+      business: {
+        price: "$287.88",
+        period: "/year",
+        saving: "Save $72/year",
+      },
+    },
+  }
+
+  const handleBillingPeriodChange = (period: "monthly" | "yearly") => {
+    setBillingPeriod(period)
+  }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-800">
-     <Header/>
+      <Header />
       <main className="flex-1">
         <section className="w-full py-20 md:py-28 lg:py-32 relative overflow-hidden isolate">
           {/* Gradient Background */}
@@ -19,27 +59,27 @@ export default function PricingPageWhiteGreen() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(74,222,128,0.15)_0%,rgba(0,0,0,0)_60%)]"></div>
 
           {/* Geometric Decorations */}
-          <div className="absolute w-96 h-96 -top-20 -right-20 bg-green-500/10 rounded-full blur-3xl animate-slow-pulse"></div>
-          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
+          <div className="absolute w-96 h-96 -top-20 -right-20 bg-teal-500/10 rounded-full blur-3xl animate-slow-pulse"></div>
+          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-teal-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
 
           {/* Floating Elements */}
-          <div className="absolute top-1/4 left-10 w-12 h-12 bg-green-50 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow"></div>
-          <div className="absolute bottom-1/4 right-10 w-20 h-20 bg-green-50 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower"></div>
+          <div className="absolute top-1/4 left-10 w-12 h-12 bg-teal-50 backdrop-blur-xl rounded-xl rotate-12 animate-float-slow"></div>
+          <div className="absolute bottom-1/4 right-10 w-20 h-20 bg-teal-50 backdrop-blur-xl rounded-full -rotate-12 animate-float-slower"></div>
 
           <div className="container mx-auto px-4 relative">
             <div className="flex flex-col items-center justify-center space-y-6 text-center max-w-4xl mx-auto">
-              <div className="inline-flex items-center backdrop-blur-md bg-green-50 rounded-full px-4 py-2 text-green-800 mb-6 animate-fade-in shadow-sm">
-                <Star className="h-4 w-4 mr-2 text-green-600" />
+              <div className="inline-flex items-center backdrop-blur-md bg-teal-50 rounded-full px-4 py-2 text-teal-800 mb-6 animate-fade-in shadow-sm">
+                <Star className="h-4 w-4 mr-2 text-teal-600" />
                 <span className="text-sm font-medium">Transparent, Value-Based Pricing</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-6 animate-slide-up leading-tight">
                 Choose the right plan for your
                 <span className="relative mt-2 block">
-                  <span className="bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent drop-shadow-sm">
+                  <span className="bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent drop-shadow-sm">
                     financial journey
                   </span>
-                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-green-500/20 rounded-full blur-xl z-0"></span>
+                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-teal-500/20 rounded-full blur-xl z-0"></span>
                 </span>
               </h1>
 
@@ -49,11 +89,25 @@ export default function PricingPageWhiteGreen() {
               </p>
 
               <div className="flex items-center gap-4 p-2 bg-white rounded-full animate-slide-up-more-delayed shadow-md">
-                <button className="px-6 py-3 rounded-full bg-gradient-to-r from-green-600 to-green-500 text-white font-medium shadow-md">
+              <button
+                  className={`px-6 py-3 cursor-pointer rounded-full font-medium transition-all duration-300 ${
+                    billingPeriod === "monthly"
+                      ? "bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                  onClick={() => handleBillingPeriodChange("monthly")}
+                >
                   Monthly
                 </button>
-                <button className="px-6 py-3 rounded-full text-gray-600 hover:text-gray-800 font-medium transition-colors">
-                  Yearly <span className="ml-1 text-xs bg-green-100 px-2 py-1 rounded-full">Save 20%</span>
+                <button
+                  className={`px-6 cursor-pointer py-3 rounded-full font-medium transition-all duration-300 ${
+                    billingPeriod === "yearly"
+                      ? "bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md"
+                      : "text-gray-600 hover:text-gray-800"
+                  }`}
+                  onClick={() => handleBillingPeriodChange("yearly")}
+                >
+                  Yearly <span className="ml-1 text-xs bg-teal-100 px-2 py-1 rounded-full">Save 20%</span>
                 </button>
               </div>
             </div>
@@ -65,19 +119,21 @@ export default function PricingPageWhiteGreen() {
             <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12 -mt-32 md:-mt-40">
               {/* Free Plan */}
               <div className="group relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-green-200/30 to-green-300/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-200/30 to-teal-300/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
                   <div className="p-6 space-y-4">
-                    <div className="bg-green-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-green-100">
-                      <Zap className="h-7 w-7 text-green-600" />
+                    <div className="bg-teal-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-teal-100">
+                      <Zap className="h-7 w-7 text-teal-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">Free</h3>
                     <p className="text-gray-500 h-12">Essential budgeting tools for individuals</p>
                     <div className="flex items-baseline text-gray-900 pt-4">
-                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-                        $0
+                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
+                        {pricing[billingPeriod].free.price}
                       </span>
-                      <span className="ml-2 text-sm font-medium text-gray-500">/month</span>
+                      <span className="ml-2 text-sm font-medium text-gray-500">
+                        {pricing[billingPeriod].free.period}
+                      </span>
                     </div>
                   </div>
 
@@ -86,26 +142,26 @@ export default function PricingPageWhiteGreen() {
                   <div className="p-6">
                     <ul className="space-y-4">
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Basic budget management</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Up to 50 expense entries per month</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Basic analytics</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">CSV export</span>
                       </li>
@@ -113,35 +169,43 @@ export default function PricingPageWhiteGreen() {
                   </div>
 
                   <div className="p-6 bg-gray-50">
-                    <button className="w-full border border-green-500 hover:bg-green-50 text-green-600 font-medium py-3 px-4 rounded-xl transition-colors">
-                      Join Waitlist
-                    </button>
+                    <Link
+                      href="/signin"
+                      className="w-full border border-teal-500 hover:bg-teal-50 text-teal-600 font-medium py-3 px-4 rounded-xl transition-colors"
+                    >
+                      Get Started
+                    </Link>
                   </div>
                 </div>
               </div>
 
               {/* Pro Plan */}
               <div className="group relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-green-500/30 to-green-400/30 opacity-90 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-500/30 to-teal-400/30 opacity-90 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
-                  <div className="absolute top-0 inset-x-0 mx-auto w-fit">
-                    <div className="bg-gradient-to-r from-green-600 to-green-500 text-white px-8 py-2 rounded-full shadow-md text-sm font-bold uppercase tracking-wide">
+                  <div className="absolute top-2 inset-x-0 mx-auto w-fit">
+                    <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white px-8 py-2 rounded-full shadow-md text-sm font-bold uppercase tracking-wide">
                       Most Popular
                     </div>
                   </div>
 
                   <div className="p-6 space-y-4 pt-10">
-                    <div className="bg-green-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-green-100">
-                      <Star className="h-7 w-7 text-green-600" />
+                    <div className="bg-teal-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-teal-100">
+                      <Star className="h-7 w-7 text-teal-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">Pro</h3>
                     <p className="text-gray-500 h-12">Advanced tools for serious budgeters</p>
                     <div className="flex items-baseline text-gray-900 pt-4">
-                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-                        $9.99
+                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
+                        {pricing[billingPeriod].pro.price}
                       </span>
-                      <span className="ml-2 text-sm font-medium text-gray-500">/month</span>
+                      <span className="ml-2 text-sm font-medium text-gray-500">
+                        {pricing[billingPeriod].pro.period}
+                      </span>
                     </div>
+                    {billingPeriod === "yearly" && (
+                      <div className="mt-1 text-sm font-medium text-teal-600">{pricing.yearly.pro.saving}</div>
+                    )}
                   </div>
 
                   <div className="border-t border-gray-100"></div>
@@ -149,38 +213,38 @@ export default function PricingPageWhiteGreen() {
                   <div className="p-6">
                     <ul className="space-y-4">
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Everything in Free</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Unlimited expense entries</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Advanced analytics and reporting</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Time tracking features</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">CSV and PDF export</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Email support</span>
                       </li>
@@ -188,9 +252,11 @@ export default function PricingPageWhiteGreen() {
                   </div>
 
                   <div className="p-6 bg-gray-50">
-                    <button className="relative overflow-hidden group w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
+                    <button className="relative overflow-hidden group w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
                       <div className="absolute -inset-full top-0 block bg-gradient-to-r from-white/20 via-white/40 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
-                      <span className="relative z-10">Join Waitlist</span>
+                      <Link href="/signin" className="relative z-10">
+                        Get Started
+                      </Link>
                     </button>
                   </div>
                 </div>
@@ -198,20 +264,25 @@ export default function PricingPageWhiteGreen() {
 
               {/* Business Plan */}
               <div className="group relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-green-400/30 to-green-500/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-400/30 to-teal-500/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
                   <div className="p-6 space-y-4">
-                    <div className="bg-green-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-green-100">
-                      <Shield className="h-7 w-7 text-green-600" />
+                    <div className="bg-teal-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-teal-100">
+                      <Shield className="h-7 w-7 text-teal-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">Business</h3>
                     <p className="text-gray-500 h-12">Complete solution for businesses and teams</p>
                     <div className="flex items-baseline text-gray-900 pt-4">
-                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
-                        $29.99
+                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
+                        {pricing[billingPeriod].business.price}
                       </span>
-                      <span className="ml-2 text-sm font-medium text-gray-500">/month</span>
+                      <span className="ml-2 text-sm font-medium text-gray-500">
+                        {pricing[billingPeriod].business.period}
+                      </span>
                     </div>
+                    {billingPeriod === "yearly" && (
+                      <div className="mt-1 text-sm font-medium text-teal-600">{pricing.yearly.business.saving}</div>
+                    )}
                   </div>
 
                   <div className="border-t border-gray-100"></div>
@@ -219,38 +290,38 @@ export default function PricingPageWhiteGreen() {
                   <div className="p-6">
                     <ul className="space-y-4">
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Everything in Pro</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Multi-user access</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Role-based permissions</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Advanced reporting and forecasting</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">API access</span>
                       </li>
                       <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-green-600" />
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
                         </div>
                         <span className="text-gray-600">Priority support</span>
                       </li>
@@ -258,7 +329,7 @@ export default function PricingPageWhiteGreen() {
                   </div>
 
                   <div className="p-6 bg-gray-50">
-                    <button className="w-full border border-green-500 hover:bg-green-50 text-green-600 font-medium py-3 px-4 rounded-xl transition-colors">
+                    <button className="w-full border border-teal-500 hover:bg-teal-50 text-teal-600 font-medium py-3 px-4 rounded-xl transition-colors">
                       Contact Sales
                     </button>
                   </div>
@@ -266,17 +337,17 @@ export default function PricingPageWhiteGreen() {
               </div>
             </div>
           </div>
-        </section>
+        </section>ction>
 
         <section className="w-full py-20 bg-gray-50 relative overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute -top-40 right-0 w-80 h-80 bg-green-500/5 rounded-full"></div>
-          <div className="absolute -bottom-40 left-0 w-80 h-80 bg-green-500/5 rounded-full"></div>
+          <div className="absolute -top-40 right-0 w-80 h-80 bg-teal-500/5 rounded-full"></div>
+          <div className="absolute -bottom-40 left-0 w-80 h-80 bg-teal-500/5 rounded-full"></div>
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center bg-green-50 rounded-full px-4 py-1.5 mb-4 border border-green-100">
-                <span className="text-sm font-medium text-green-800">Compare Plans</span>
+              <div className="inline-flex items-center justify-center bg-teal-50 rounded-full px-4 py-1.5 mb-4 border border-teal-100">
+                <span className="text-sm font-medium text-teal-800">Compare Plans</span>
               </div>
               <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">Feature Comparison</h2>
               <p className="max-w-2xl mx-auto text-gray-600 text-lg">
@@ -291,7 +362,7 @@ export default function PricingPageWhiteGreen() {
                     <tr>
                       <th className="bg-gray-50 px-6 py-5 text-left text-sm font-semibold text-gray-900">Features</th>
                       <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">Free</th>
-                      <th className="bg-gradient-to-r from-green-50 to-green-100 px-6 py-5 text-center text-sm font-semibold text-gray-900">
+                      <th className="bg-gradient-to-r from-teal-50 to-teal-100 px-6 py-5 text-center text-sm font-semibold text-gray-900">
                         Pro
                       </th>
                       <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">Business</th>
@@ -301,7 +372,7 @@ export default function PricingPageWhiteGreen() {
                     <tr className="border-t border-gray-200">
                       <td className="px-6 py-4 text-sm text-gray-900">Budget Creation</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Basic</td>
-                      <td className="px-6 py-4 text-center bg-gradient-to-r from-green-50 to-green-100 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Advanced
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Advanced</td>
@@ -309,7 +380,7 @@ export default function PricingPageWhiteGreen() {
                     <tr className="border-t border-gray-200">
                       <td className="px-6 py-4 text-sm text-gray-900">Expense Tracking</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Limited (50/mo)</td>
-                      <td className="px-6 py-4 text-center bg-gradient-to-r from-green-50 to-green-100 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Unlimited
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Unlimited</td>
@@ -317,7 +388,7 @@ export default function PricingPageWhiteGreen() {
                     <tr className="border-t border-gray-200">
                       <td className="px-6 py-4 text-sm text-gray-900">Data Visualization</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Basic</td>
-                      <td className="px-6 py-4 text-center bg-gradient-to-r from-green-50 to-green-100 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Advanced
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">Advanced+</td>
@@ -325,7 +396,7 @@ export default function PricingPageWhiteGreen() {
                     <tr className="border-t border-gray-200">
                       <td className="px-6 py-4 text-sm text-gray-900">Export Options</td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">CSV only</td>
-                      <td className="px-6 py-4 text-center bg-gradient-to-r from-green-50 to-green-100 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         CSV, PDF
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">All formats</td>
@@ -342,9 +413,9 @@ export default function PricingPageWhiteGreen() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </td>
-                      <td className="px-6 py-4 text-center bg-gradient-to-r from-green-50 to-green-100 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         <svg
-                          className="w-5 h-5 mx-auto text-green-600"
+                          className="w-5 h-5 mx-auto text-teal-600"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -354,7 +425,7 @@ export default function PricingPageWhiteGreen() {
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">
                         <svg
-                          className="w-5 h-5 mx-auto text-green-600"
+                          className="w-5 h-5 mx-auto text-teal-600"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -372,15 +443,15 @@ export default function PricingPageWhiteGreen() {
 
         {/* FAQ Section */}
         <section className="w-full py-20 bg-white relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-200 to-transparent"></div>
-          <div className="absolute top-20 right-10 w-72 h-72 bg-green-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-10 w-72 h-72 bg-green-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-200 to-transparent"></div>
+          <div className="absolute top-20 right-10 w-72 h-72 bg-teal-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-72 h-72 bg-teal-500/5 rounded-full blur-3xl"></div>
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
-              <div className="inline-flex items-center justify-center bg-green-50 rounded-full px-4 py-1.5 mb-4 border border-green-100">
-                <span className="text-sm font-medium text-green-800">FAQ</span>
+              <div className="inline-flex items-center justify-center bg-teal-50 rounded-full px-4 py-1.5 mb-4 border border-teal-100">
+                <span className="text-sm font-medium text-teal-800">FAQ</span>
               </div>
               <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">Frequently Asked Questions</h2>
               <p className="max-w-2xl mx-auto text-gray-600 text-lg">Got questions? We&apos;ve got answers.</p>
@@ -425,14 +496,14 @@ export default function PricingPageWhiteGreen() {
         {/* CTA Section */}
         <section className="py-24 relative overflow-hidden isolate">
           {/* Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-green-50 to-white"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-white"></div>
 
           {/* Animated Gradient Overlay */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(74,222,128,0.2)_0%,rgba(0,0,0,0)_60%)]"></div>
 
           {/* Geometric Decorations */}
-          <div className="absolute w-96 h-96 -top-20 -right-20 bg-green-500/10 rounded-full blur-3xl animate-slow-pulse"></div>
-          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-green-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
+          <div className="absolute w-96 h-96 -top-20 -right-20 bg-teal-500/10 rounded-full blur-3xl animate-slow-pulse"></div>
+          <div className="absolute w-96 h-96 -bottom-20 -left-20 bg-teal-600/10 rounded-full blur-3xl animate-slow-pulse delay-200"></div>
 
           <div className="container mx-auto px-4 relative">
             <div className="flex flex-col items-center justify-center space-y-8 text-center max-w-3xl mx-auto">
@@ -443,10 +514,10 @@ export default function PricingPageWhiteGreen() {
                 Join thousands of users who have already discovered the power of Apture. Start your journey today.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
-                <button className="group relative overflow-hidden bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 flex-1">
+                <button className="group relative overflow-hidden bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 flex-1">
                   <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
                   <span className="relative z-10 flex items-center justify-center">
-                    Join Waitlist
+                    Get Started
                     <svg
                       className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1"
                       fill="none"
@@ -457,7 +528,7 @@ export default function PricingPageWhiteGreen() {
                     </svg>
                   </span>
                 </button>
-                <button className="relative overflow-hidden bg-white text-gray-800 border border-gray-200 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 hover:border-green-300 flex-1">
+                <button className="relative overflow-hidden bg-white text-gray-800 border border-gray-200 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 hover:border-teal-300 flex-1">
                   <span className="relative z-10">Contact Sales</span>
                 </button>
               </div>
@@ -471,10 +542,11 @@ export default function PricingPageWhiteGreen() {
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="relative w-10 h-10 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90 blur-[1px]"></div>
-                  <DollarSign className="h-6 w-6 text-white z-10" />
+                  <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
+                  {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
+                  <Image src="/apture.png" width={100} height={100} className="w-full" alt="" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-400 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
                   Apture
                 </span>
               </div>
@@ -522,12 +594,12 @@ export default function PricingPageWhiteGreen() {
               <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Quick links</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="#" className="text-gray-500 hover:text-green-600 transition-colors">
+                  <Link href="#" className="text-gray-500 hover:text-teal-600 transition-colors">
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-gray-500 hover:text-green-600 transition-colors">
+                  <Link href="/pricing" className="text-gray-500 hover:text-teal-600 transition-colors">
                     Pricing
                   </Link>
                 </li>
@@ -539,13 +611,13 @@ export default function PricingPageWhiteGreen() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500">© {new Date().getFullYear()} Apture. All rights reserved.</p>
             <div className="flex gap-6">
-              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
                 Terms of Service
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-green-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
                 Cookie Policy
               </Link>
             </div>

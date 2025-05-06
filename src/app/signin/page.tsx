@@ -5,8 +5,9 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { DollarSign, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuthStore } from "@/lib/store/authStore"
+import Image from "next/image"
 
 export default function SignIn() {
   const router = useRouter()
@@ -30,8 +31,8 @@ export default function SignIn() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
 
-  
-    
+
+
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,9 +48,9 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 to-teal-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-50 to-teal-100">
       <div className="container mx-auto px-4 py-8">
-        <Link href="/" className="inline-flex items-center text-emerald-600 hover:text-emerald-700 transition-colors">
+        <Link href="/" className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Link>
@@ -59,11 +60,12 @@ export default function SignIn() {
         <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-8 transform transition-all duration-500 hover:shadow-2xl">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 justify-center">
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
-                <DollarSign className="h-6 w-6 text-white z-10" />
+              <div className="inline-flex items-center justify-center gap-2">
+                <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
+                {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
+                <Image src="/apture.png" width={30} height={30} className="w-full" alt="" />
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
                 Apture
               </span>
             </div>
@@ -85,7 +87,7 @@ export default function SignIn() {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                 placeholder="Enter your email"
               />
             </div>
@@ -95,7 +97,7 @@ export default function SignIn() {
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
                 </label>
-                <Link href="/forgot-password" className="text-sm text-emerald-600 hover:text-emerald-700">
+                <Link href="/forgot-password" className="text-sm text-teal-600 hover:text-teal-700">
                   Forgot password?
                 </Link>
               </div>
@@ -107,7 +109,7 @@ export default function SignIn() {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                   placeholder="Enter your password"
                 />
                 <button
@@ -127,7 +129,7 @@ export default function SignIn() {
                 type="checkbox"
                 checked={rememberMe}
                 onChange={() => setRememberMe(!rememberMe)}
-                className="h-4 w-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                className="h-4 w-4 text-teal-500 border-gray-300 rounded focus:ring-teal-500"
               />
               <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                 Remember me
@@ -138,7 +140,7 @@ export default function SignIn() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
+                className="w-full bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -155,7 +157,7 @@ export default function SignIn() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-emerald-600 hover:underline font-medium">
+              <Link href="/signup" className="text-teal-600 hover:underline font-medium">
                 Sign up
               </Link>
             </p>
