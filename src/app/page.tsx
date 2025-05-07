@@ -787,6 +787,7 @@ export default function LandingPage() {
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
                   Apture
+
                 </span>
               </div>
               <p className="text-gray-500 mb-6 max-w-sm">

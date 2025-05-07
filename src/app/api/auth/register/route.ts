@@ -99,6 +99,7 @@ export async function POST(request: NextRequest) {
       where: { id: user.id },
     }); 
 
+
     // Generate verification URL
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}&email=${encodeURIComponent(
       email
