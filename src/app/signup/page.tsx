@@ -5,13 +5,15 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowLeft, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuthStore } from "@/lib/store/authStore"
 import Image from "next/image"
 export default function SignUp() {
   const router = useRouter()
-  const [signingFor, setSigningFor] = useState<"user" | "organization">("organization")
+  const [signingFor, setSigningFor] = useState<"organization">("organization")
   const { register, isLoading, error, isAuthenticated } = useAuthStore()
+
+  const [currentTab, setCurrentTab] = useState(0)
 
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState({
@@ -28,15 +30,17 @@ export default function SignUp() {
     lastName: "",
     email: "",
     password: "",
-    // organizationName: "",
-    // organizationEmail:"",
-    // organizationPhone: "",
+    organizationName: "",
+    organizationEmail: "",
+    organizationPhone: "",
   })
+
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/signin")
+      setSigningFor("organization")
     }
   }, [isAuthenticated, router])
 
@@ -47,12 +51,74 @@ export default function SignUp() {
       lastName: "",
       email: "",
       password: "",
+      organizationName: "",
+      organizationEmail: "",
+      organizationPhone: "",
     }
 
     if (!formData.firstName.trim()) {
       errors.firstName = "First name is required"
       valid = false
     }
+
+    if (!formData.organizationName.trim()) {
+      errors.organizationName = "Organization name is required"
+      valid = false
+    }
+
+    if (!formData.organizationPhone) {
+      errors.organizationPhone = "Phone Number  is required"
+      valid = false
+    }
+    if (!formData.lastName.trim()) {
+      errors.lastName = "Last name is required"
+      valid = false
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = "Email is required"
+      valid = false
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = "Email is invalid"
+      valid = false
+    }
+    if (!formData.organizationEmail.trim()) {
+      errors.organizationEmail = "Email is required"
+      valid = false
+    } else if (!/\S+@\S+\.\S+/.test(formData.organizationEmail)) {
+      errors.organizationEmail = "Email is invalid"
+      valid = false
+    }
+
+
+
+    if (!formData.password) {
+      errors.password = "Password is required"
+      valid = false
+    } else if (formData.password.length < 8) {
+      errors.password = "Password must be at least 8 characters"
+      valid = false
+    }
+
+    setFormErrors(errors)
+    return valid
+  }
+  const validateUserDetails = () => {
+    let valid = true
+    const errors = {
+      ...formErrors,  // Pres
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+
+    }
+
+    if (!formData.firstName.trim()) {
+      errors.firstName = "First name is required"
+      valid = false
+    }
+
 
     if (!formData.lastName.trim()) {
       errors.lastName = "Last name is required"
@@ -67,6 +133,9 @@ export default function SignUp() {
       valid = false
     }
 
+
+
+
     if (!formData.password) {
       errors.password = "Password is required"
       valid = false
@@ -78,24 +147,33 @@ export default function SignUp() {
     setFormErrors(errors)
     return valid
   }
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+  const handleNextTab = () => {
 
-    // Clear error when user types
-
+    if (validateUserDetails()) {
+      setCurrentTab(1)
+    }
   }
 
+  const handlePrevTab = () => {
+    setCurrentTab(0)
+  }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    if (currentTab === 0) {
+      handleNextTab()
+      return
+    }
     if (!validateForm()) return
 
     try {
+      console.log(formData)
       await register(formData)
-
-      router.push("/signin")
+     // If register doesn't throw an error, we can assume it was successful
+     router.push("/signin")
     } catch (err) {
       // Error is handled by the store
       console.error("Registration failed:", err)
@@ -127,120 +205,116 @@ export default function SignUp() {
             <h1 className="text-2xl font-bold text-gray-800 mt-4">Create your account</h1>
             <p className="text-gray-600 mt-2">Start managing your finances and time today</p>
           </div>
+          <div className="flex mb-6">
+            <div
+              className={`flex-1 text-center py-2 border-b-2 ${currentTab === 0 ? "border-teal-500 text-teal-600 font-medium" : "border-gray-200 text-gray-500"
+                }`}
+            >
+              User Details
+            </div>
+            <div
+              className={`flex-1 text-center py-2 border-b-2 ${currentTab === 1 ? "border-teal-500 text-teal-600 font-medium" : "border-gray-200 text-gray-500"
+                }`}
+            >
+              Organization Details
+            </div>
+          </div>
 
           {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${formErrors.firstName ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
-                  placeholder="First name"
-                />
-                {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
-              </div>
+            {currentTab === 0 ? (
+              // User Details Tab
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
+                      First Name
+                    </label>
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      required
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 border ${formErrors.firstName ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+                      placeholder="First name"
+                    />
+                    {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
+                  </div>
+                  <input type="hidden" value={signingFor} />
+                  <div>
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
+                      Last Name
+                    </label>
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      required
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 border ${formErrors.lastName ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+                      placeholder="Last name"
+                    />
+                    {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
+                  </div>
+                </div>
 
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${formErrors.lastName ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
-                  placeholder="Last name"
-                />
-                {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
-              </div>
-            </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className={`w-full px-4 py-2 border ${formErrors.email ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+                    placeholder="Enter your email"
+                  />
+                  {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
+                </div>
 
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border ${formErrors.email ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
-                placeholder="Enter your email"
-              />
-              {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
-                  placeholder="Create a password"
-                />
-                <button
-                  type="button"
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
-              {formErrors.password ? (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
-              ) : (
-                <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
-              )}
-            </div>
-            <div className="flex items-center gap-6 mb-4">
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="signingFor"
-                  value="organization"
-                  checked={signingFor === "organization"}
-                  onChange={() => setSigningFor("organization")}
-                />
-                Organization
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="signingFor"
-                  value="user"
-                  checked={signingFor === "user"}
-                  onChange={() => setSigningFor("user")}
-                />
-                Personal Use
-              </label>
-
-            </div>
-            {signingFor === "organization" && (
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      required
+                      value={formData.password}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+                      placeholder="Create a password"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {formErrors.password ? (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
+                  ) : (
+                    <p className="text-xs text-gray-500 mt-1">Password must be at least 8 characters long</p>
+                  )}
+                </div>
+              </>
+            ) : (
+              // Organization Details Tab
               <>
                 <div>
                   <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -250,29 +324,34 @@ export default function SignUp() {
                     id="organizationName"
                     name="organizationName"
                     type="text"
+                    required
                     value={formData.organizationName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                    className={`w-full px-4 py-2 border ${formErrors.organizationName ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                     placeholder="Your organization name"
                   />
-                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationName}</p>} */}
+                  {formErrors.organizationName && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.organizationName}</p>
+                  )}
                 </div>
+
                 <div>
-                  <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="organizationEmail" className="block text-sm font-medium text-gray-700 mb-1">
                     Organization Email Address
                   </label>
                   <input
                     id="organizationEmail"
                     name="organizationEmail"
-                    type="text"
+                    type="email"
                     value={formData.organizationEmail}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
-                    placeholder="j.smith@company.com"
+                    className={`w-full px-4 py-2 border ${formErrors.organizationEmail ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+                    placeholder="organization@company.com"
                   />
-                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationEmail}</p>} */}
+                  <p className="text-xs text-gray-500 mt-1">Optional - defaults to your email if not provided</p>
                 </div>
-
 
                 <div>
                   <label htmlFor="organizationPhone" className="block text-sm font-medium text-gray-700 mb-1">
@@ -282,28 +361,46 @@ export default function SignUp() {
                     id="organizationPhone"
                     name="organizationPhone"
                     type="tel"
+                    required
                     value={formData.organizationPhone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
+                    className={`w-full px-4 py-2 border ${formErrors.organizationPhone ? "border-red-500" : "border-gray-300"
+                      } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                     placeholder="Phone number for organization"
                   />
-                  {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>} */}
+                  {formErrors.organizationPhone && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.organizationPhone}</p>
+                  )}
                 </div>
               </>
             )}
 
+            <div className="pt-2 flex justify-between">
+              {currentTab === 1 && (
+                <button
+                  type="button"
+                  onClick={handlePrevTab}
+                  className="px-4 py-2 border border-teal-500 text-teal-500 rounded-lg hover:bg-teal-50 transition-colors"
+                >
+                  Back
+                </button>
+              )}
 
-
-            <div className="pt-2">
               <button
-                type="submit"
+                type={currentTab === 1 ? "submit" : "button"}
+                onClick={currentTab === 0 ? handleNextTab : undefined}
                 disabled={isLoading}
-                className="w-full bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
+                className={`${currentTab === 0 ? "ml-auto" : "w-full md:w-auto"} bg-teal-500 text-white py-2 px-6 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center`}
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                     Creating Account...
+                  </>
+                ) : currentTab === 0 ? (
+                  <>
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
                   </>
                 ) : (
                   "Create Account"

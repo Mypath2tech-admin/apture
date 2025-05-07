@@ -21,7 +21,7 @@ export default function Header() {
   }
   
   return (
-    <header className="backdrop-blur-xl sticky top-0 z-50 border-b border-gray-200/50">
+    <header className="backdrop-blur-xl bg-[#f8fafc] sticky top-0 z-50 ">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.05)_0%,rgba(255,255,255,0)_60%)]"></div>
       <div className="container mx-auto px-4 flex h-20 items-center justify-between">
         <div className="flex items-center gap-2">
