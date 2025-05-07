@@ -5,12 +5,16 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+
 import { ArrowLeft, ChevronRight, Eye, EyeOff, Loader2 } from "lucide-react"
+
 import { useAuthStore } from "@/lib/store/authStore"
 import Image from "next/image"
 export default function SignUp() {
   const router = useRouter()
+
   const [signingFor, setSigningFor] = useState<"organization">("organization")
+
   const { register, isLoading, error, isAuthenticated } = useAuthStore()
 
   const [currentTab, setCurrentTab] = useState(0)
@@ -40,7 +44,9 @@ export default function SignUp() {
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/signin")
+
       setSigningFor("organization")
+
     }
   }, [isAuthenticated, router])
 
@@ -153,9 +159,11 @@ export default function SignUp() {
   }
   const handleNextTab = () => {
 
+
     if (validateUserDetails()) {
       setCurrentTab(1)
     }
+
   }
 
   const handlePrevTab = () => {
@@ -172,8 +180,10 @@ export default function SignUp() {
     try {
       console.log(formData)
       await register(formData)
+
      // If register doesn't throw an error, we can assume it was successful
      router.push("/signin")
+
     } catch (err) {
       // Error is handled by the store
       console.error("Registration failed:", err)
@@ -224,6 +234,7 @@ export default function SignUp() {
           {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
             {currentTab === 0 ? (
               // User Details Tab
               <>
@@ -316,6 +327,7 @@ export default function SignUp() {
               </>
             ) : (
               // Organization Details Tab
+
               <>
                 <div>
                   <label htmlFor="organizationName" className="block text-sm font-medium text-gray-700 mb-1">
@@ -328,8 +340,10 @@ export default function SignUp() {
                     required
                     value={formData.organizationName}
                     onChange={handleChange}
+
                     className={`w-full px-4 py-2 border ${formErrors.organizationName ? "border-red-500" : "border-gray-300"
                       } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+
                     placeholder="Your organization name"
                   />
                   {formErrors.organizationName && (
@@ -347,9 +361,11 @@ export default function SignUp() {
                     type="email"
                     value={formData.organizationEmail}
                     onChange={handleChange}
+
                     className={`w-full px-4 py-2 border ${formErrors.organizationEmail ? "border-red-500" : "border-gray-300"
                       } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                     placeholder="organization@company.com"
+
                   />
                   <p className="text-xs text-gray-500 mt-1">Optional - defaults to your email if not provided</p>
                 </div>
@@ -365,8 +381,10 @@ export default function SignUp() {
                     required
                     value={formData.organizationPhone}
                     onChange={handleChange}
+
                     className={`w-full px-4 py-2 border ${formErrors.organizationPhone ? "border-red-500" : "border-gray-300"
                       } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
+
                     placeholder="Phone number for organization"
                   />
                   {formErrors.organizationPhone && (
@@ -391,7 +409,9 @@ export default function SignUp() {
                 type={currentTab === 1 ? "submit" : "button"}
                 onClick={currentTab === 0 ? handleNextTab : undefined}
                 disabled={isLoading}
+
                 className={`${currentTab === 0 ? "ml-auto" : "w-full md:w-auto"} bg-teal-500 text-white py-2 px-6 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center`}
+
               >
                 {isLoading ? (
                   <>

@@ -276,11 +276,14 @@ export default function CreateExpensePage() {
         title="Create Expense"
         description="Add a new expense to your budget"
         action={
+
           <Button variant="outline" onClick={() => router.push("/dashboard/expenses")}>
+
             Cancel
           </Button>
         }
       />
+
 
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
@@ -291,6 +294,7 @@ export default function CreateExpensePage() {
           {isLoading ? (
             <div className="flex justify-center items-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -321,6 +325,7 @@ export default function CreateExpensePage() {
                     rows={3}
                   />
                 </div>
+
 
                 <div className="grid gap-2">
                   <Label htmlFor="amount" className={formErrors.amount ? "text-destructive" : ""}>
@@ -362,6 +367,7 @@ export default function CreateExpensePage() {
                   {formErrors.date && <p className="text-sm text-destructive">{formErrors.date}</p>}
                 </div>
 
+
                 <div className="grid gap-2">
                   <Label htmlFor="budget" className={formErrors.budgetId ? "text-destructive" : ""}>
                     Budget
@@ -387,6 +393,7 @@ export default function CreateExpensePage() {
                   {formErrors.budgetId && <p className="text-sm text-destructive">{formErrors.budgetId}</p>}
                 </div>
 
+
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="category" className={formErrors.categoryId ? "text-destructive" : ""}>
@@ -399,6 +406,7 @@ export default function CreateExpensePage() {
                         size="sm"
                         className="h-8 px-2 text-xs"
                         onClick={() => setIsCategoryDialogOpen(true)}
+
                       >
                         <PlusCircle className="h-3.5 w-3.5 mr-1" />
                         Add Category
@@ -407,8 +415,10 @@ export default function CreateExpensePage() {
                   </div>
                   <Select
                     value={formData.categoryId}
+
                     onValueChange={(value) => handleSelectChange("categoryId", value)}
                     disabled={!formData.budgetId}
+
                   >
                     <SelectTrigger id="category" className={formErrors.categoryId ? "border-destructive" : ""}>
                       <SelectValue placeholder={formData.budgetId ? "Select a category" : "Select a budget first"} />
@@ -433,6 +443,7 @@ export default function CreateExpensePage() {
                   </Select>
                   {formErrors.categoryId && <p className="text-sm text-destructive">{formErrors.categoryId}</p>}
                 </div>
+
               </div>
             </form>
           )}
@@ -469,6 +480,7 @@ export default function CreateExpensePage() {
             const error = await response.json();
             throw new Error(error.error || "Failed to create expense");
           }
+
 
           toast.success("Expense created successfully");
           
@@ -525,6 +537,7 @@ export default function CreateExpensePage() {
             const error = await response.json();
             throw new Error(error.error || "Failed to create expense");
           }
+
 
           toast.success("Expense created successfully");
           
@@ -607,6 +620,7 @@ export default function CreateExpensePage() {
           </form>
         </DialogContent>
       </Dialog>
+
     </div>
   )
 }

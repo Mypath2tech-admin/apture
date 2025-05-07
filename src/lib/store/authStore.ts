@@ -162,12 +162,14 @@ export const useAuthStore = create<AuthState>()(
                         toast.error(`Error:${err.error}`)
                         throw new Error(err.error || "Registration failed")
                     }
+
                     
                     toast.success("Regisration successful, check your email to proceed")
                       
                     const data = await res.json()
                     set({ isAuthenticated: false, user: data.user })
                     
+
                 } catch (err) {
                     set({ error: err instanceof Error ? err.message : "Registration failed" })
                 } finally {

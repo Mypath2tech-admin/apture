@@ -74,7 +74,9 @@ export default function DashboardSidebar() {
             <Link href="/dashboard" className="flex items-center">
               <div className="flex items-center gap-2">
                 <div className="relative w-10 h-10 flex items-center justify-center">
+
                 <Image src="/apture.png" width={100} height={100} className="" alt="" />
+
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
                   Apture
@@ -117,7 +119,9 @@ export default function DashboardSidebar() {
           <div className="p-4 border-t border-gray-200">
             <Link href="/pricing">
               <button
+
                 className="w-full flex items-center gap-1 justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-teal-600 to-gray-600 hover:from-teal-700 hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+
               >
               <Sparkles className='w-5' />
                 <span> Upgrade to Pro</span>
