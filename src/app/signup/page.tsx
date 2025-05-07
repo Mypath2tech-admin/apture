@@ -5,12 +5,12 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { DollarSign, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import { useAuthStore } from "@/lib/store/authStore"
-
+import Image from "next/image"
 export default function SignUp() {
   const router = useRouter()
-  const [signingFor, setSigningFor] = useState<"user" | "organization">("user")
+  const [signingFor, setSigningFor] = useState<"user" | "organization">("organization")
   const { register, isLoading, error, isAuthenticated } = useAuthStore()
 
   const [showPassword, setShowPassword] = useState(false)
@@ -36,7 +36,7 @@ export default function SignUp() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      router.push("/dashboard")
+      router.push("/signin")
     }
   }, [isAuthenticated, router])
 
@@ -84,7 +84,7 @@ export default function SignUp() {
     setFormData((prev) => ({ ...prev, [name]: value }))
 
     // Clear error when user types
-    
+
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -94,7 +94,7 @@ export default function SignUp() {
 
     try {
       await register(formData)
-      
+
       router.push("/signin")
     } catch (err) {
       // Error is handled by the store
@@ -103,9 +103,9 @@ export default function SignUp() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-emerald-50 to-teal-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-teal-50 to-teal-100">
       <div className="container mx-auto px-4 py-8">
-        <Link href="/" className="inline-flex items-center text-emerald-600 hover:text-emerald-700 transition-colors">
+        <Link href="/" className="inline-flex items-center text-teal-600 hover:text-teal-700 transition-colors">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Link>
@@ -116,10 +116,12 @@ export default function SignUp() {
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center gap-2">
               <div className="relative w-10 h-10 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
-                <DollarSign className="h-6 w-6 text-white z-10" />
+                {/* <div className="absolute inset-0 bg-gradient-to-tr  rounded-lg opacity-90"></div> */}
+                <Image src="/apture.png" width={30} height={30} className="w-full" alt="" />
+
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
+
                 Apture
               </span>
             </div>
@@ -143,7 +145,7 @@ export default function SignUp() {
                   value={formData.firstName}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${formErrors.firstName ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                   placeholder="First name"
                 />
                 {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>}
@@ -161,7 +163,7 @@ export default function SignUp() {
                   value={formData.lastName}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${formErrors.lastName ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                   placeholder="Last name"
                 />
                 {formErrors.lastName && <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>}
@@ -180,7 +182,7 @@ export default function SignUp() {
                 value={formData.email}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border ${formErrors.email ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                  } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                 placeholder="Enter your email"
               />
               {formErrors.email && <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>}
@@ -199,7 +201,7 @@ export default function SignUp() {
                   value={formData.password}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${formErrors.password ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors`}
+                    } rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors`}
                   placeholder="Create a password"
                 />
                 <button
@@ -221,22 +223,23 @@ export default function SignUp() {
                 <input
                   type="radio"
                   name="signingFor"
-                  value="user"
-                  checked={signingFor === "user"}
-                  onChange={() => setSigningFor("user")}
-                />
-                Personal Use
-              </label>
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  name="signingFor"
                   value="organization"
                   checked={signingFor === "organization"}
                   onChange={() => setSigningFor("organization")}
                 />
                 Organization
               </label>
+              <label className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="signingFor"
+                  value="user"
+                  checked={signingFor === "user"}
+                  onChange={() => setSigningFor("user")}
+                />
+                Personal Use
+              </label>
+
             </div>
             {signingFor === "organization" && (
               <>
@@ -250,7 +253,7 @@ export default function SignUp() {
                     type="text"
                     value={formData.organizationName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Your organization name"
                   />
                   {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationName}</p>} */}
@@ -265,7 +268,7 @@ export default function SignUp() {
                     type="text"
                     value={formData.organizationEmail}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="j.smith@company.com"
                   />
                   {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.organizationEmail}</p>} */}
@@ -282,7 +285,7 @@ export default function SignUp() {
                     type="tel"
                     value={formData.organizationPhone}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors"
                     placeholder="Phone number for organization"
                   />
                   {/* {formErrors.firstName && <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>} */}
@@ -296,7 +299,7 @@ export default function SignUp() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-emerald-500 text-white py-2 px-4 rounded-lg hover:bg-emerald-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
+                className="w-full bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-600 transition-colors transform hover:scale-[1.02] active:scale-[0.98] duration-200 flex items-center justify-center"
               >
                 {isLoading ? (
                   <>
@@ -312,11 +315,11 @@ export default function SignUp() {
             <div className="text-center text-sm text-gray-600">
               <p>
                 By signing up, you agree to our{" "}
-                <Link href="#" className="text-emerald-600 hover:underline">
+                <Link href="#" className="text-teal-600 hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="#" className="text-emerald-600 hover:underline">
+                <Link href="#" className="text-teal-600 hover:underline">
                   Privacy Policy
                 </Link>
               </p>
@@ -326,7 +329,7 @@ export default function SignUp() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/signin" className="text-emerald-600 hover:underline font-medium">
+              <Link href="/signin" className="text-teal-600 hover:underline font-medium">
                 Sign in
               </Link>
             </p>

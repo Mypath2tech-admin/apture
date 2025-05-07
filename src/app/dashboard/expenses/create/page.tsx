@@ -242,7 +242,7 @@ export default function CreateExpense() {
         action={
           <Link
             href={formData.budgetId ? `/dashboard/budgets/${formData.budgetId}` : "/dashboard/expenses"}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
           >
             Cancel
           </Link>
@@ -257,8 +257,8 @@ export default function CreateExpense() {
         )}
 
         {successMessage && (
-          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-md">
-            <p className="text-sm text-green-600">{successMessage}</p>
+          <div className="mb-4 p-4 bg-teal-50 border border-teal-200 rounded-md">
+            <p className="text-sm text-teal-600">{successMessage}</p>
           </div>
         )}
 
@@ -275,7 +275,7 @@ export default function CreateExpense() {
                 required
                 value={formData.title}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
               />
             </div>
 
@@ -295,7 +295,7 @@ export default function CreateExpense() {
                   value={formData.amount}
                   onChange={handleChange}
                   placeholder="0.00"
-                  className="block w-full pl-7 rounded-md p-2 border-gray-300 focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                  className="block w-full pl-7 rounded-md p-2 border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                 />
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function CreateExpense() {
                 required
                 value={formData.date}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
               />
             </div>
 
@@ -324,7 +324,7 @@ export default function CreateExpense() {
                 name="budgetId"
                 value={formData.budgetId}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                 disabled={isLoadingBudgets}
               >
                 <option value="">Select a budget (optional)</option>
@@ -368,7 +368,7 @@ export default function CreateExpense() {
                         id="newCategoryName"
                         value={newCategoryName}
                         onChange={(e) => setNewCategoryName(e.target.value)}
-                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-xs"
+                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-xs"
                         placeholder="Enter category name"
                         required
                       />
@@ -383,7 +383,7 @@ export default function CreateExpense() {
                         id="newCategoryDescription"
                         value={newCategoryDescription}
                         onChange={(e) => setNewCategoryDescription(e.target.value)}
-                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-xs"
+                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-xs"
                         placeholder="Enter description"
                       />
                     </div>
@@ -395,7 +395,7 @@ export default function CreateExpense() {
                         type="button"
                         onClick={handleCreateCategory}
                         disabled={isCreatingCategory || !formData.budgetId}
-                        className="inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                        className="inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
                       >
                         {isCreatingCategory ? "Creating..." : "Create Category"}
                       </button>
@@ -409,7 +409,7 @@ export default function CreateExpense() {
                     name="categoryId"
                     value={formData.categoryId}
                     onChange={handleChange}
-                    className="block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                    className="block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                     disabled={isLoadingCategories}
                   >
                     <option value="">Select a category</option>
@@ -429,7 +429,7 @@ export default function CreateExpense() {
                 <button
                   type="button"
                   onClick={() => setShowNewCategoryForm(true)}
-                  className="mt-1 inline-flex items-center text-sm text-green-600 hover:text-green-700"
+                  className="mt-1 inline-flex items-center text-sm text-teal-600 hover:text-teal-700"
                 >
                   <PlusCircle size={16} className="mr-1" />
                   Create new category
@@ -448,7 +448,7 @@ export default function CreateExpense() {
                 id="receipt"
                 accept="image/*,.pdf"
                 onChange={handleFileChange}
-                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
               />
             </div>
 
@@ -462,7 +462,7 @@ export default function CreateExpense() {
                 rows={3}
                 value={formData.description}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 sm:text-sm"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
               />
             </div>
           </div>
@@ -471,7 +471,7 @@ export default function CreateExpense() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
             >
               {isSubmitting ? "Saving..." : "Save Expense"}
             </button>

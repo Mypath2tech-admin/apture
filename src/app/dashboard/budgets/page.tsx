@@ -148,7 +148,7 @@ export default function Budgets() {
         title="Budgets"
         description="Manage and track your financial allocations"
         action={
-          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-green-600 hover:bg-green-700">
+          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-teal-600 hover:bg-teal-700">
             <PlusCircle className="mr-2 h-4 w-4" />
             Create Budget
           </Button>
@@ -228,7 +228,7 @@ export default function Budgets() {
             </p>
             <Button
               onClick={() => router.push("/dashboard/budgets/create")}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-teal-600 hover:bg-teal-700"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Budget
@@ -288,7 +288,7 @@ export default function Budgets() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-2">
                   <div>
                     <h4 className="text-xs font-medium uppercase text-muted-foreground">Total Budget</h4>
-                    <p className="mt-1 text-2xl font-bold text-green-600">{formatCurrency(budget.amount)}</p>
+                    <p className="mt-1 text-2xl font-bold text-teal-600">{formatCurrency(budget.amount)}</p>
                   </div>
                   <div>
                     <h4 className="text-xs font-medium uppercase text-muted-foreground">Spent</h4>
@@ -348,7 +348,7 @@ export default function Budgets() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-green-600 hover:text-green-700 cursor-pointer hover:bg-green-50"
+                    className="text-teal-600 hover:text-teal-700 cursor-pointer hover:bg-teal-50"
                     onClick={() => router.push(`/dashboard/budgets/${budget.id}`)}
                   >
                     View Details

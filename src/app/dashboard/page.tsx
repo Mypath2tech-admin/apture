@@ -69,7 +69,7 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
       </div>
     )
   }
@@ -126,7 +126,7 @@ export default function Dashboard() {
 
       {isLoadingData ? (
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
         </div>
       ) : dashboardData ? (
         <>
@@ -134,25 +134,25 @@ export default function Dashboard() {
             <StatItem
               title="Total Budget"
               value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalBudget.toFixed(2)}`}
-              icon={<DollarSign className="h-6 w-6" />}
+              icon={<DollarSign className="h-6 w-6 text-teal-500" />}
               change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.budgetChange}
             />
             <StatItem
               title="Total Expenses"
               value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalExpenses.toFixed(2)}`}
-              icon={<TrendingUp className="h-6 w-6" />}
+              icon={<TrendingUp className="h-6 w-6 text-teal-500" />}
               change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
             />
             <StatItem
-              title="Timesheet Hours"
+              title="Timesheet Hours22"
               value={dashboardData.timesheetHours.toString()}
-              icon={<Clock className="h-6 w-6" />}
+              icon={<Clock className="h-6 w-6 text-teal-500" />}
               change={dashboardData.timesheetChange}
             />
             <StatItem
               title="Team Members"
               value={dashboardData.teamMembers.toString()}
-              icon={<Users className="h-6 w-6" />}
+              icon={<Users className="h-6 w-6 text-teal-500" />}
             />
           </DashboardStats>
 
@@ -163,7 +163,7 @@ export default function Dashboard() {
                   <p className="text-gray-500">No budgets found</p>
                   <Button
                     onClick={() => router.push("/dashboard/budgets/create")}
-                    className="mt-4 bg-green-600 hover:bg-green-700"
+                    className="mt-4 bg-teal-600 hover:bg-teal-700"
                   >
                     Create Budget
                   </Button>
@@ -181,7 +181,7 @@ export default function Dashboard() {
                                   ? "bg-red-500"
                                   : budget.progress > 70
                                     ? "bg-yellow-500"
-                                    : "bg-green-500"
+                                    : "bg-teal-500"
                                 }`}
                               style={{ width: `${Math.min(budget.progress, 100)}%` }}
                             ></div>
@@ -214,13 +214,13 @@ export default function Dashboard() {
               )}
             </DashboardCard>
 
-            <DashboardCard title="Recent Expenses">
+            <DashboardCard title="Recent Expenses333">
               {dashboardData.recentExpenses.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">No expenses found</p>
                   <Button
                     onClick={() => router.push("/dashboard/expenses/create")}
-                    className="mt-4 bg-green-600 hover:bg-green-700"
+                    className="mt-4 bg-teal-600 hover:bg-teal-700"
                   >
                     Add Expense
                   </Button>
@@ -262,23 +262,23 @@ export default function Dashboard() {
           {dashboardData.viewingOrgData && dashboardData.organization && (
             <DashboardCard title="Organization Overview" className="mt-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h4 className="text-sm font-medium text-green-800">Organization</h4>
+                <div className="p-4 bg-teal-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-teal-800">Organization</h4>
                   <p className="text-lg font-semibold mt-1">{dashboardData.organization.name}</p>
                   {dashboardData.organization.description && (
                     <p className="text-sm text-gray-600 mt-1">{dashboardData.organization.description}</p>
                   )}
                 </div>
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h4 className="text-sm font-medium text-green-800">Team Size</h4>
+                <div className="p-4 bg-teal-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-teal-800">Team Size</h4>
                   <p className="text-lg font-semibold mt-1">{dashboardData.organization.memberCount} members</p>
                   <p className="text-sm text-gray-600 mt-1">
                     {dashboardData.organization.totalBudgets} budgets · {dashboardData.organization.totalExpenses}{" "}
                     expenses
                   </p>
                 </div>
-                <div className="p-4 bg-green-50 rounded-lg">
-                  <h4 className="text-sm font-medium text-green-800">Contact</h4>
+                <div className="p-4 bg-teal-50 rounded-lg">
+                  <h4 className="text-sm font-medium text-teal-800">Contact</h4>
                   <p className="text-sm mt-1">{dashboardData.organization.email || "No email provided"}</p>
                   <p className="text-sm mt-1">{dashboardData.organization.website || "No website provided"}</p>
                 </div>
@@ -289,7 +289,7 @@ export default function Dashboard() {
       ) : error ? (
         <div className="text-center py-8">
           <p className="text-red-500">{error}</p>
-          <Button onClick={() => fetchDashboardData(viewType)} className="mt-4 bg-green-600 hover:bg-green-700">
+          <Button onClick={() => fetchDashboardData(viewType)} className="mt-4 bg-teal-600 hover:bg-teal-700">
             Try Again
           </Button>
         </div>

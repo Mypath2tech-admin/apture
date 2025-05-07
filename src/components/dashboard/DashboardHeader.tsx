@@ -26,7 +26,7 @@ export default function DashboardHeader() {
               <input
                 type="search"
                 placeholder="Search..."
-                className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-teal-600 sm:text-sm sm:leading-6"
               />
             </div> */}
           </div>
@@ -36,7 +36,7 @@ export default function DashboardHeader() {
             {/* Notifications */}
             {/* <button
               type="button"
-              className="relative p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              className="relative p-1 rounded-full text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
             >
               <span className="sr-only">View notifications</span>
               <Bell className="h-6 w-6" aria-hidden="true" />
@@ -47,11 +47,11 @@ export default function DashboardHeader() {
             <div className="relative">
               <button
                 type="button"
-                className="flex items-center max-w-xs rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="flex items-center max-w-xs rounded-full bg-white text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center text-white">
+                <div className="h-8 w-8 rounded-full bg-teal-600 flex items-center justify-center text-white">
                   <User className="h-5 w-5" aria-hidden="true" />
                 </div>
               </button>

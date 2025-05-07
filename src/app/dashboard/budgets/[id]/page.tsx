@@ -73,7 +73,7 @@ export default function BudgetDetail() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
       </div>
     )
   }
@@ -88,7 +88,7 @@ export default function BudgetDetail() {
         <div className="mt-6">
           <Link
             href="/dashboard/budgets"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
           >
             <ArrowLeft className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
             Back to Budgets
@@ -114,7 +114,7 @@ export default function BudgetDetail() {
             </Link>
             <Link
               href="/dashboard/budgets"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
             >
               <ArrowLeft className="-ml-1 mr-2 h-5 w-5" />
               Back
@@ -145,7 +145,7 @@ export default function BudgetDetail() {
                 <span className="text-xs font-medium text-gray-900">{budget.progress}%</span>
               </div>
               <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-green-600 rounded-full" style={{ width: `${budget.progress}%` }} />
+                <div className="h-full bg-teal-600 rounded-full" style={{ width: `${budget.progress}%` }} />
               </div>
             </div>
           </div>
@@ -227,7 +227,7 @@ export default function BudgetDetail() {
         action={
           <Link
             href={`/dashboard/expenses/create?budgetId=${budget.id}`}
-            className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700"
           >
             <Plus className="-ml-1 mr-1 h-4 w-4" />
             Add Expense

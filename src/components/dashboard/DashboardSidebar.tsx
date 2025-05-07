@@ -73,10 +73,10 @@ export default function DashboardSidebar() {
             <Link href="/dashboard" className="flex items-center">
               <div className="flex items-center gap-2">
                 <div className="relative w-10 h-10 flex items-center justify-center">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-green-600 to-green-400 rounded-lg opacity-90"></div>
+                  <div className="absolute inset-0 bg-gradient-to-tr from-teal-600 to-teal-400 rounded-lg opacity-90"></div>
                   <DollarSign className="h-6 w-6 text-white z-10" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-green-500 bg-clip-text text-transparent">
+                <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
                   Apture
                 </span>
               </div>
@@ -99,12 +99,12 @@ export default function DashboardSidebar() {
                   key={item.name}
                   href={item.href}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
-                    ? 'bg-green-50 text-green-700'
+                    ? 'bg-teal-50 text-teal-700'
                     : 'text-gray-700 hover:bg-gray-100'
                     }`}
                 >
                   <item.icon
-                    className={`mr-3 h-5 w-5 ${isActive ? 'text-green-600' : 'text-gray-500'}`}
+                    className={`mr-3 h-5 w-5 ${isActive ? 'text-teal-600' : 'text-gray-500'}`}
                     aria-hidden="true"
                   />
                   {item.name}
@@ -117,7 +117,7 @@ export default function DashboardSidebar() {
           <div className="p-4 border-t border-gray-200">
             <Link href="/dashboard/budgets/create">
               <button
-                className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 New Budget

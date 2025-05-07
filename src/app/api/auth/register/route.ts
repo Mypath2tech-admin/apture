@@ -97,7 +97,8 @@ export async function POST(request: NextRequest) {
     }
     const updatedUser = await prisma.user.findUnique({
       where: { id: user.id },
-    });
+    }); 
+
 
     // Generate verification URL
     const verificationUrl = `${baseUrl}/verify-email?token=${verificationToken}&email=${encodeURIComponent(

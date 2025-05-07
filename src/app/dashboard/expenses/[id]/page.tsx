@@ -141,7 +141,7 @@ export default function ExpenseDetail() {
             {expense.budget && (
               <Link
                 href={`/dashboard/budgets/${expense.budget.id}`}
-                className="mt-2 inline-flex items-center text-sm text-green-600 hover:text-green-700"
+                className="mt-2 inline-flex items-center text-sm text-teal-600 hover:text-teal-700"
               >
                 <Tag className="mr-1 h-4 w-4" />
                 {expense.budget.name}
@@ -162,7 +162,7 @@ export default function ExpenseDetail() {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="border-green-600 text-green-600 hover:bg-green-50"
+                  className="border-teal-600 text-teal-600 hover:bg-teal-50"
                   onClick={() => updateExpenseStatus("APPROVED")}
                 >
                   <CheckCircle className="mr-1 h-4 w-4" />
@@ -210,7 +210,7 @@ export default function ExpenseDetail() {
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Category</p>
                   <div className="flex items-center">
-                    <div className="h-4 w-4 rounded-full bg-green-500 mr-2"></div>
+                    <div className="h-4 w-4 rounded-full bg-teal-500 mr-2"></div>
                     <p className="text-base text-gray-900">{expense?.category?.name}</p>
                   </div>
                 </div>
