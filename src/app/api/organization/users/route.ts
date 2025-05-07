@@ -30,15 +30,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    // Check if user is admin or organization admin
-    if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN" && user.role !== "ORGANIZATION_MEMBER") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    }
+
 
     // Check if user belongs to an organization
-    if (!user.organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 })
-    }
+    // if (!user.organizationId) {
+    //   return NextResponse.json({ error: "No organization found" }, { status: 404 })
+    // }
 
     // Get all users in the organization
     const organizationUsers = await prisma.user.findMany({

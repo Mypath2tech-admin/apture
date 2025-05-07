@@ -2,8 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import prisma from "@/lib/prisma"
-import type { Budget, BudgetCategory } from "../../../types/dashboard"
-import { type Prisma, UserRole } from "../../../../generated/prisma"
+import type { Budget, BudgetCategory } from "@/types/dashboard"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -28,7 +27,7 @@ interface BudgetWhereClause {
   userId?: string
   name?: {
     contains: string
-    mode: Prisma.QueryMode
+    mode: "insensitive"
   }
   startDate?: {
     gte: Date
@@ -83,12 +82,9 @@ export async function GET(request: NextRequest) {
     const where: BudgetWhereClause = {}
 
     // Filter by organization or user
-    if (
-      (user.role === UserRole.ORGANIZATION_ADMIN || user.role === UserRole.ORGANIZATION_MEMBER) &&
-      user.organizationId
-    ) {
+    if ((user.role === "ORGANIZATION_ADMIN" || user.role === "ORGANIZATION_MEMBER") && user.organizationId) {
       where.organizationId = user.organizationId
-    } else if (user.role === UserRole.USER) {
+    } else if (user.role === "USER") {
       where.userId = user.id
     }
 
@@ -129,25 +125,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Create a type-safe sort object based on the queryParams
-    type SortField = keyof Prisma.BudgetOrderByWithRelationInput
+    const validSortFields = ["id", "name", "amount", "startDate", "endDate", "createdAt", "updatedAt", "description"]
 
-    // Validate that the sortBy field is actually a valid field to sort by
-    const validSortFields: SortField[] = [
-      "id",
-      "name",
-      "amount",
-      "startDate",
-      "endDate",
-      "createdAt",
-      "updatedAt",
-      "description",
-    ]
+    const sortField = validSortFields.includes(queryParams.sortBy) ? (queryParams.sortBy) : "createdAt"
 
-    const sortField = validSortFields.includes(queryParams.sortBy as SortField)
-      ? (queryParams.sortBy as SortField)
-      : "createdAt"
-
-    const orderBy: Prisma.BudgetOrderByWithRelationInput = {
+    const orderBy = {
       [sortField]: queryParams.sortOrder,
     }
 
@@ -177,7 +159,7 @@ export async function GET(request: NextRequest) {
         name: cat.name,
         allocatedAmount: Number(cat.allocatedAmount),
         description: cat.description || undefined,
-        budgetId: budget.id, // ✅ add this
+        budgetId: budget.id,
       }))
 
       return {
@@ -261,15 +243,16 @@ export async function POST(request: NextRequest) {
         organizationId: user.organizationId,
         projectId,
         categories:
-          categories && categories.length > 0
-            ? {
-                create: categories.map((cat) => ({
-                  name: cat.name,
-                  allocatedAmount: Number(cat.allocatedAmount),
-                  description: cat.description,
-                })),
-              }
-            : undefined,
+        categories && categories.length > 0
+          ? {
+              create: categories.map((cat) => ({
+                name: cat.name,
+                allocatedAmount: Number(cat.allocatedAmount),
+                description: cat.description,
+              })),
+            }
+          : undefined,
+      
       },
       include: {
         categories: true,
@@ -282,7 +265,7 @@ export async function POST(request: NextRequest) {
       name: cat.name,
       allocatedAmount: Number(cat.allocatedAmount),
       description: cat.description || undefined,
-      budgetId: budget.id, // ✅ add this
+      budgetId: budget.id,
     }))
 
     // Create response object that matches our updated Budget interface
@@ -297,11 +280,8 @@ export async function POST(request: NextRequest) {
       updatedAt: budget.updatedAt.toISOString(),
       organizationId: budget.organizationId || undefined,
       userId: budget.userId || undefined,
-      // projectId: budget.projectId || undefined,
-      // spent: 0, // New budget, so spent is 0
-      // remaining: Number(budget.amount), // New budget, so remaining is the full amount
-      // progress: 0, // New budget, so progress is 0
-      categories: mappedCategories.length > 0 ? mappedCategories : undefined,
+      remaining:0,
+      categories: mappedCategories,
     }
 
     return NextResponse.json(response)

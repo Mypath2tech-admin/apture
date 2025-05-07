@@ -428,11 +428,11 @@ export default function Expenses() {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                              className="text-red-600 relative z-50 hover:text-red-800 hover:bg-red-50 cursor-pointer"
                               onClick={() => setDeletingExpenseId(expense.id)}
                             >
                               <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
+                              <span className="sr-only cursor-pointer">Delete</span>
                             </Button>
                           </DialogTrigger>
                           <DialogContent>

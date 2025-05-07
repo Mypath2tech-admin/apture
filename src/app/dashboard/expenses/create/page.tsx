@@ -1,147 +1,235 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useState, useEffect, type FormEvent, type ChangeEvent } from "react"
+import { useRouter } from "next/navigation"
+import { Loader2, PlusCircle } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { toast } from 'react-toastify'
 import PageHeader from "@/components/dashboard/PageHeader"
-import DashboardCard from "@/components/dashboard/DashboardCard"
-import Link from "next/link"
-import { toast } from "react-toastify"
-import { PlusCircle, X } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import type { Budget, ExpenseCategory } from "@/types/dashboard"
+import { DatePickerDemo } from "@/components/ui/date-picker"
 
-interface ExpenseFormData {
+// Define interfaces for our component state
+interface FormData {
   title: string
+  description: string
   amount: string
   date: string
-  categoryId: string
   budgetId: string
-  description: string
-  receipt?: File | null
+  categoryId: string
 }
 
-export default function CreateExpense() {
+interface NewCategoryData {
+  name: string
+  description: string
+}
+
+export default function CreateExpensePage() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-
+  const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
-  const [userRole, setUserRole] = useState<string | null>(null)
-
   const [budgets, setBudgets] = useState<Budget[]>([])
-  const [isLoadingBudgets, setIsLoadingBudgets] = useState(true)
-
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true)
-
-  // New state for category creation
-  const [showNewCategoryForm, setShowNewCategoryForm] = useState(false)
-  const [newCategoryName, setNewCategoryName] = useState("")
-  const [newCategoryDescription, setNewCategoryDescription] = useState("")
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false)
-
-  const [formData, setFormData] = useState<ExpenseFormData>({
-    title: "",
-    amount: "",
-    date: new Date().toISOString().split("T")[0], // Today's date as default
-    categoryId: "",
-    budgetId: searchParams.get("budgetId") || "",
+  const [filteredCategories, setFilteredCategories] = useState<ExpenseCategory[]>([])
+  const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
+  const [newCategory, setNewCategory] = useState<NewCategoryData>({
+    name: "",
     description: "",
-    receipt: null,
   })
 
-  // Fetch user role
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const response = await fetch("/api/users/me")
-        if (response.ok) {
-          const userData = await response.json()
-          setUserRole(userData.role)
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error)
-      }
-    }
+  const [formData, setFormData] = useState<FormData>({
+    title: "",
+    description: "",
+    amount: "",
+    date: new Date().toISOString().split("T")[0],
+    budgetId: "",
+    categoryId: "",
+  })
 
-    fetchUserRole()
-  }, [])
+  const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
 
-  // Fetch categories and budgets when the component mounts
+  // Fetch budgets and categories on component mount
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true)
       try {
-        // Always fetch budgets
+        // Fetch budgets
         const budgetsResponse = await fetch("/api/budget")
-
         if (!budgetsResponse.ok) {
           throw new Error("Failed to fetch budgets")
         }
-
         const budgetsData = await budgetsResponse.json()
         setBudgets(budgetsData)
-        setIsLoadingBudgets(false)
 
-        // Only fetch categories if user is admin or organization admin
-        if (userRole === "ADMIN" || userRole === "ORGANIZATION_ADMIN") {
-          const categoriesResponse = await fetch("/api/categories")
-
-          if (!categoriesResponse.ok) {
-            throw new Error("Failed to fetch categories")
-          }
-
-          const categoriesData = await categoriesResponse.json()
-          setCategories(categoriesData)
+        // Fetch categories
+        const categoriesResponse = await fetch("/api/categories")
+        if (!categoriesResponse.ok) {
+          throw new Error("Failed to fetch categories")
         }
+        const categoriesData = await categoriesResponse.json()
+        setCategories(categoriesData)
+      } catch (error) {
+        console.error("Error fetching data:", error)
 
-        setIsLoadingCategories(false)
-      } catch (err) {
-        console.error("Error fetching data:", err)
-        setError(err instanceof Error ? err.message : "Failed to load data")
-        setIsLoadingBudgets(false)
-        setIsLoadingCategories(false)
+        toast.error("Failed to load data. Please try again.")
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    if (userRole !== null) {
-      fetchData()
+    fetchData()
+  }, [])
+
+  // Filter categories based on selected budget
+  useEffect(() => {
+    if (formData.budgetId) {
+      const filtered = categories.filter((category) => category.budgetId === formData.budgetId)
+      setFilteredCategories(filtered)
+
+      // Reset category selection if the current selection doesn't belong to the selected budget
+      if (formData.categoryId && !filtered.some((cat) => cat.id === formData.categoryId)) {
+        setFormData((prev) => ({ ...prev, categoryId: "" }))
+      }
+    } else {
+      setFilteredCategories([])
+      setFormData((prev) => ({ ...prev, categoryId: "" }))
     }
-  }, [userRole])
+  }, [formData.budgetId, categories, formData.categoryId])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  // Handle form input changes
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
 
-    // Special handling for category selection
-    if (name === "categoryId" && value === "new") {
-      setShowNewCategoryForm(true)
+    // Clear error for this field when user types
+    if (formErrors[name as keyof FormData]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name as keyof FormData]
+        return newErrors
+      })
+    }
+  }
+
+  // Handle select changes
+  const handleSelectChange = (name: keyof FormData, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }))
+
+    // Clear error for this field when user selects
+    if (formErrors[name]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[name]
+        return newErrors
+      })
+    }
+  }
+
+  // Validate form
+  const validateForm = (): boolean => {
+    const errors: Partial<Record<keyof FormData, string>> = {}
+
+    if (!formData.title.trim()) {
+      errors.title = "Title is required"
+    }
+
+    if (!formData.amount) {
+      errors.amount = "Amount is required"
+    } else if (isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) {
+      errors.amount = "Amount must be a positive number"
+    }
+
+    if (!formData.date) {
+      errors.date = "Date is required"
+    }
+
+    if (!formData.budgetId) {
+      errors.budgetId = "Budget is required"
+    }
+
+    if (!formData.categoryId) {
+      errors.categoryId = "Category is required"
+    }
+
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  // Handle form submission
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+
+    if (!validateForm()) {
       return
     }
 
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setIsSubmitting(true)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, receipt: e.target.files?.[0] || null }))
+    try {
+      const response = await fetch("/api/expenses", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          amount: Number(formData.amount),
+          date: formData.date,
+          budgetId: formData.budgetId,
+          categoryId: formData.categoryId,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create expense")
+      }
+
+
+      toast.success("Expense created successfully")
+
+      // Redirect to expenses list
+      router.push("/dashboard/expenses")
+    } catch (error) {
+      console.error("Error creating expense:", error)
+
+      toast.error("Failed to create expense")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleCreateCategory = async (e: React.FormEvent) => {
+  // Handle creating a new category
+  const handleCreateCategory = async (e: FormEvent) => {
     e.preventDefault()
 
-    if (!newCategoryName.trim()) {
+    if (!newCategory.name.trim()) {
+
       toast.error("Category name is required")
       return
     }
 
     if (!formData.budgetId) {
-      toast.error("Please select a budget for the new category")
+
+      toast.error("Please select a budget first")
       return
     }
 
-    setIsCreatingCategory(true)
+    setIsSubmitting(true)
 
     try {
       const response = await fetch("/api/categories", {
@@ -150,85 +238,33 @@ export default function CreateExpense() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: newCategoryName,
-          description: newCategoryDescription,
+          name: newCategory.name,
+          description: newCategory.description,
           budgetId: formData.budgetId,
         }),
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to create category")
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create category")
       }
 
-      const newCategory = await response.json()
+      const newCategoryData = await response.json()
 
       // Add the new category to the list and select it
-      setCategories((prev) => [...prev, newCategory])
-      setFormData((prev) => ({ ...prev, categoryId: newCategory.id }))
+      setCategories((prev) => [...prev, newCategoryData])
+      setFormData((prev) => ({ ...prev, categoryId: newCategoryData.id }))
 
-      // Reset the form
-      setShowNewCategoryForm(false)
-      setNewCategoryName("")
-      setNewCategoryDescription("")
+      // Reset the form and close the dialog
+      setNewCategory({ name: "", description: "" })
+      setIsCategoryDialogOpen(false)
+
 
       toast.success("Category created successfully")
-    } catch (err) {
-      console.error("Failed to create category:", err)
-      toast.error(err instanceof Error ? err.message : "Failed to create category")
-    } finally {
-      setIsCreatingCategory(false)
-    }
-  }
+    } catch (error) {
+      console.error("Error creating category:", error)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
-    setSuccessMessage(null)
-
-    try {
-      // Create request payload
-      const payload = {
-        title: formData.title,
-        amount: Number.parseFloat(formData.amount),
-        date: formData.date,
-        categoryId: formData.categoryId || undefined, // Allow undefined for non-admin users
-        budgetId: formData.budgetId || undefined,
-        description: formData.description || undefined,
-        // We'll handle file upload separately if needed
-      }
-
-      const response = await fetch("/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to create expense")
-      }
-
-      const data = await response.json()
-      console.log(data)
-      setSuccessMessage("Expense created successfully!")
-
-      // Redirect after a brief delay to show success message
-      setTimeout(() => {
-        // Redirect to the budget detail page if a budget was selected
-        if (formData.budgetId) {
-          router.push(`/dashboard/budgets/${formData.budgetId}`)
-        } else {
-          router.push("/dashboard/expenses")
-        }
-      }, 1500)
-    } catch (err) {
-      console.error("Failed to create expense:", err)
-      setError(err instanceof Error ? err.message : "Failed to create expense")
-      toast.error(err instanceof Error ? err.message : "Failed to create expense")
+      toast.error("Failed to create category")
     } finally {
       setIsSubmitting(false)
     }
@@ -237,247 +273,354 @@ export default function CreateExpense() {
   return (
     <div>
       <PageHeader
-        title="Add Expense"
-        description="Record a new expense"
+        title="Create Expense"
+        description="Add a new expense to your budget"
         action={
-          <Link
-            href={formData.budgetId ? `/dashboard/budgets/${formData.budgetId}` : "/dashboard/expenses"}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-          >
+
+          <Button variant="outline" onClick={() => router.push("/dashboard/expenses")}>
+
             Cancel
-          </Link>
+          </Button>
         }
       />
 
-      <DashboardCard title="Expense Details">
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
 
-        {successMessage && (
-          <div className="mb-4 p-4 bg-teal-50 border border-teal-200 rounded-md">
-            <p className="text-sm text-teal-600">{successMessage}</p>
-          </div>
-        )}
+      <Card className="max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle>New Expense</CardTitle>
+          <CardDescription>Enter the details of your expense</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="flex justify-center items-center py-8">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-            <div className="col-span-2">
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Expense Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                id="title"
-                required
-                value={formData.title}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-              />
             </div>
-
-            <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
-                Amount
-              </label>
-              <div className="mt-1 relative rounded-md shadow-sm">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <span className="text-gray-500 sm:text-sm">$</span>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title" className={formErrors.title ? "text-destructive" : ""}>
+                    Title
+                  </Label>
+                  <Input
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    placeholder="Expense title"
+                    className={formErrors.title ? "border-destructive" : ""}
+                  />
+                  {formErrors.title && <p className="text-sm text-destructive">{formErrors.title}</p>}
                 </div>
-                <input
-                  type="text"
-                  name="amount"
-                  id="amount"
-                  required
-                  value={formData.amount}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  className="block w-full pl-7 rounded-md p-2 border-gray-300 focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description (optional)</Label>
+                  <Textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="Expense description"
+                    rows={3}
+                  />
+                </div>
+
+
+                <div className="grid gap-2">
+                  <Label htmlFor="amount" className={formErrors.amount ? "text-destructive" : ""}>
+                    Amount
+                  </Label>
+                  <Input
+                    id="amount"
+                    name="amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    placeholder="0.00"
+                    className={formErrors.amount ? "border-destructive" : ""}
+                  />
+                  {formErrors.amount && <p className="text-sm text-destructive">{formErrors.amount}</p>}
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="date" className={formErrors.date ? "text-destructive" : ""}>
+                    Date
+                  </Label>
+                  {/* <Input
+                    id="date"
+                    name="date"
+                    type="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    className={formErrors.date ? "border-destructive" : ""}
+                  /> */}
+                  <DatePickerDemo
+                    id="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange} 
+                  
+                    />
+                  {formErrors.date && <p className="text-sm text-destructive">{formErrors.date}</p>}
+                </div>
+
+
+                <div className="grid gap-2">
+                  <Label htmlFor="budget" className={formErrors.budgetId ? "text-destructive" : ""}>
+                    Budget
+                  </Label>
+                  <Select value={formData.budgetId} onValueChange={(value) => handleSelectChange("budgetId", value)}>
+                    <SelectTrigger id="budget" className={formErrors.budgetId ? "border-destructive" : ""}>
+                      <SelectValue placeholder="Select a budget" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {budgets.length === 0 ? (
+                        <SelectItem value="no-budgets" disabled>
+                          No budgets available
+                        </SelectItem>
+                      ) : (
+                        budgets.map((budget) => (
+                          <SelectItem key={budget.id} value={budget.id}>
+                            {budget.name} (${budget.remaining?.toFixed(2) || 0} remaining)
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {formErrors.budgetId && <p className="text-sm text-destructive">{formErrors.budgetId}</p>}
+                </div>
+
+
+                <div className="grid gap-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="category" className={formErrors.categoryId ? "text-destructive" : ""}>
+                      Category
+                    </Label>
+                    {formData.budgetId && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 text-xs"
+                        onClick={() => setIsCategoryDialogOpen(true)}
+
+                      >
+                        <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                        Add Category
+                      </Button>
+                    )}
+                  </div>
+                  <Select
+                    value={formData.categoryId}
+
+                    onValueChange={(value) => handleSelectChange("categoryId", value)}
+                    disabled={!formData.budgetId}
+
+                  >
+                    <SelectTrigger id="category" className={formErrors.categoryId ? "border-destructive" : ""}>
+                      <SelectValue placeholder={formData.budgetId ? "Select a category" : "Select a budget first"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {!formData.budgetId ? (
+                        <SelectItem value="no-budget" disabled>
+                          Select a budget first
+                        </SelectItem>
+                      ) : filteredCategories.length === 0 ? (
+                        <SelectItem value="no-categories" disabled>
+                          No categories available
+                        </SelectItem>
+                      ) : (
+                        filteredCategories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {formErrors.categoryId && <p className="text-sm text-destructive">{formErrors.categoryId}</p>}
+                </div>
+
+              </div>
+            </form>
+          )}
+        </CardContent>
+        <CardFooter className="flex justify-between gap-2">
+  <Button variant="outline" onClick={() => router.push("/dashboard/expenses")}>
+    Cancel
+  </Button>
+  <div className="flex gap-2">
+    <Button 
+      variant="secondary" 
+      onClick={async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        
+        setIsSubmitting(true);
+        try {
+          const response = await fetch("/api/expenses", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: formData.title,
+              description: formData.description,
+              amount: Number(formData.amount),
+              date: formData.date,
+              budgetId: formData.budgetId,
+              categoryId: formData.categoryId,
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to create expense");
+          }
+
+
+          toast.success("Expense created successfully");
+          
+          // Reset form for new entry
+          setFormData({
+            title: "",
+            description: "",
+            amount: "",
+            date: new Date().toISOString().split("T")[0],
+            budgetId: formData.budgetId, // Keep the same budget
+            categoryId: formData.categoryId, // Keep the same category
+          });
+        } catch (error) {
+          console.error("Error creating expense:", error);
+          toast.error("Failed to create expense");
+        } finally {
+          setIsSubmitting(false);
+        }
+      }}
+      disabled={isSubmitting || isLoading}
+    >
+      {isSubmitting ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Saving...
+        </>
+      ) : (
+        "Save and create new"
+      )}
+    </Button>
+    <Button 
+      onClick={async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+        
+        setIsSubmitting(true);
+        try {
+          const response = await fetch("/api/expenses", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: formData.title,
+              description: formData.description,
+              amount: Number(formData.amount),
+              date: formData.date,
+              budgetId: formData.budgetId,
+              categoryId: formData.categoryId,
+            }),
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to create expense");
+          }
+
+
+          toast.success("Expense created successfully");
+          
+          // Redirect to expenses list
+          router.push("/dashboard/expenses");
+        } catch (error) {
+          console.error("Error creating expense:", error);
+          toast.error("Failed to create expense");
+        } finally {
+          setIsSubmitting(false);
+        }
+      }}
+      disabled={isSubmitting || isLoading}
+    >
+      {isSubmitting ? (
+        <>
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Saving...
+        </>
+      ) : (
+        "Save and go back"
+      )}
+    </Button>
+  </div>
+</CardFooter>
+      </Card>
+
+      {/* Create Category Dialog */}
+      <Dialog open={isCategoryDialogOpen} onOpenChange={setIsCategoryDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Category</DialogTitle>
+            <DialogDescription>Add a new category to the selected budget.</DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateCategory}>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="categoryName">Name</Label>
+                <Input
+                  id="categoryName"
+                  value={newCategory.name}
+                  onChange={(e) => setNewCategory((prev) => ({ ...prev, name: e.target.value }))}
+                  placeholder="Category name"
+                />
+              </div>
+
+              <div className="grid gap-2">
+                <Label htmlFor="categoryDescription">Description (optional)</Label>
+                <Textarea
+                  id="categoryDescription"
+                  value={newCategory.description}
+                  onChange={(e) => setNewCategory((prev) => ({ ...prev, description: e.target.value }))}
+                  placeholder="Category description"
+                  rows={3}
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-                Date
-              </label>
-              <input
-                type="date"
-                name="date"
-                id="date"
-                required
-                value={formData.date}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="budgetId" className="block text-sm font-medium text-gray-700">
-                Budget
-              </label>
-              <select
-                id="budgetId"
-                name="budgetId"
-                value={formData.budgetId}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-                disabled={isLoadingBudgets}
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsCategoryDialogOpen(false)}
+                disabled={isSubmitting}
               >
-                <option value="">Select a budget (optional)</option>
-                {budgets.map((budget) => (
-                  <option key={budget.id} value={budget.id}>
-                    {budget.name}
-                  </option>
-                ))}
-              </select>
-              {isLoadingBudgets && <p className="mt-1 text-sm text-gray-500">Loading budgets...</p>}
-            </div>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Create Category"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-            {/* Only show category selection for admin users */}
-
-            <div>
-              <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
-                Category
-              </label>
-
-              {showNewCategoryForm ? (
-                <div className="mt-1 p-3 border border-gray-300 rounded-md bg-gray-50">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="text-sm font-medium text-gray-700">Add New Category</h4>
-                    <button
-                      type="button"
-                      onClick={() => setShowNewCategoryForm(false)}
-                      className="text-gray-400 hover:text-gray-500"
-                    >
-                      <X size={18} />
-                      <span className="sr-only">Close</span>
-                    </button>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div>
-                      <label htmlFor="newCategoryName" className="block text-xs font-medium text-gray-700">
-                        Category Name
-                      </label>
-                      <input
-                        type="text"
-                        id="newCategoryName"
-                        value={newCategoryName}
-                        onChange={(e) => setNewCategoryName(e.target.value)}
-                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-xs"
-                        placeholder="Enter category name"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="newCategoryDescription" className="block text-xs font-medium text-gray-700">
-                        Description (optional)
-                      </label>
-                      <input
-                        type="text"
-                        id="newCategoryDescription"
-                        value={newCategoryDescription}
-                        onChange={(e) => setNewCategoryDescription(e.target.value)}
-                        className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-xs"
-                        placeholder="Enter description"
-                      />
-                    </div>
-
-                    {!formData.budgetId && <p className="text-xs text-amber-600">Please select a budget first</p>}
-
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={handleCreateCategory}
-                        disabled={isCreatingCategory || !formData.budgetId}
-                        className="inline-flex items-center px-3 py-1 border border-transparent rounded-md shadow-sm text-xs font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
-                      >
-                        {isCreatingCategory ? "Creating..." : "Create Category"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-1">
-                  <select
-                    id="categoryId"
-                    name="categoryId"
-                    value={formData.categoryId}
-                    onChange={handleChange}
-                    className="block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-                    disabled={isLoadingCategories}
-                  >
-                    <option value="">Select a category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                    <option value="new">+ Add new category</option>
-                  </select>
-
-                  {isLoadingCategories && <p className="mt-1 text-sm text-gray-500">Loading categories...</p>}
-                </div>
-              )}
-
-              {!showNewCategoryForm && (
-                <button
-                  type="button"
-                  onClick={() => setShowNewCategoryForm(true)}
-                  className="mt-1 inline-flex items-center text-sm text-teal-600 hover:text-teal-700"
-                >
-                  <PlusCircle size={16} className="mr-1" />
-                  Create new category
-                </button>
-              )}
-            </div>
-
-
-            <div>
-              <label htmlFor="receipt" className="block text-sm font-medium text-gray-700">
-                Receipt (optional)
-              </label>
-              <input
-                type="file"
-                name="receipt"
-                id="receipt"
-                accept="image/*,.pdf"
-                onChange={handleFileChange}
-                className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
-              />
-            </div>
-
-            <div className="col-span-2">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                Description (optional)
-              </label>
-              <textarea
-                id="description"
-                name="description"
-                rows={3}
-                value={formData.description}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
-            >
-              {isSubmitting ? "Saving..." : "Save Expense"}
-            </button>
-          </div>
-        </form>
-      </DashboardCard>
     </div>
   )
 }

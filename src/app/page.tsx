@@ -29,7 +29,7 @@ export default function LandingPage() {
     <div className="flex flex-col min-h-screen text-gray-800 overflow-hidden bg-white">
 
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 bg-[#f8fafc ]">
         {/* Hero Section */}
         <section className="relative py-24 md:py-32 overflow-hidden">
           {/* Animated Gradient Overlay */}
@@ -53,7 +53,9 @@ export default function LandingPage() {
           </div>
 
           {/* Glowing lines */}
-          {/* <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-600/20 to-transparent"></div> */}
+
+          {/* <div className="absolute top-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#358f82]/20 to-transparent"></div> */}
+
           <div className="absolute bottom-1/3 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-400/20 to-transparent"></div>
 
           <div className="container mx-auto px-4 relative">
@@ -62,8 +64,10 @@ export default function LandingPage() {
                 className="inline-flex items-center backdrop-blur-md bg-white/80 rounded-full px-4 py-2 text-gray-800 mb-8 shadow-sm border border-gray-200/50"
                 data-aos="fade-down"
               >
-                <Sparkles className="h-4 w-4 mr-2 text-teal-500" />
-                <span className="text-sm font-medium">Budget & Timesheet Management</span>
+
+                <Sparkles className="h-4 w-4 mr-2 text-[#317f82]" />
+                <span className="text-sm font-medium  ">Budget & Timesheet Management</span>
+
               </div>
 
               <h1
@@ -76,10 +80,12 @@ export default function LandingPage() {
                 </span>
                 <br />
                 <span className="relative mt-2 inline-block">
-                  <span className="bg-gradient-to-r from-teal-600 via-teal-500 to-emerald-500 bg-clip-text text-transparent drop-shadow-sm">
+
+                  <span className="bg-gradient-to-r from-[#317f82] via-[#317f82] to-emerald-500 bg-clip-text text-transparent drop-shadow-sm">
                     in one place
                   </span>
-                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-teal-600/10 rounded-full blur-xl z-0"></span>
+                  <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-[#358f82]/10 rounded-full blur-xl z-0"></span>
+
                 </span>
               </h1>
 
@@ -93,7 +99,9 @@ export default function LandingPage() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-6" data-aos="fade-up" data-aos-delay="300">
-                <button className="group relative overflow-hidden bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1">
+
+                <button className="group relative overflow-hidden bg-gradient-to-r from-[#358f82] to-[#317f82] hover:from-teal-700 hover:to-[#358f82] text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1">
+
                   <div className="absolute inset-0 w-3 bg-gradient-to-r from-white/10 to-white/5 transition-all duration-500 ease-out group-hover:w-full opacity-0 group-hover:opacity-100"></div>
                   <Link href="/signin" className="relative z-10 flex items-center">
                     Get Started
@@ -108,14 +116,16 @@ export default function LandingPage() {
             </div>
 
             {/* Dashboard Preview */}
-            <div className="relative max-w-6xl mx-auto" data-aos="zoom-in" data-aos-delay="400">
+            <div className="relative max-w-6xl mx-auto " data-aos="zoom-in" data-aos-delay="400">
               {/* Shadow and Glow Effects */}
-              <div className="absolute inset-0 bg-gradient-to-b from-teal-600/5 to-teal-400/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-600/10 to-teal-400/10 rounded-3xl opacity-70 blur-xl"></div>
+
+              <div className="absolute inset-0 bg-gradient-to-b from-[#358f82]/5 to-teal-400/5 rounded-3xl transform rotate-1 scale-[1.03] blur-xl"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#358f82]/10 to-teal-400/10 rounded-3xl opacity-70 blur-xl"></div>
 
               {/* Main Dashboard Container */}
               <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-                <div className="bg-gradient-to-r from-teal-600 to-teal-500 h-1"></div>
+                <div className="bg-gradient-to-r from-[#358f82] to-[#317f82] h-1"></div>
+
                 <div className="p-8">
                   {/* Dashboard Header */}
                   <div className="flex flex-col md:flex-row justify-between md:items-center mb-10 w-full">
@@ -133,11 +143,13 @@ export default function LandingPage() {
                     <div className="flex items-center gap-3">
                       <div className="bg-gray-100 px-3 py-1.5 rounded-full border border-gray-200">
                         <span className="text-sm font-medium text-gray-700 flex items-center">
-                          <Clock className="w-3.5 h-3.5 mr-1.5 text-teal-500" />
+
+                          <Clock className="w-3.5 h-3.5 mr-1.5 text-[#317f82]" />
                           July 2023
                         </span>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-600/10 to-teal-400/10 flex items-center justify-center border border-gray-200">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#358f82]/10 to-teal-400/10 flex items-center justify-center border border-gray-200">
+
                         <span className="text-sm font-medium text-gray-700">JD</span>
                       </div>
                     </div>
@@ -151,16 +163,20 @@ export default function LandingPage() {
                       data-aos-delay="100"
                     >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
+
+                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-[#358f82]">
+
                           <CreditCard className="h-5 w-5" />
                         </div>
                         <p className="text-sm text-gray-500">Total Budget</p>
                       </div>
                       <div className="flex items-end gap-2">
-                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-600 group-hover:to-teal-500">
+
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#358f82] group-hover:to-[#317f82]">
                           $4,500.00
                         </p>
-                        <span className="text-teal-600 text-sm font-medium pb-1">+5% from last month</span>
+                        <span className="text-[#358f82] text-sm font-medium pb-1">+5% from last month</span>
+
                       </div>
                     </div>
 
@@ -170,16 +186,20 @@ export default function LandingPage() {
                       data-aos-delay="200"
                     >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
+
+                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-[#358f82]">
+
                           <DollarSign className="h-5 w-5" />
                         </div>
                         <p className="text-sm text-gray-500">Spent</p>
                       </div>
                       <div className="flex items-end gap-2">
-                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-teal-500 group-hover:to-emerald-600">
+
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#317f82] group-hover:to-emerald-600">
                           $2,345.67
                         </p>
-                        <span className="text-teal-600 text-sm font-medium pb-1">52% of budget</span>
+                        <span className="text-[#358f82] text-sm font-medium pb-1">52% of budget</span>
+
                       </div>
                     </div>
 
@@ -189,16 +209,19 @@ export default function LandingPage() {
                       data-aos-delay="300"
                     >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-600">
+                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-[#358f82]">
+
                           <Clock className="h-5 w-5" />
                         </div>
                         <p className="text-sm text-gray-500">Hours Tracked</p>
                       </div>
                       <div className="flex items-end gap-2">
-                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-500 group-hover:to-teal-600">
+
+                        <p className="text-3xl font-bold text-gray-900 group-hover:scale-105 transition-transform group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-emerald-500 group-hover:to-[#358f82]">
                           128.5
                         </p>
-                        <span className="text-teal-600 text-sm font-medium pb-1">This month</span>
+                        <span className="text-[#358f82] text-sm font-medium pb-1">This month</span>
+
                       </div>
                     </div>
                   </div>
@@ -207,13 +230,15 @@ export default function LandingPage() {
                   <div className="mb-10" data-aos="fade-up" data-aos-delay="400">
                     <div className="flex justify-between text-sm mb-2">
                       <span className="font-medium flex items-center text-gray-700">
-                        <Target className="h-4 w-4 mr-2 text-teal-600" />
+
+                        <Target className="h-4 w-4 mr-2 text-[#358f82]" />
                         Budget Usage
                       </span>
-                      <span className="text-teal-600 font-medium">52%</span>
+                      <span className="text-[#358f82] font-medium">52%</span>
                     </div>
                     <div className="h-3 bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200">
-                      <div className="h-3 bg-gradient-to-r from-teal-600 to-teal-500 rounded-full w-[52%] relative">
+                      <div className="h-3 bg-gradient-to-r from-[#358f82] to-[#317f82] rounded-full w-[52%] relative">
+
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_100%,rgba(255,255,255,0.3)_0%,rgba(255,255,255,0)_60%)]"></div>
                       </div>
                     </div>
@@ -227,14 +252,18 @@ export default function LandingPage() {
                       data-aos-delay="500"
                     >
                       <h4 className="text-sm font-medium mb-4 flex items-center text-gray-700">
-                        <PieChart className="h-4 w-4 mr-2 text-teal-600" />
+
+                        <PieChart className="h-4 w-4 mr-2 text-[#358f82]" />
+
                         Expense Categories
                       </h4>
                       <div className="flex items-center justify-center h-48 relative">
                         {/* Stylized donut chart */}
-                        <div className="w-32 h-32 rounded-full border-[12px] border-teal-500/70 relative">
+
+                        <div className="w-32 h-32 rounded-full border-[12px] border-[#317f82]/70 relative">
+
                           <div className="absolute inset-0 border-[12px] border-transparent border-t-emerald-500/70 rounded-full transform rotate-45"></div>
-                          <div className="absolute inset-0 border-[12px] border-transparent border-r-teal-500/70 rounded-full transform rotate-45"></div>
+                          <div className="absolute inset-0 border-[12px] border-transparent border-r-[#317f82]/70 rounded-full transform rotate-45"></div>
                           <div className="absolute inset-0 border-[4px] border-white rounded-full transform scale-90"></div>
                           <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-xl font-bold text-gray-900">52%</span>
@@ -242,8 +271,10 @@ export default function LandingPage() {
                         </div>
 
                         {/* Blurred glow effects */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-teal-500/10 rounded-full blur-xl"></div>
-                        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-teal-500/10 rounded-full blur-lg"></div>
+
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-[#317f82]/10 rounded-full blur-xl"></div>
+                        <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-[#317f82]/10 rounded-full blur-lg"></div>
+
                         <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl"></div>
                       </div>
                     </div>
@@ -254,13 +285,17 @@ export default function LandingPage() {
                       data-aos-delay="600"
                     >
                       <h4 className="text-sm font-medium mb-4 flex items-center text-gray-700">
-                        <Clock className="h-4 w-4 mr-2 text-teal-600" />
+
+                        <Clock className="h-4 w-4 mr-2 text-[#358f82]" />
+
                         Recent Timesheets
                       </h4>
                       <div className="space-y-4">
                         <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+
+                            <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-[#358f82]">
+
                               <span className="text-xs font-medium">WD</span>
                             </div>
                             <div>
@@ -273,7 +308,9 @@ export default function LandingPage() {
 
                         <div className="flex justify-between items-center p-3 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-all">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+
+                            <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-[#358f82]">
+
                               <span className="text-xs font-medium">MT</span>
                             </div>
                             <div>
@@ -306,12 +343,14 @@ export default function LandingPage() {
         </section>
 
         {/* How It Works Section */}
-        <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
+        <section className="py-24 relative overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent"></div>
-          <div className="absolute top-20 right-10 w-72 h-72 bg-teal-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 left-10 w-72 h-72 bg-teal-500/5 rounded-full blur-3xl"></div>
+
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#317f82]/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#317f82]/20 to-transparent"></div>
+          <div className="absolute top-20 right-10 w-72 h-72 bg-[#317f82]/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-10 w-72 h-72 bg-[#317f82]/5 rounded-full blur-3xl"></div>
+
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-20">
@@ -338,7 +377,9 @@ export default function LandingPage() {
             <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
               <div className="order-2 lg:order-1" data-aos="fade-right" data-aos-delay="100">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-teal-600 to-teal-500 rounded-2xl flex items-center justify-center shadow-md">
+
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#358f82] to-[#317f82] rounded-2xl flex items-center justify-center shadow-md">
+
                     <span className="text-white font-bold text-xl">1</span>
                   </div>
                   <h3 className="text-3xl font-bold text-gray-900">Create Budget</h3>
@@ -350,30 +391,40 @@ export default function LandingPage() {
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Create multiple budget categories</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Set monthly or annual budget limits</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Track progress with visual indicators</span>
                   </li>
                 </ul>
-                <button className="text-teal-600 font-medium flex items-center hover:text-teal-700 transition-colors">
+
+                <button className="text-[#358f82] font-medium flex items-center hover:text-teal-700 transition-colors">
+
                   Learn more
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
               <div className="order-1 lg:order-2 relative" data-aos="fade-left" data-aos-delay="200">
-                <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/10 via-teal-500/10 to-teal-500/10 rounded-3xl blur-xl opacity-70"></div>
+
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#317f82]/10 via-[#317f82]/10 to-[#317f82]/10 rounded-3xl blur-xl opacity-70"></div>
+
                 <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
                   <Image
                     src="https://placehold.co/600x400/ffffff/5a5a5a?text=Create+Budget"
@@ -390,7 +441,9 @@ export default function LandingPage() {
             <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
               <div className="order-2" data-aos="fade-left" data-aos-delay="100">
                 <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/10 via-teal-500/10 to-teal-500/10 rounded-3xl blur-xl opacity-70"></div>
+
+                  <div className="absolute -inset-4 bg-gradient-to-r from-[#317f82]/10 via-[#317f82]/10 to-[#317f82]/10 rounded-3xl blur-xl opacity-70"></div>
+
                   <Image
                     src="https://placehold.co/600x400/ffffff/5a5a5a?text=Add+Expenses"
                     alt="Add Expenses Interface"
@@ -402,7 +455,9 @@ export default function LandingPage() {
               </div>
               <div className="order-1" data-aos="fade-right" data-aos-delay="200">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-md">
+
+                  <div className="w-12 h-12 bg-gradient-to-br from-[#317f82] to-emerald-600 rounded-2xl flex items-center justify-center shadow-md">
+
                     <span className="text-white font-bold text-xl">2</span>
                   </div>
                   <h3 className="text-3xl font-bold text-gray-900">Add Expenses</h3>
@@ -414,24 +469,32 @@ export default function LandingPage() {
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Quick expense entry with smart categorization</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Upload receipt photos directly from your phone</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Automatic budget updates and alerts</span>
                   </li>
                 </ul>
-                <button className="text-teal-600 font-medium flex items-center hover:text-teal-700 transition-colors">
+
+                <button className="text-[#358f82] font-medium flex items-center hover:text-teal-700 transition-colors">
+
                   Learn more
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </button>
@@ -442,7 +505,9 @@ export default function LandingPage() {
             <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div className="order-2 lg:order-1" data-aos="fade-right" data-aos-delay="100">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-md">
+
+                  <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-[#358f82] rounded-2xl flex items-center justify-center shadow-md">
+
                     <span className="text-white font-bold text-xl">3</span>
                   </div>
                   <h3 className="text-3xl font-bold text-gray-900">Record Timesheets</h3>
@@ -454,30 +519,40 @@ export default function LandingPage() {
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Simple time tracking with start/stop functionality</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Categorize time entries by project or client</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Generate detailed time reports for billing</span>
                   </li>
                 </ul>
-                <button className="text-teal-600 font-medium flex items-center hover:text-teal-700 transition-colors">
+
+                <button className="text-[#358f82] font-medium flex items-center hover:text-teal-700 transition-colors">
+
                   Learn more
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
               <div className="order-1 lg:order-2 relative" data-aos="fade-left" data-aos-delay="200">
-                <div className="absolute -inset-4 bg-gradient-to-r from-teal-500/10 via-emerald-500/10 to-teal-500/10 rounded-3xl blur-xl opacity-70"></div>
+
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#317f82]/10 via-emerald-500/10 to-[#317f82]/10 rounded-3xl blur-xl opacity-70"></div>
+
                 <div className="relative bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
                   <Image
                     src="https://placehold.co/600x400/ffffff/5a5a5a?text=Record+Timesheets"
@@ -495,8 +570,9 @@ export default function LandingPage() {
         {/* Features Section */}
         <section className="w-full py-24 bg-white relative overflow-hidden">
           {/* Decorative elements */}
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-teal-500/5 rounded-full"></div>
-          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-500/5 rounded-full"></div>
+
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#317f82]/5 rounded-full"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#317f82]/5 rounded-full"></div>
 
           <div className="container mx-auto px-4 relative">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-20">
@@ -509,7 +585,9 @@ export default function LandingPage() {
               <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900" data-aos="fade-up">
                 Everything you need.
                 <br />
-                <span className="bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
+
+                <span className="bg-gradient-to-r from-[#358f82] to-[#317f82] bg-clip-text text-transparent">
+
                   Nothing you don&apos;t.
                 </span>
               </h2>
@@ -526,11 +604,13 @@ export default function LandingPage() {
             <div className="mx-auto grid max-w-6xl items-center gap-8 py-12 lg:grid-cols-2 lg:gap-16">
               <div className="grid gap-8">
                 <div className="group relative" data-aos="fade-right" data-aos-delay="100">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-teal-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#317f82]/5 to-[#317f82]/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
                   <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-teal-100 flex items-center justify-center border border-gray-200">
-                        <BarChart3 className="h-6 w-6 text-teal-600" />
+                        <BarChart3 className="h-6 w-6 text-[#358f82]" />
+
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">Budget Management</h3>
                     </div>
@@ -542,11 +622,13 @@ export default function LandingPage() {
                 </div>
 
                 <div className="group relative" data-aos="fade-right" data-aos-delay="100">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-teal-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#317f82]/5 to-[#317f82]/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
                   <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-teal-100 flex items-center justify-center border border-gray-200">
-                        <NotebookIcon className="h-6 w-6 text-teal-600" />
+                        <NotebookIcon className="h-6 w-6 text-[#358f82]" />
+
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">Expense Recording</h3>
                     </div>
@@ -558,11 +640,13 @@ export default function LandingPage() {
                 </div>
 
                 <div className="group relative" data-aos="fade-right" data-aos-delay="200">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-teal-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#317f82]/5 to-[#317f82]/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
                   <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-teal-100 flex items-center justify-center border border-gray-200">
-                        <Clock className="h-6 w-6 text-teal-600" />
+                        <Clock className="h-6 w-6 text-[#358f82]" />
+
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">Timesheet Tracking</h3>
                     </div>
@@ -574,11 +658,13 @@ export default function LandingPage() {
                 </div>
 
                 <div className="group relative" data-aos="fade-right" data-aos-delay="300">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-teal-500/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
+
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#317f82]/5 to-[#317f82]/5 rounded-xl transform transition-transform group-hover:scale-105 opacity-0 group-hover:opacity-100"></div>
                   <div className="relative bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all">
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-100 to-teal-100 flex items-center justify-center border border-gray-200">
-                        <PieChart className="h-6 w-6 text-teal-600" />
+                        <PieChart className="h-6 w-6 text-[#358f82]" />
+
                       </div>
                       <h3 className="text-xl font-bold text-gray-900">Insightful Analytics</h3>
                     </div>
@@ -593,14 +679,18 @@ export default function LandingPage() {
               <div className="flex items-center justify-center" data-aos="fade-left" data-aos-delay="200">
                 <div className="relative w-full max-w-md aspect-square">
                   {/* Glowing background effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-teal-500/10 to-emerald-500/10 rounded-3xl blur-3xl transform -rotate-6"></div>
+
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#317f82]/10 via-[#317f82]/10 to-emerald-500/10 rounded-3xl blur-3xl transform -rotate-6"></div>
+
 
                   {/* Main feature showcase */}
                   <div className="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-8 transform rotate-3 hover:rotate-0 transition-transform duration-500">
                     {/* Header with title and date */}
                     <div className="flex justify-between items-center mb-6">
                       <h3 className="font-bold text-gray-900 flex items-center">
-                        <Sparkles className="h-5 w-5 mr-2 text-teal-600" />
+
+                        <Sparkles className="h-5 w-5 mr-2 text-[#358f82]" />
+
                         Weekly Report
                       </h3>
                       <span className="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-full border border-gray-200">
@@ -613,14 +703,18 @@ export default function LandingPage() {
                       <div className="relative">
                         {/* Stylized donut chart with glow effects */}
                         <div className="w-40 h-40 rounded-full relative">
-                          <div className="absolute inset-0 rounded-full border-[16px] border-teal-500/70 opacity-80"></div>
+
+                          <div className="absolute inset-0 rounded-full border-[16px] border-[#317f82]/70 opacity-80"></div>
+
                           <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-t-emerald-500/70 opacity-80"></div>
-                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-l-teal-500/70 opacity-80"></div>
+                          <div className="absolute inset-0 rounded-full border-[16px] border-transparent border-l-[#317f82]/70 opacity-80"></div>
 
                           {/* Inner circle */}
                           <div className="absolute inset-[16px] rounded-full bg-white border border-gray-200 flex items-center justify-center">
                             <div className="text-center">
-                              <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-teal-600 to-teal-500">
+
+                              <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#358f82] to-[#317f82]">
+
                                 32.5h
                               </span>
                               <span className="text-xs text-gray-500">Total Hours</span>
@@ -628,7 +722,9 @@ export default function LandingPage() {
                           </div>
 
                           {/* Glow effects */}
-                          <div className="absolute -inset-4 bg-teal-500/5 rounded-full blur-xl"></div>
+
+                          <div className="absolute -inset-4 bg-[#317f82]/5 rounded-full blur-xl"></div>
+
                         </div>
                       </div>
                     </div>
@@ -636,7 +732,9 @@ export default function LandingPage() {
                     {/* Category legend */}
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+
+                        <div className="w-3 h-3 bg-[#317f82] rounded-full"></div>
+
                         <div>
                           <span className="text-xs font-medium text-gray-900">Development</span>
                           <span className="block text-xs text-gray-500">15.5h • 48%</span>
@@ -650,7 +748,7 @@ export default function LandingPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors">
-                        <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
+                        <div className="w-3 h-3 bg-[#317f82] rounded-full"></div>
                         <div>
                           <span className="text-xs font-medium text-gray-900">Meetings</span>
                           <span className="block text-xs text-gray-500">6.0h • 18%</span>
@@ -673,8 +771,10 @@ export default function LandingPage() {
 
         {/* Old Way vs New Way Section */}
         <section className="py-24 bg-gradient-to-br from-gray-50 via-white to-gray-100 relative overflow-hidden">
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-teal-500/20 to-transparent"></div>
+
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#317f82]/20 to-transparent"></div>
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#317f82]/20 to-transparent"></div>
+
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
@@ -731,25 +831,33 @@ export default function LandingPage() {
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Use 1 platform for all your budget and time tracking needs</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Seamlessly connect time entries with expenses</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Get unified reports and insights across all your data</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-teal-100 to-teal-100 rounded-full flex items-center justify-center mt-0.5 border border-teal-200">
-                      <CheckCircle2 className="h-3 w-3 text-teal-600" />
+
+                      <CheckCircle2 className="h-3 w-3 text-[#358f82]" />
+
                     </div>
                     <span className="text-gray-700">Save money with a single subscription</span>
                   </li>
@@ -759,7 +867,9 @@ export default function LandingPage() {
 
             <div className="flex justify-center mt-12">
               <button
-                className="group relative overflow-hidden bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-full px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1"
+
+                className="group relative overflow-hidden bg-gradient-to-r from-[#358f82] to-[#317f82] hover:from-teal-700 hover:to-[#358f82] text-white rounded-full px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1"
+
                 data-aos="fade-up"
                 data-aos-delay="400"
               >
@@ -785,7 +895,9 @@ export default function LandingPage() {
                   {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
                   <Image src="/apture.png" width={100} height={100} className="w-full" alt="" />
                 </div>
-                <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
+
+                <span className="text-xl font-bold bg-gradient-to-r from-[#358f82] to-teal-400 bg-clip-text text-transparent">
+
                   Apture
 
                 </span>
@@ -834,12 +946,16 @@ export default function LandingPage() {
               <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Quick links</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="#" className="text-gray-500 hover:text-teal-600 transition-colors">
+
+                  <Link href="#" className="text-gray-500 hover:text-[#358f82] transition-colors">
+
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-gray-500 hover:text-teal-600 transition-colors">
+
+                  <Link href="/pricing" className="text-gray-500 hover:text-[#358f82] transition-colors">
+
                     Pricing
                   </Link>
                 </li>
@@ -851,13 +967,15 @@ export default function LandingPage() {
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-gray-500">© {new Date().getFullYear()} Apture. All rights reserved.</p>
             <div className="flex gap-6">
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+
+              <Link href="#" className="text-sm text-gray-500 hover:text-[#358f82] transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-[#358f82] transition-colors">
                 Terms of Service
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+              <Link href="#" className="text-sm text-gray-500 hover:text-[#358f82] transition-colors">
+
                 Cookie Policy
               </Link>
             </div>

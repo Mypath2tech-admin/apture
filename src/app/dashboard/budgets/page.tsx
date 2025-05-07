@@ -113,7 +113,7 @@ export default function Budgets() {
     setFilteredBudgets(result)
   }, [budgets, searchQuery, sortBy, viewType])
 
- 
+
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -143,7 +143,7 @@ export default function Budgets() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <PageHeader
         title="Budgets"
         description="Manage and track your financial allocations"
@@ -196,6 +196,7 @@ export default function Budgets() {
         </div>
       </div>
 
+      <div ></div>
       {loading ? (
         <div className="grid grid-cols-1 gap-6">
           {[1, 2, 3].map((i) => (
@@ -236,7 +237,7 @@ export default function Budgets() {
           </CardContent>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-6 overflow-y-scroll">
           {filteredBudgets.map((budget) => (
             <Card key={budget.id} className="overflow-hidden hover:shadow-md transition-shadow">
               <CardHeader className="pb-2">
@@ -323,7 +324,7 @@ export default function Budgets() {
                   <Progress
                     value={budget.progress}
                     className="h-2"
-               
+
                   />
                 </div>
 

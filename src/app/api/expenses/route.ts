@@ -188,115 +188,70 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, amount, date, description, categoryId, budgetId } = body
+    const { title, amount, date, description, categoryId, budgetId, createAnother = false } = body
 
     // Validate required fields
     if (!title || !amount || !date) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    // Handle category permissions
+    // Validate that budgetId is provided
+    if (!budgetId) {
+      return NextResponse.json({ error: "Budget ID is required" }, { status: 400 })
+    }
+
+    // Verify the budget exists
+    const budget = await prisma.budget.findUnique({
+      where: { id: budgetId },
+    })
+
+    if (!budget) {
+      return NextResponse.json({ error: "Budget not found" }, { status: 404 })
+    }
+
+    // Handle category
     let finalCategoryId = categoryId
 
-    // If user is not admin or organization admin, they can't select categories
-    if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
-      // Find or create a default "Uncategorized" category
-      let defaultCategory = await prisma.budgetCategory.findFirst({
+    if (!categoryId) {
+      // If no category is provided, find or create an "Uncategorized" category for this budget
+      let uncategorizedCategory = await prisma.budgetCategory.findFirst({
         where: {
           name: "Uncategorized",
-          budget: {
-            OR: [{ organizationId: user.organizationId }, { organizationId: null }],
-          },
+          budgetId: budgetId,
         },
       })
 
-      if (!defaultCategory) {
-        // We need to create a default budget first if it doesn't exist
-        const defaultBudget =
-          (await prisma.budget.findFirst({
-            where: {
-              name: "Default Budget",
-              OR: [{ organizationId: user.organizationId }, { organizationId: null }],
-            },
-          })) ||
-          (await prisma.budget.create({
-            data: {
-              name: "Default Budget",
-              description: "Default budget for uncategorized expenses",
-              amount: 0,
-              startDate: new Date(),
-              organizationId: user.organizationId,
-              userId: user.id,
-            },
-          }))
-
-        // Create default category if it doesn't exist
-        defaultCategory = await prisma.budgetCategory.create({
+      if (!uncategorizedCategory) {
+        // Create an "Uncategorized" category for this budget
+        uncategorizedCategory = await prisma.budgetCategory.create({
           data: {
             name: "Uncategorized",
             description: "Default category for expenses",
             allocatedAmount: 0,
-            budgetId: defaultBudget.id,
+            budgetId: budgetId,
           },
         })
       }
 
-      finalCategoryId = defaultCategory.id
-    } else if (categoryId) {
-      // For admins, verify the category exists
-      const categoryExists = await prisma.budgetCategory.findUnique({
-        where: { id: categoryId },
+      finalCategoryId = uncategorizedCategory.id
+    } else {
+      // Verify the category exists and belongs to the selected budget
+      const categoryExists = await prisma.budgetCategory.findFirst({
+        where: {
+          id: categoryId,
+          budgetId: budgetId,
+        },
       })
 
       if (!categoryExists) {
-        return NextResponse.json({ error: "Invalid category" }, { status: 400 })
-      }
-    } else {
-      // Even for admins, if no category is provided, use default
-      let defaultCategory = await prisma.budgetCategory.findFirst({
-        where: {
-          name: "Uncategorized",
-          budget: {
-            OR: [{ organizationId: user.organizationId }, { organizationId: null }],
+        return NextResponse.json(
+          {
+            error: "Invalid category or category does not belong to the selected budget",
           },
-        },
-      })
-
-      if (!defaultCategory) {
-        // We need to create a default budget first if it doesn't exist
-        const defaultBudget =
-          (await prisma.budget.findFirst({
-            where: {
-              name: "Default Budget",
-              OR: [{ organizationId: user.organizationId }, { organizationId: null }],
-            },
-          })) ||
-          (await prisma.budget.create({
-            data: {
-              name: "Default Budget",
-              description: "Default budget for uncategorized expenses",
-              amount: 0,
-              startDate: new Date(),
-              organizationId: user.organizationId,
-              userId: user.id,
-            },
-          }))
-
-        defaultCategory = await prisma.budgetCategory.create({
-          data: {
-            name: "Uncategorized",
-            description: "Default category for expenses",
-            allocatedAmount: 0,
-            budgetId: defaultBudget.id,
-          },
-        })
+          { status: 400 },
+        )
       }
-
-      finalCategoryId = defaultCategory.id
     }
-
-    // Set default status based on user role
-    // const finalStatus = status || (user.role === "ORGANIZATION_ADMIN" || user.role === "ADMIN" ? "APPROVED" : "PENDING")
 
     // Create expense
     const expense = await prisma.expense.create({
@@ -310,7 +265,6 @@ export async function POST(request: NextRequest) {
         budgetId,
         userId: user.id,
         organizationId: user.organizationId,
-        // status: finalStatus,
       },
       include: {
         category: true,
@@ -348,7 +302,6 @@ export async function POST(request: NextRequest) {
       budgetId: expense.budgetId || undefined,
       userId: expense.userId,
       organizationId: expense.organizationId || undefined,
-      // status: expense.status,
       createdAt: expense.createdAt.toISOString(),
       updatedAt: expense.updatedAt.toISOString(),
       category: expense.category
@@ -378,6 +331,7 @@ export async function POST(request: NextRequest) {
             name: expense.organization.name,
           }
         : undefined,
+      createAnother, // Return this flag so the frontend knows whether to redirect or stay
     })
   } catch (error) {
     console.error("Create expense error:", error)

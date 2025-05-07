@@ -32,24 +32,32 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "User not found", request }, { status: 404 })
     }
 
-    // // Only admin and organization admin can fetch categories
-    // if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    // }
+    // Parse query parameters to get budgetId if provided
+    const searchParams = request.nextUrl.searchParams
+    const budgetId = searchParams.get("budgetId") || undefined
+
+    // Build where clause based on whether a specific budget is requested
+    const where = budgetId
+      ? { budgetId } // If budgetId is provided, only get categories for that budget
+      : {
+          budget: {
+            OR: [
+              { organizationId: user.organizationId },
+              { organizationId: null }, // Global categories
+              { userId: user.id }, // User's personal categories
+            ],
+          },
+        }
+
+    console.log("Category query where clause:", JSON.stringify(where, null, 2))
 
     // Get categories from BudgetCategory table
     const categories = await prisma.budgetCategory.findMany({
-      where: {
-        budget: {
-          OR: [
-            { organizationId: user.organizationId },
-            { organizationId: null }, // Global categories
-          ],
-        },
-      },
+      where,
       include: {
         budget: {
           select: {
+            id: true,
             name: true,
             organizationId: true,
           },
@@ -98,11 +106,6 @@ export async function POST(request: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
-
-    // // Only admin and organization admin can create categories
-    // if (user.role !== "ADMIN" && user.role !== "ORGANIZATION_ADMIN") {
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
-    // }
 
     const body = await request.json()
     const { name, description, budgetId } = body

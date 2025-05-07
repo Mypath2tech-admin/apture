@@ -22,6 +22,7 @@ export interface Organization {
 }
 
 export interface Budget {
+  remaining: number
   id: string
   name: string
   description?: string
