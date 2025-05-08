@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PieChart, DollarSign, Clock, Users, Menu, X,  Sparkles, Lock } from 'lucide-react'
+
+import { Home, PieChart, DollarSign, Clock, Users, Menu, X,  Sparkles } from 'lucide-react'
 import Image from 'next/image'
 
 // Type for navigation items
