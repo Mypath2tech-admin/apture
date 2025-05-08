@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, PieChart, DollarSign, Clock, Users, Menu, X,  Sparkles } from 'lucide-react'
+import { Home, PieChart, DollarSign, Clock, Users, Menu, X,  Sparkles, Lock } from 'lucide-react'
 import Image from 'next/image'
 
 // Type for navigation items
@@ -12,6 +12,7 @@ type NavItem = {
   href: string
   icon: React.ElementType
   userTypes: ('user' | 'organization')[]
+  locked?: boolean
 }
 
 export default function DashboardSidebar() {
@@ -22,12 +23,51 @@ export default function DashboardSidebar() {
   const userType: 'user' | 'organization' = 'organization' // Change to test different views
 
   const navigation: NavItem[] = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home, userTypes: ['user', 'organization'] },
-    { name: 'Budgets', href: '/dashboard/budgets', icon: PieChart, userTypes: ['user', 'organization'] },
-    { name: 'Expenses', href: '/dashboard/expenses', icon: DollarSign, userTypes: ['user', 'organization'] },
-    { name: 'Timesheets', href: '/dashboard/timesheets', icon: Clock, userTypes: ['user', 'organization'] },
-    { name: 'Team Members', href: '/dashboard/users', icon: Users, userTypes: ['organization'] },
-  ]
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      icon: Home,
+      userTypes: ["user", "organization"],
+    },
+    {
+      name: "Budgets",
+      href: "/dashboard/budgets",
+      icon: PieChart,
+      userTypes: ["user", "organization"],
+    },
+    {
+      name: "Expenses",
+      href: "/dashboard/expenses",
+      icon: DollarSign,
+      userTypes: ["user", "organization"],
+    },
+    {
+      name: "Timesheets",
+      href: "/dashboard/timesheets",
+      icon: Clock,
+      userTypes: ["user", "organization"],
+    },
+    {
+      name: "Team Members",
+      href: "/dashboard/users",
+      icon: Users,
+      userTypes: ["organization"],
+    },
+    {
+      name: "Membership",
+      href: "/dashboard/membership",
+      icon: Lock,
+      userTypes: ["organization"],
+      locked: true,
+    },
+    {
+      name: "⟡ AI Assistant",
+      href: "/dashboard/ai-assistant",
+      icon: Lock,
+      userTypes: ["organization"],
+      locked: true,
+    },
+  ];
 
   // Filter navigation items based on user type
   const filteredNavigation = navigation.filter(item =>
@@ -99,14 +139,14 @@ export default function DashboardSidebar() {
               return (
                 <Link
                   key={item.name}
-                  href={item.href}
+                  href={item.locked ? '#' : item.href}
                   className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                     ? 'bg-teal-50 text-teal-700'
                     : 'text-gray-700 hover:bg-gray-100'
-                    }`}
+                    } ${item.locked ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <item.icon
-                    className={`mr-3 h-5 w-5 ${isActive ? 'text-teal-600' : 'text-gray-500'}`}
+                    className={`mr-3 h-5 w-5 ${isActive ? 'text-teal-600' : 'text-gray-500'} ${item.locked ? 'text-yellow-300 cursor-not-allowed' : ''}`}
                     aria-hidden="true"
                   />
                   {item.name}
