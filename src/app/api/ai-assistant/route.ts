@@ -1,6 +1,17 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
+interface AppError extends Error {
+  code?: string;
+  stack?: string;
+}
+
+interface UploadedFile {
+  name: string;
+  type: string;
+  content: string; // Assuming the file content is plain text or base64
+}
+
 // Initialize the Gemini API client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
@@ -20,7 +31,7 @@ export async function POST(request: Request) {
     }
 
     // Prepare the chat history for Gemini
-    let chatHistory = [];
+    const chatHistory = [];
     let userPrompt = "";
 
     // Format previous messages for chat history
@@ -40,11 +51,13 @@ export async function POST(request: Request) {
 
         // Add file content if there are attachments
         if (fileData && fileData.length > 0) {
-          const fileContents = fileData
-            .map((file: any) => file.content)
+          const files: UploadedFile[] = fileData;
+          const fileContents = files
+            .map((file) => file.content)
             .join("\n");
           userPrompt += `\n\nAttached file contents:\n${fileContents}`;
         }
+        
       }
     }
 
@@ -80,11 +93,13 @@ export async function POST(request: Request) {
     };
 
     return NextResponse.json({ message: assistantMessage });
-  } catch (error: any) {
-    console.error("Error calling Gemini API:", error);
+  }  catch (error: unknown) {
+    const err = error as AppError;
+    console.error("Error calling Gemini API:", err);
     return NextResponse.json(
-      { error: error.message || "Failed to get AI response" },
+      { error: err.message || "Failed to get AI response" },
       { status: 500 }
     );
   }
+  
 }
