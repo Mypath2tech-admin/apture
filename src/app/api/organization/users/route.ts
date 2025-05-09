@@ -164,3 +164,95 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to add user to organization" }, { status: 500 })
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    // Verify authentication
+    const cookieStore = await cookies()
+    const token = cookieStore.get("auth-token")?.value
+
+    if (!token) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET) as {
+      userId: string
+    }
+
+    // Get user with organization
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        role: true,
+        organizationId: true,
+      },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Check if user is an admin
+    if (user.role !== "ORGANIZATION_ADMIN") {
+      return NextResponse.json(
+        { error: "Only organization admins can update organization information" },
+        { status: 403 },
+      )
+    }
+
+    if (!user.organizationId) {
+      return NextResponse.json({ error: "User is not associated with an organization" }, { status: 400 })
+    }
+
+    // Get the form data
+    const formData = await request.formData()
+
+    // Extract organization data
+    const name = formData.get("name") as string
+    const email = formData.get("email") as string
+    const website = formData.get("website") as string
+
+    // Handle logo upload
+    const logo = formData.get("logo") as File | null
+    let logoUrl = null
+
+    if (logo) {
+      // In a real implementation, you would upload the image to a storage service
+      // like AWS S3, Cloudinary, or Vercel Blob Storage
+      // For this example, we'll just simulate the upload and return a placeholder URL
+
+      // Example with Vercel Blob (you would need to set up the proper imports and env vars)
+      // const { url } = await put(`org-logo-${user.organizationId}`, logo, {
+      //   access: 'public',
+      // })
+      // logoUrl = url
+
+      // For now, we'll use a placeholder
+      logoUrl = `/api/images/organization/${user.organizationId}`
+    }
+
+    // Update organization in database
+    const updatedOrg = await prisma.organization.update({
+      where: { id: user.organizationId },
+      data: {
+        name,
+        email,
+        website,
+        ...(logoUrl && { logo: logoUrl }),
+      },
+    })
+
+    return NextResponse.json({
+      id: updatedOrg.id,
+      name: updatedOrg.name,
+      email: updatedOrg.email,
+      website: updatedOrg.website,
+      logo: updatedOrg.logo,
+    })
+  } catch (error) {
+    console.error("Update organization error:", error)
+    return NextResponse.json({ error: "Failed to update organization" }, { status: 500 })
+  }
+}

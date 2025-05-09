@@ -16,6 +16,7 @@ interface User {
         id: string
         name: string
         logo: string | null
+        email:string
     } | null
     createdAt: string
     canViewOrgDashboard? : boolean
@@ -189,8 +190,10 @@ export const useAuthStore = create<AuthState>()(
                         throw new Error("Failed to fetch user details")
                     }
 
-                    const data = await res.json()
+                    const data = await res.json()  
+                    // console.log("Data from profile", data)
                     set({ isAuthenticated: true, user: data })
+                  
                 } catch (err) {
                     console.error("Fetch user details error:", err)
                     set({ error: err instanceof Error ? err.message : "Failed to fetch user details" })
