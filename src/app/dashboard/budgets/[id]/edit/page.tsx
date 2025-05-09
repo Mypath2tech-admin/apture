@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import type { Budget } from "@/types/dashboard"
+import { DatePickerDemo } from "@/components/ui/date-picker"
 
 export default function EditBudget() {
   const params = useParams()
@@ -28,6 +29,7 @@ export default function EditBudget() {
     name: "",
     description: "",
     amount: "",
+
     startDate: "",
     endDate: "",
   })
@@ -163,7 +165,7 @@ export default function EditBudget() {
         }
       />
 
-      <DashboardCard  title="Edit Budget">
+      <DashboardCard title="Edit Budget">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -218,7 +220,7 @@ export default function EditBudget() {
 
             <div>
               <Label htmlFor="startDate">Start Date</Label>
-              <Input
+              {/* <Input
                 type="date"
                 id="startDate"
                 name="startDate"
@@ -226,19 +228,31 @@ export default function EditBudget() {
                 onChange={handleChange}
                 className="mt-1"
                 required
-              />
+              /> */}
+              <DatePickerDemo
+                name="startDate"
+                id="startDate"
+                value={formData.startDate}
+                onChange={handleChange} />
             </div>
 
             <div>
               <Label htmlFor="endDate">End Date (Optional)</Label>
-              <Input
+              {/* <Input
                 type="date"
                 id="endDate"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
                 className="mt-1"
-              />
+              /> */}
+              <DatePickerDemo
+                name="endDate"
+                id="endDate"
+                // required={formData.hasTimeframe}
+                value={formData.endDate}
+                onChange={handleChange} />
+
             </div>
 
             <div className="col-span-2">

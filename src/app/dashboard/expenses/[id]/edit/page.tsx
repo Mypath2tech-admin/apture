@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Expense, ExpenseCategory, Budget } from "@/types/dashboard"
+import { DatePickerDemo } from "@/components/ui/date-picker"
 
 export default function EditExpense() {
   const params = useParams()
@@ -245,7 +246,7 @@ export default function EditExpense() {
 
             <div>
               <Label htmlFor="date">Date</Label>
-              <Input
+              {/* <Input
                 type="date"
                 id="date"
                 name="date"
@@ -253,7 +254,13 @@ export default function EditExpense() {
                 onChange={handleChange}
                 className="mt-1"
                 required
-              />
+              /> */}
+              <DatePickerDemo
+                name="date"
+                id="date"
+                // required={formData.hasTimeframe}
+                value={formData.date}
+                onChange={handleChange} />
             </div>
 
             <div>
