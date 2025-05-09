@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Filter, Search, ChevronDown, ChevronUp, Trash2, Edit } from "lucide-react"
+import { Plus, Filter, Search, ChevronDown, ChevronUp, Trash2, Edit, FileUp } from "lucide-react"
 import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "react-toastify"
+import { DatePickerDemo } from "@/components/ui/date-picker"
 
 export default function Expenses() {
   // const router = useRouter()
@@ -163,6 +164,7 @@ export default function Expenses() {
         title="Expenses"
         description="Track and manage your expenses"
         action={
+          <>
           <Link
             href="/dashboard/expenses/create"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
@@ -170,6 +172,14 @@ export default function Expenses() {
             <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
             Add Expense
           </Link>
+           <Link
+            href="/dashboard/expenses/export"
+            className="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+          >
+            <FileUp className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+             Expense Export
+          </Link>
+          </>
         }
       />
 
@@ -198,9 +208,16 @@ export default function Expenses() {
               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
                 Start Date
               </label>
-              <Input
+              {/* <Input
                 type="date"
                 id="startDate"
+                value={filters.startDate || ""}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              /> */}
+              <DatePickerDemo
+                name="date"
+                id="startDate"
+                // required={formData.hasTimeframe}
                 value={filters.startDate || ""}
                 onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               />
@@ -209,10 +226,17 @@ export default function Expenses() {
               <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
                 End Date
               </label>
-              <Input
+              {/* <Input
                 type="date"
                 id="endDate"
                 value={filters.endDate || ""}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              /> */}
+              <DatePickerDemo
+                name="date"
+                id="endDate"
+                // required={formData.hasTimeframe}
+                value={filters.startDate || ""}
                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               />
             </div>

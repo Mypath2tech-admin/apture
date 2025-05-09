@@ -31,6 +31,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { toast } from "react-toastify"
 import { Skeleton } from "@/components/ui/skeleton"
+import Link from "next/link"
 
 interface Budget {
   id: string
@@ -189,10 +190,14 @@ export default function Budgets() {
             </SelectContent>
           </Select>
 
-          <Button variant="outline" className="w-full sm:w-auto">
+
+        <Link href="budgets/export">
+           <Button variant="outline" className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
+          </Link>
+       
         </div>
       </div>
 
