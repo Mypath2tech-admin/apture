@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
             id: true,
             name: true,
             logo: true,
+            email:true,
           },
         },
       },
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Return user data (excluding sensitive information)
+    console.log(user)
     return NextResponse.json({
       id: user.id,
       email: user.email,
