@@ -1,28 +1,32 @@
-import nodemailer from "nodemailer"
-import type { User } from "../../generated/prisma"
+import nodemailer from "nodemailer";
+import type { User } from "../../generated/prisma";
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    service:"gmail",
-    host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
-    secure: process.env.EMAIL_SERVER_SECURE === "true",
-    auth: {
-        user: process.env.EMAIL_SERVER_USER,
-        pass: process.env.EMAIL_SERVER_PASSWORD,
-    },
-})
-
+  host: process.env.EMAIL_SERVER_HOST,
+  port: Number(process.env.EMAIL_SERVER_PORT),
+  secure: process.env.EMAIL_SERVER_SECURE === "true",
+  auth: {
+    user: process.env.EMAIL_SERVER_USER,
+    pass: process.env.EMAIL_SERVER_PASSWORD,
+  },
+  debug: process.env.NODE_ENV !== "production",
+  logger: process.env.NODE_ENV !== "production",
+});
+console.log(process.env.NODE_ENV)
 // Email verification template
-export const sendVerificationEmail = async (user: User, verificationUrl: string) => {
-    const { email, firstName, lastName } = user
-    const name = firstName && lastName ? `${firstName} ${lastName}` : email
+export const sendVerificationEmail = async (
+  user: User,
+  verificationUrl: string
+) => {
+  const { email, firstName, lastName } = user;
+  const name = firstName && lastName ? `${firstName} ${lastName}` : email;
 
-    const mailOptions = {
-        from: `"Apture" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: "Verify Your Email Address",
-        html: `
+  const mailOptions = {
+    from: `"Finn - Apture" <${process.env.EMAIL_FROM}>`,
+    to: email,
+    subject: "Verify Your Email Address",
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -126,21 +130,21 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
       </body>
       </html>
     `,
-    }
+  };
 
-    return transporter.sendMail(mailOptions)
-}
+  return transporter.sendMail(mailOptions);
+};
 
 // Welcome email template after verification
 export const sendWelcomeEmail = async (user: User) => {
-    const { email, firstName, lastName } = user
-    const name = firstName && lastName ? `${firstName} ${lastName}` : email
+  const { email, firstName, lastName } = user;
+  const name = firstName && lastName ? `${firstName} ${lastName}` : email;
 
-    const mailOptions = {
-        from: `"Apture" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: "Welcome to Apture!",
-        html: `
+  const mailOptions = {
+    from: `"Finn - Apture" <${process.env.EMAIL_FROM}>`,
+    to: email,
+    subject: "Welcome to Apture!",
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -228,7 +232,9 @@ export const sendWelcomeEmail = async (user: User) => {
             <h1>Welcome to Apture!</h1>
             <p>Hi ${name},</p>
             <p>Thank you for verifying your email address. Your account is now active and you can start using Apture!</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+            <a href="${
+              process.env.NEXT_PUBLIC_APP_URL
+            }/dashboard" class="button">Go to Dashboard</a>
             <div style="margin-top: 30px; text-align: left;">
               <h3>Here's what you can do with Apture:</h3>
               <div class="feature">
@@ -253,7 +259,7 @@ export const sendWelcomeEmail = async (user: User) => {
       </body>
       </html>
     `,
-    }
+  };
 
-    return transporter.sendMail(mailOptions)
-}
+  return transporter.sendMail(mailOptions);
+};

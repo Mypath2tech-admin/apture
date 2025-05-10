@@ -61,17 +61,17 @@ export default function DashboardSidebar() {
       locked: true,
     },
     {
-      name: "⟡ AI Assistant",
+      name: "✨ Ask Finn👋",
       href: "/dashboard/ai-assistant",
       icon: Lock,
       userTypes: ["organization"],
       locked: true,
     },
-     {
+    {
       name: "Settings",
       href: "/dashboard/settings",
       icon: Settings,
-      userTypes: ["user","organization"],
+      userTypes: ["user", "organization"],
     },
   ];
 

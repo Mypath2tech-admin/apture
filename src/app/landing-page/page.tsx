@@ -57,7 +57,6 @@ export default function LandingPage() {
               Pricing
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-green-400 transition-all duration-300 group-hover:w-full"></span>
             </Link>
-
           </nav>
           <div className="hidden md:flex items-center gap-6">
             <Link
@@ -76,22 +75,51 @@ export default function LandingPage() {
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"
+                  />
                 </svg>
               </span>
             </button>
           </div>
-          <button className="md:hidden text-white" onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
+          <button
+            className="md:hidden text-white"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? (
+              <X className="w-6 h-6 text-white" />
+            ) : (
+              <Menu className="w-6 h-6 text-white" />
+            )}
           </button>
         </div>
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden bg-[#151525] shadow-lg px-4 py-4 flex flex-col gap-4">
-            <Link href="/" className="text-sm font-medium hover:text-gray-200 transition-colors">Home</Link>
-            <Link href="/pricing" className="text-sm font-medium hover:text-gray-200 transition-colors">Pricing</Link>
-            <Link href="/login" className="text-sm font-medium hover:text-gray-200 transition-colors">Log in</Link>
-            <button className="bg-gradient-to-tr from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 p-2 px-4 rounded-full text-white w-full">Join Waitlist</button>
+            <Link
+              href="/"
+              className="text-sm font-medium hover:text-gray-200 transition-colors"
+            >
+              Home
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-sm font-medium hover:text-gray-200 transition-colors"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/login"
+              className="text-sm font-medium hover:text-gray-200 transition-colors"
+            >
+              Log in
+            </Link>
+            <button className="bg-gradient-to-tr from-purple-600 to-green-600 hover:from-purple-700 hover:to-green-700 p-2 px-4 rounded-full text-white w-full">
+              Join Waitlist
+            </button>
           </div>
         )}
       </header>
@@ -130,7 +158,9 @@ export default function LandingPage() {
                 data-aos="fade-down"
               >
                 <Sparkles className="h-4 w-4 mr-2 text-purple-400" />
-                <span className="text-sm font-medium">Budget & Timesheet Management</span>
+                <span className="text-sm font-medium">
+                  Budget & Timesheet Management
+                </span>
               </div>
 
               <h1
@@ -139,12 +169,14 @@ export default function LandingPage() {
                 data-aos-delay="100"
               >
                 <span className="relative">
-                  <span className="relative z-10">All your work tools</span>
+                  <span className="relative z-10">
+                    Run Your Entire Nonprofit.
+                  </span>
                 </span>
                 <br />
                 <span className="relative mt-2 inline-block">
                   <span className="bg-gradient-to-r from-purple-400 via-green-400 to-blue-400 bg-clip-text text-transparent drop-shadow-lg">
-                    in one place
+                    One Dashboard.
                   </span>
                   <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-purple-600/20 rounded-full blur-xl z-0"></span>
                 </span>
@@ -155,8 +187,9 @@ export default function LandingPage() {
                 data-aos="fade-up"
                 data-aos-delay="200"
               >
-                Combine budget management, timesheet tracking, and more in a single powerful platform.
-                Streamline your workflow and boost productivity with our all-in-one solution.
+                Combine budget management, timesheet tracking, and more in a
+                single powerful platform. Streamline your workflow and boost
+                productivity with our all-in-one solution.
               </p>
 
               <div
@@ -200,8 +233,12 @@ export default function LandingPage() {
                         <DollarSign className="h-5 w-5 text-white z-10" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white text-lg">Financial Dashboard</h3>
-                        <p className="text-sm text-white/50">Budget & Timesheet Overview</p>
+                        <h3 className="font-semibold text-white text-lg">
+                          Financial Dashboard
+                        </h3>
+                        <p className="text-sm text-white/50">
+                          Budget & Timesheet Overview
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
@@ -212,7 +249,9 @@ export default function LandingPage() {
                         </span>
                       </div>
                       <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600/20 to-green-400/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                        <span className="text-sm font-medium text-white/80">JD</span>
+                        <span className="text-sm font-medium text-white/80">
+                          JD
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -234,7 +273,9 @@ export default function LandingPage() {
                         <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-400 group-hover:to-green-400">
                           $4,500.00
                         </p>
-                        <span className="text-purple-400 text-sm font-medium pb-1">+5% from last month</span>
+                        <span className="text-purple-400 text-sm font-medium pb-1">
+                          +5% from last month
+                        </span>
                       </div>
                     </div>
 
@@ -253,7 +294,9 @@ export default function LandingPage() {
                         <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-green-400 group-hover:to-purple-400">
                           $2,345.67
                         </p>
-                        <span className="text-green-400 text-sm font-medium pb-1">52% of budget</span>
+                        <span className="text-green-400 text-sm font-medium pb-1">
+                          52% of budget
+                        </span>
                       </div>
                     </div>
 
@@ -272,7 +315,9 @@ export default function LandingPage() {
                         <p className="text-3xl font-bold text-white group-hover:scale-105 transition-transform  group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-400 group-hover:to-purple-400">
                           128.5
                         </p>
-                        <span className="text-blue-400 text-sm font-medium pb-1">This month</span>
+                        <span className="text-blue-400 text-sm font-medium pb-1">
+                          This month
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -315,7 +360,9 @@ export default function LandingPage() {
                           <div className="absolute inset-0 border-[12px] border-transparent border-r-blue-500/70 rounded-full transform rotate-45"></div>
                           <div className="absolute inset-0 border-[4px] border-[#151525] rounded-full transform scale-90"></div>
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-xl font-bold text-white">52%</span>
+                            <span className="text-xl font-bold text-white">
+                              52%
+                            </span>
                           </div>
                         </div>
 
@@ -342,11 +389,17 @@ export default function LandingPage() {
                               <span className="text-xs font-medium">WD</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Web Development</span>
-                              <p className="text-xs text-white/50">Today, 10:30 AM - 2:45 PM</p>
+                              <span className="text-sm font-medium text-white">
+                                Web Development
+                              </span>
+                              <p className="text-xs text-white/50">
+                                Today, 10:30 AM - 2:45 PM
+                              </p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">4.25h</span>
+                          <span className="text-sm font-bold text-white">
+                            4.25h
+                          </span>
                         </div>
 
                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
@@ -355,11 +408,17 @@ export default function LandingPage() {
                               <span className="text-xs font-medium">MT</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Marketing Tasks</span>
-                              <p className="text-xs text-white/50">Yesterday, 9:15 AM - 11:30 AM</p>
+                              <span className="text-sm font-medium text-white">
+                                Marketing Tasks
+                              </span>
+                              <p className="text-xs text-white/50">
+                                Yesterday, 9:15 AM - 11:30 AM
+                              </p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">2.25h</span>
+                          <span className="text-sm font-bold text-white">
+                            2.25h
+                          </span>
                         </div>
 
                         <div className="flex justify-between items-center p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/5 hover:bg-white/10 transition-all">
@@ -368,11 +427,17 @@ export default function LandingPage() {
                               <span className="text-xs font-medium">RM</span>
                             </div>
                             <div>
-                              <span className="text-sm font-medium text-white">Research Meeting</span>
-                              <p className="text-xs text-white/50">Jul 24, 1:00 PM - 2:30 PM</p>
+                              <span className="text-sm font-medium text-white">
+                                Research Meeting
+                              </span>
+                              <p className="text-xs text-white/50">
+                                Jul 24, 1:00 PM - 2:30 PM
+                              </p>
                             </div>
                           </div>
-                          <span className="text-sm font-bold text-white">1.5h</span>
+                          <span className="text-sm font-bold text-white">
+                            1.5h
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -458,8 +523,8 @@ export default function LandingPage() {
             </div>
           </div>
         </section> */}
-       
-       <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
+
+        <section className="py-24 bg-gradient-to-br from-[#0f0f1a] via-[#151525] to-[#1a1a2e] relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-green-500/30 to-transparent"></div>
@@ -468,31 +533,34 @@ export default function LandingPage() {
 
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-20">
-              <div 
+              <div
                 className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-6 border border-white/10"
                 data-aos="fade-down"
               >
-                <span className="text-sm font-medium text-white/70">How It Works</span>
+                <span className="text-sm font-medium text-white/70">
+                  How It Works
+                </span>
               </div>
-              <h2 
+              <h2
                 className="text-4xl md:text-5xl font-bold mb-6 text-white tracking-tight"
                 data-aos="fade-up"
               >
                 Simplify your workflow
               </h2>
-              <p 
+              <p
                 className="max-w-2xl mx-auto text-white/60 text-lg leading-relaxed"
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                Apture combines budget management and timesheet tracking in one intuitive platform,
-                making it easier to manage your finances and time.
+                Apture combines budget management and timesheet tracking in one
+                intuitive platform, making it easier to manage your finances and
+                time.
               </p>
             </div>
 
             {/* Feature 1: Create Budget */}
             <div className="grid mx-6 grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
-              <div 
+              <div
                 className="order-2 lg:order-1"
                 data-aos="fade-right"
                 data-aos-delay="100"
@@ -501,30 +569,39 @@ export default function LandingPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-purple-600 to-green-500 rounded-2xl flex items-center justify-center shadow-xl">
                     <span className="text-white font-bold text-xl">1</span>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">Create Budget</h3>
+                  <h3 className="text-3xl font-bold text-white">
+                    Create Budget
+                  </h3>
                 </div>
                 <p className="text-white/70 text-lg mb-6 leading-relaxed">
-                  Set up your budget categories and allocate funds based on your financial goals and income. Our
-                  intuitive interface makes this process quick and painless.
+                  Set up your budget categories and allocate funds based on your
+                  financial goals and income. Our intuitive interface makes this
+                  process quick and painless.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Create multiple budget categories</span>
+                    <span className="text-white/70">
+                      Create multiple budget categories
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Set monthly or annual budget limits</span>
+                    <span className="text-white/70">
+                      Set monthly or annual budget limits
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Track progress with visual indicators</span>
+                    <span className="text-white/70">
+                      Track progress with visual indicators
+                    </span>
                   </li>
                 </ul>
                 <button className="text-purple-400 font-medium flex items-center hover:text-purple-300 transition-colors">
@@ -532,16 +609,16 @@ export default function LandingPage() {
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
-              <div 
+              <div
                 className="order-1 lg:order-2 relative"
                 data-aos="fade-left"
                 data-aos-delay="200"
               >
                 <div className="absolute -inset-4 bg-gradient-to-r from-purple-600/20 via-green-500/20 to-purple-600/20 rounded-3xl blur-xl opacity-70"></div>
                 <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
-                  <Image 
-                    src="https://placehold.co/600x400/151525/FFFFFF?text=Create+Budget" 
-                    alt="Create Budget Interface" 
+                  <Image
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Create+Budget"
+                    alt="Create Budget Interface"
                     className="rounded-xl w-full h-auto"
                     width={0}
                     height={0}
@@ -552,23 +629,23 @@ export default function LandingPage() {
 
             {/* Feature 2: Add Expenses */}
             <div className="grid  mx-6  grid-cols-1 lg:grid-cols-2 gap-12 mb-24 items-center">
-              <div 
+              <div
                 className="order-2"
                 data-aos="fade-left"
                 data-aos-delay="100"
               >
                 <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
                   <div className="absolute -inset-4 bg-gradient-to-r from-green-500/20 via-purple-600/20 to-green-500/20 rounded-3xl blur-xl opacity-70"></div>
-                  <Image 
-                    src="https://placehold.co/600x400/151525/FFFFFF?text=Add+Expenses" 
-                    alt="Add Expenses Interface" 
+                  <Image
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Add+Expenses"
+                    alt="Add Expenses Interface"
                     className="rounded-xl w-full h-auto relative"
                     width={0}
                     height={0}
                   />
                 </div>
               </div>
-              <div 
+              <div
                 className="order-1"
                 data-aos="fade-right"
                 data-aos-delay="200"
@@ -577,30 +654,39 @@ export default function LandingPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-green-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
                     <span className="text-white font-bold text-xl">2</span>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">Add Expenses</h3>
+                  <h3 className="text-3xl font-bold text-white">
+                    Add Expenses
+                  </h3>
                 </div>
                 <p className="text-white/70 text-lg mb-6 leading-relaxed">
-                  Easily record and categorize your expenses as they happen. Attach receipts, add notes, and keep
-                  everything organized in one place for easy reference.
+                  Easily record and categorize your expenses as they happen.
+                  Attach receipts, add notes, and keep everything organized in
+                  one place for easy reference.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Quick expense entry with smart categorization</span>
+                    <span className="text-white/70">
+                      Quick expense entry with smart categorization
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Upload receipt photos directly from your phone</span>
+                    <span className="text-white/70">
+                      Upload receipt photos directly from your phone
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-green-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Automatic budget updates and alerts</span>
+                    <span className="text-white/70">
+                      Automatic budget updates and alerts
+                    </span>
                   </li>
                 </ul>
                 <button className="text-green-400 font-medium flex items-center hover:text-green-300 transition-colors">
@@ -612,7 +698,7 @@ export default function LandingPage() {
 
             {/* Feature 3: Record Timesheets */}
             <div className="grid  mx-6  grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div 
+              <div
                 className="order-2 lg:order-1"
                 data-aos="fade-right"
                 data-aos-delay="100"
@@ -621,30 +707,39 @@ export default function LandingPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-500 rounded-2xl flex items-center justify-center shadow-xl">
                     <span className="text-white font-bold text-xl">3</span>
                   </div>
-                  <h3 className="text-3xl font-bold text-white">Record Timesheets</h3>
+                  <h3 className="text-3xl font-bold text-white">
+                    Record Timesheets
+                  </h3>
                 </div>
                 <p className="text-white/70 text-lg mb-6 leading-relaxed">
-                  Track your working hours with precision and ease. Log time by project, client, or task to maintain
-                  accurate records and improve your productivity.
+                  Track your working hours with precision and ease. Log time by
+                  project, client, or task to maintain accurate records and
+                  improve your productivity.
                 </p>
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-blue-400" />
                     </div>
-                    <span className="text-white/70">Simple time tracking with start/stop functionality</span>
+                    <span className="text-white/70">
+                      Simple time tracking with start/stop functionality
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-blue-400" />
                     </div>
-                    <span className="text-white/70">Categorize time entries by project or client</span>
+                    <span className="text-white/70">
+                      Categorize time entries by project or client
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-blue-400" />
                     </div>
-                    <span className="text-white/70">Generate detailed time reports for billing</span>
+                    <span className="text-white/70">
+                      Generate detailed time reports for billing
+                    </span>
                   </li>
                 </ul>
                 <button className="text-blue-400 font-medium flex items-center hover:text-blue-300 transition-colors">
@@ -652,16 +747,16 @@ export default function LandingPage() {
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
-              <div 
+              <div
                 className="order-1 lg:order-2 relative"
                 data-aos="fade-left"
                 data-aos-delay="200"
               >
                 <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-blue-600/20 rounded-3xl blur-xl opacity-70"></div>
                 <div className="relative bg-[#151525] rounded-2xl shadow-2xl overflow-hidden border border-white/10 p-4">
-                  <Image 
-                    src="https://placehold.co/600x400/151525/FFFFFF?text=Record+Timesheets" 
-                    alt="Timesheet Recording Interface" 
+                  <Image
+                    src="https://placehold.co/600x400/151525/FFFFFF?text=Record+Timesheets"
+                    alt="Timesheet Recording Interface"
                     className="rounded-xl w-full h-auto"
                     width={0}
                     height={0}
@@ -682,7 +777,9 @@ export default function LandingPage() {
                 className="inline-flex items-center justify-center bg-white/5 backdrop-blur-md rounded-full px-4 py-1.5 mb-2 border border-white/10"
                 data-aos="fade-down"
               >
-                <span className="text-sm font-medium text-white/70">Premium Features</span>
+                <span className="text-sm font-medium text-white/70">
+                  Premium Features
+                </span>
               </div>
               <h2
                 className="text-4xl md:text-5xl font-bold tracking-tight text-white"
@@ -699,8 +796,9 @@ export default function LandingPage() {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                Financial management and time tracking in one place. Experience a flexible toolkit that makes every task
-                feel like a breeze, designed with your needs in mind.
+                Financial management and time tracking in one place. Experience
+                a flexible toolkit that makes every task feel like a breeze,
+                designed with your needs in mind.
               </p>
             </div>
 
@@ -717,11 +815,14 @@ export default function LandingPage() {
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 flex items-center justify-center border border-white/5">
                         <BarChart3 className="h-6 w-6 text-purple-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">Budget Management</h3>
+                      <h3 className="text-xl font-bold text-white">
+                        Budget Management
+                      </h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Create and manage budgets for different time periods. Track your spending against your budget in
-                      real-time with visual indicators and alerts.
+                      Create and manage budgets for different time periods.
+                      Track your spending against your budget in real-time with
+                      visual indicators and alerts.
                     </p>
                   </div>
                 </div>
@@ -737,11 +838,14 @@ export default function LandingPage() {
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500/20 to-green-500/20 flex items-center justify-center border border-white/5">
                         <NotebookIcon className="h-6 w-6 text-purple-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">Expense Recording</h3>
+                      <h3 className="text-xl font-bold text-white">
+                        Expense Recording
+                      </h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Create and manage your expense for  a particular budget. Track your spending against your budget in
-                      real-time with visual indicators and alerts.
+                      Create and manage your expense for a particular budget.
+                      Track your spending against your budget in real-time with
+                      visual indicators and alerts.
                     </p>
                   </div>
                 </div>
@@ -757,11 +861,14 @@ export default function LandingPage() {
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
                         <Clock className="h-6 w-6 text-green-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">Timesheet Tracking</h3>
+                      <h3 className="text-xl font-bold text-white">
+                        Timesheet Tracking
+                      </h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Log your hours with precision and ease. Track time by project, client, or task to maintain
-                      accurate records and improve your productivity.
+                      Log your hours with precision and ease. Track time by
+                      project, client, or task to maintain accurate records and
+                      improve your productivity.
                     </p>
                   </div>
                 </div>
@@ -777,16 +884,18 @@ export default function LandingPage() {
                       <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center border border-white/5">
                         <PieChart className="h-6 w-6 text-blue-400" />
                       </div>
-                      <h3 className="text-xl font-bold text-white">Insightful Analytics</h3>
+                      <h3 className="text-xl font-bold text-white">
+                        Insightful Analytics
+                      </h3>
                     </div>
                     <p className="text-white/60 pl-16">
-                      Visualize your spending patterns and time allocation with beautiful interactive charts and graphs.
-                      Gain insights to make better decisions with our comprehensive reporting tools.
+                      Visualize your spending patterns and time allocation with
+                      beautiful interactive charts and graphs. Gain insights to
+                      make better decisions with our comprehensive reporting
+                      tools.
                     </p>
                   </div>
                 </div>
-
-
               </div>
 
               <div
@@ -826,7 +935,9 @@ export default function LandingPage() {
                               <span className="block text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-green-400">
                                 32.5h
                               </span>
-                              <span className="text-xs text-white/50">Total Hours</span>
+                              <span className="text-xs text-white/50">
+                                Total Hours
+                              </span>
                             </div>
                           </div>
 
@@ -841,29 +952,45 @@ export default function LandingPage() {
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Development</span>
-                          <span className="block text-xs text-white/50">15.5h • 48%</span>
+                          <span className="text-xs font-medium text-white">
+                            Development
+                          </span>
+                          <span className="block text-xs text-white/50">
+                            15.5h • 48%
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Marketing</span>
-                          <span className="block text-xs text-white/50">8.0h • 25%</span>
+                          <span className="text-xs font-medium text-white">
+                            Marketing
+                          </span>
+                          <span className="block text-xs text-white/50">
+                            8.0h • 25%
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Meetings</span>
-                          <span className="block text-xs text-white/50">6.0h • 18%</span>
+                          <span className="text-xs font-medium text-white">
+                            Meetings
+                          </span>
+                          <span className="block text-xs text-white/50">
+                            6.0h • 18%
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 p-2 rounded-lg hover:bg-white/5 transition-colors">
                         <div className="w-3 h-3 bg-indigo-500 rounded-full"></div>
                         <div>
-                          <span className="text-xs font-medium text-white">Other</span>
-                          <span className="block text-xs text-white/50">3.0h • 9%</span>
+                          <span className="text-xs font-medium text-white">
+                            Other
+                          </span>
+                          <span className="block text-xs text-white/50">
+                            3.0h • 9%
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -891,7 +1018,8 @@ export default function LandingPage() {
                 data-aos="fade-up"
                 data-aos-delay="100"
               >
-                Managing your budget, expense and time shouldn&apos;t be complicated. See how Apture simplifies your workflow.
+                Managing your budget, expense and time shouldn&apos;t be
+                complicated. See how Apture simplifies your workflow.
               </p>
             </div>
 
@@ -907,25 +1035,33 @@ export default function LandingPage() {
                     <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
                       <X className="h-3 w-3 text-red-400" />
                     </div>
-                    <span className="text-white/70">Connect up to 8 different software tools</span>
+                    <span className="text-white/70">
+                      Connect up to 8 different software tools
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
                       <X className="h-3 w-3 text-red-400" />
                     </div>
-                    <span className="text-white/70">Manually track time in one system and expenses in another</span>
+                    <span className="text-white/70">
+                      Manually track time in one system and expenses in another
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
                       <X className="h-3 w-3 text-red-400" />
                     </div>
-                    <span className="text-white/70">Waste hours reconciling data between systems</span>
+                    <span className="text-white/70">
+                      Waste hours reconciling data between systems
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-white/10 rounded-full flex items-center justify-center mt-0.5">
                       <X className="h-3 w-3 text-red-400" />
                     </div>
-                    <span className="text-white/70">Pay for multiple subscriptions</span>
+                    <span className="text-white/70">
+                      Pay for multiple subscriptions
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -935,31 +1071,41 @@ export default function LandingPage() {
                 data-aos="fade-left"
                 data-aos-delay="300"
               >
-                <h3 className="text-2xl font-bold mb-6 text-white">Apture Way</h3>
+                <h3 className="text-2xl font-bold mb-6 text-white">
+                  Apture Way
+                </h3>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Use 1 platform for all your budget and time tracking needs</span>
+                    <span className="text-white/70">
+                      Use 1 platform for all your budget and time tracking needs
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Seamlessly connect time entries with expenses</span>
+                    <span className="text-white/70">
+                      Seamlessly connect time entries with expenses
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Get unified reports and insights across all your data</span>
+                    <span className="text-white/70">
+                      Get unified reports and insights across all your data
+                    </span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div className="flex-shrink-0 w-6 h-6 bg-gradient-to-br from-purple-500/20 to-green-500/20 rounded-full flex items-center justify-center mt-0.5">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-white/70">Save money with a single subscription</span>
+                    <span className="text-white/70">
+                      Save money with a single subscription
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -980,13 +1126,11 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
-
       </main>
 
       <footer className="border-t border-white/5 bg-[#0a0a16]">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col justify-between md:flex-row gap-10">
-
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-6">
                 <div className="relative w-10 h-10 flex items-center justify-center">
@@ -998,15 +1142,21 @@ export default function LandingPage() {
                 </span>
               </div>
               <p className="text-white/50 mb-6 max-w-sm">
-                Modern budgeting and expense tracking for everyone. Take control of your finances with powerful,
-                intuitive tools designed for real people.
+                Modern budgeting and expense tracking for everyone. Take control
+                of your finances with powerful, intuitive tools designed for
+                real people.
               </p>
               <div className="flex items-center gap-4">
                 <a
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
                 >
-                  <svg className="w-5 h-5 text-white/70" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-white/70"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
                   </svg>
                 </a>
@@ -1014,7 +1164,12 @@ export default function LandingPage() {
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
                 >
-                  <svg className="w-5 h-5 text-white/70" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-white/70"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
@@ -1026,7 +1181,12 @@ export default function LandingPage() {
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
                 >
-                  <svg className="w-5 h-5 text-white/70" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-white/70"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z"
@@ -1038,36 +1198,52 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">Quick links</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-white/80 mb-4">
+                Quick links
+              </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="#" className="text-white/50 hover:text-purple-400 transition-colors">
+                  <Link
+                    href="#"
+                    className="text-white/50 hover:text-purple-400 transition-colors"
+                  >
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-white/50 hover:text-purple-400 transition-colors">
+                  <Link
+                    href="/pricing"
+                    className="text-white/50 hover:text-purple-400 transition-colors"
+                  >
                     Pricing
                   </Link>
                 </li>
-
               </ul>
             </div>
-
-
           </div>
         </div>
         <div className="border-t border-white/5 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-white/40">© {new Date().getFullYear()} Apture. All rights reserved.</p>
+            <p className="text-sm text-white/40">
+              © {new Date().getFullYear()} Apture. All rights reserved.
+            </p>
             <div className="flex gap-6">
-              <Link href="#" className="text-sm text-white/40 hover:text-purple-400 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-white/40 hover:text-purple-400 transition-colors"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-sm text-white/40 hover:text-purple-400 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-white/40 hover:text-purple-400 transition-colors"
+              >
                 Terms of Service
               </Link>
-              <Link href="#" className="text-sm text-white/40 hover:text-purple-400 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-white/40 hover:text-purple-400 transition-colors"
+              >
                 Cookie Policy
               </Link>
             </div>
@@ -1075,5 +1251,5 @@ export default function LandingPage() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
