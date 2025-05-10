@@ -1,12 +1,14 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Check, Shield, Zap, Star } from "lucide-react"
-import Header from "@/components/navbar"
-import Image from 'next/image'
-import { useState } from "react"
+import Header from "@/components/navbar";
+import { Check, Shield, Star } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
 export default function PricingPageWhiteteal() {
-  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">("monthly")
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
+    "monthly"
+  );
 
   // Define pricing for both billing periods
   const pricing = {
@@ -16,7 +18,7 @@ export default function PricingPageWhiteteal() {
         period: "/month",
       },
       pro: {
-        price: "$9.99",
+        price: "$49",
         period: "/month",
       },
       business: {
@@ -30,9 +32,9 @@ export default function PricingPageWhiteteal() {
         period: "/year",
       },
       pro: {
-        price: "$95.88",
-        period: "/year",
-        saving: "Save $24/year",
+        price: "$29",
+        period: "/month, billed yearly",
+        saving: "Save $250+/year",
       },
       business: {
         price: "$287.88",
@@ -40,12 +42,11 @@ export default function PricingPageWhiteteal() {
         saving: "Save $72/year",
       },
     },
-  }
+  };
 
   const handleBillingPeriodChange = (period: "monthly" | "yearly") => {
-    setBillingPeriod(period)
-  }
-
+    setBillingPeriod(period);
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-800">
@@ -70,26 +71,31 @@ export default function PricingPageWhiteteal() {
             <div className="flex flex-col items-center justify-center space-y-6 text-center max-w-4xl mx-auto">
               <div className="inline-flex items-center backdrop-blur-md bg-teal-50 rounded-full px-4 py-2 text-teal-800 mb-6 animate-fade-in shadow-sm">
                 <Star className="h-4 w-4 mr-2 text-teal-600" />
-                <span className="text-sm font-medium">Transparent, Value-Based Pricing</span>
+                <span className="text-sm font-medium">
+                  Transparent, Value-Based Pricing
+                </span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-gray-900 mb-6 animate-slide-up leading-tight">
-                Choose the right plan for your
+                Try it free
                 <span className="relative mt-2 block">
                   <span className="bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent drop-shadow-sm">
-                    financial journey
+                    - No Credit Card Required
                   </span>
                   <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-teal-500/20 rounded-full blur-xl z-0"></span>
                 </span>
               </h1>
 
-              <p className="text-gray-600 text-xl max-w-[900px] mb-8 animate-slide-up-delayed leading-relaxed">
-                Whether you&apos;re just starting out or managing complex finances, we have a plan that fits your needs.
-                All plans include our core features with no hidden fees.
+              <p className="text-gray-600 text-xl max-w-[900px] mb-2 animate-slide-up-delayed leading-relaxed">
+                Kick the tires. Invite your team. Fall in love or walk away.
+                We’ll still respect you.
+              </p>
+              <p className="text-teal-600 font-extrabold text-xl max-w-[900px] mb-8 animate-slide-up-delayed leading-relaxed">
+                Built for nonprofits. Powered by AI.
               </p>
 
               <div className="flex items-center gap-4 p-2 bg-white rounded-full animate-slide-up-more-delayed shadow-md">
-              <button
+                <button
                   className={`px-6 py-3 cursor-pointer rounded-full font-medium transition-all duration-300 ${
                     billingPeriod === "monthly"
                       ? "bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-md"
@@ -107,7 +113,14 @@ export default function PricingPageWhiteteal() {
                   }`}
                   onClick={() => handleBillingPeriodChange("yearly")}
                 >
-                  Yearly <span className="ml-1 text-xs bg-teal-100 px-2 py-1 rounded-full">Save 20%</span>
+                  Yearly{" "}
+                  <span
+                    className={`ml-1 text-xs ${
+                      billingPeriod === "yearly" ? "bg-teal-900" : "bg-teal-100"
+                    } px-2 py-1 rounded-full`}
+                  >
+                    <b>Get 5 months free</b>
+                  </span>
                 </button>
               </div>
             </div>
@@ -116,77 +129,17 @@ export default function PricingPageWhiteteal() {
 
         <section className="w-full py-12 md:py-24 lg:py-32 bg-transparent relative z-10">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:gap-12 -mt-32 md:-mt-40">
-              {/* Free Plan */}
-              <div className="group relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-200/30 to-teal-300/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
-                  <div className="p-6 space-y-4">
-                    <div className="bg-teal-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-teal-100">
-                      <Zap className="h-7 w-7 text-teal-600" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">Free</h3>
-                    <p className="text-gray-500 h-12">Essential budgeting tools for individuals</p>
-                    <div className="flex items-baseline text-gray-900 pt-4">
-                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
-                        {pricing[billingPeriod].free.price}
-                      </span>
-                      <span className="ml-2 text-sm font-medium text-gray-500">
-                        {pricing[billingPeriod].free.period}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="border-t border-gray-100"></div>
-
-                  <div className="p-6">
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Basic budget management</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Up to 50 expense entries per month</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Basic analytics</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">CSV export</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="p-6 bg-gray-50">
-                    <Link
-                      href="/signin"
-                      className="w-full border border-teal-500 hover:bg-teal-50 text-teal-600 font-medium py-3 px-4 rounded-xl transition-colors"
-                    >
-                      Get Started
-                    </Link>
-                  </div>
-                </div>
-              </div>
-
+            <div className="flex justify-center items-center -mt-32 md:-mt-40">
               {/* Pro Plan */}
-              <div className="group relative">
+              <div className="group relative w-full max-w-md">
                 <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-500/30 to-teal-400/30 opacity-90 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
-                  <div className="absolute top-2 inset-x-0 mx-auto w-fit">
-                    <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white px-8 py-2 rounded-full shadow-md text-sm font-bold uppercase tracking-wide">
-                      Most Popular
-                    </div>
+                  <div className="absolute top-4 inset-x-0 mx-auto w-fit">
+                    {billingPeriod === "yearly" && (
+                      <div className="bg-gradient-to-r from-teal-600 to-teal-500 text-white px-8 py-2 rounded-full shadow-md text-sm font-bold uppercase tracking-wide">
+                        Most Popular
+                      </div>
+                    )}
                   </div>
 
                   <div className="p-6 space-y-4 pt-10">
@@ -194,7 +147,9 @@ export default function PricingPageWhiteteal() {
                       <Star className="h-7 w-7 text-teal-600" />
                     </div>
                     <h3 className="text-2xl font-bold text-gray-900">Pro</h3>
-                    <p className="text-gray-500 h-12">Advanced tools for serious budgeters</p>
+                    <p className="text-gray-500 h-7">
+                      Ideal for funded grassroots, small & medium organizations
+                    </p>
                     <div className="flex items-baseline text-gray-900 pt-4">
                       <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
                         {pricing[billingPeriod].pro.price}
@@ -204,43 +159,124 @@ export default function PricingPageWhiteteal() {
                       </span>
                     </div>
                     {billingPeriod === "yearly" && (
-                      <div className="mt-1 text-sm font-medium text-teal-600">{pricing.yearly.pro.saving}</div>
+                      <div className="mt-1 text-sm font-bold text-white w-fit bg-gradient-to-r from-teal-500 to-teal-700 rounded-full px-2 py-1">
+                        {pricing.yearly.pro.saving}
+                      </div>
                     )}
                   </div>
 
                   <div className="border-t border-gray-100"></div>
 
                   <div className="p-6">
+                    <p className="text-black font-bold text-xl mb-4">
+                      What’s Included
+                    </p>
                     <ul className="space-y-4">
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                           <Check className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-gray-600">Everything in Free</span>
+                        <span className="text-gray-600">
+                          <b>FREE</b> 60-Day trial
+                        </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                           <Check className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-gray-600">Unlimited expense entries</span>
+                        <span className="text-gray-600">
+                          <b>No</b> Credit Card required
+                        </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                           <Check className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-gray-600">Advanced analytics and reporting</span>
+                        <span className="text-gray-600">
+                          Cancel <b>anytime</b>
+                        </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                           <Check className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-gray-600">Time tracking features</span>
+                        <span className="text-gray-600">
+                          +1 AI powered manager (<b>✨Finn</b>)
+                        </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
                           <Check className="h-4 w-4 text-teal-600" />
                         </div>
-                        <span className="text-gray-600">CSV and PDF export</span>
+                        <span className="text-gray-600">
+                          <b>Priority</b> feature requests
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> team members
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> tracked community members
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> membership auto-payments
+                        </span>
+                      </li>
+
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> expense & budget entries
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> categories
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> time tracking
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Check className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>Unlimited</b> exports to clean Excel, CSV and PDF
+                        </span>
+                      </li>
+
+                      <li className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                          <Shield className="h-4 w-4 text-teal-600" />
+                        </div>
+                        <span className="text-gray-600">
+                          <b>30-Day</b> money back guarantee
+                        </span>
                       </li>
                       <li className="flex items-start gap-3">
                         <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
@@ -252,85 +288,14 @@ export default function PricingPageWhiteteal() {
                   </div>
 
                   <div className="p-6 bg-gray-50">
-                    <button className="relative overflow-hidden group w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
+                    <button className="cursor-pointer relative overflow-hidden group w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white font-medium py-3 px-4 rounded-xl transition-all shadow-md hover:shadow-lg">
                       <div className="absolute -inset-full top-0 block bg-gradient-to-r from-white/20 via-white/40 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer"></div>
-                      <Link href="/signin" className="relative z-10">
+                      <Link
+                        href="/signin"
+                        className="relative z-10"
+                      >
                         Get Started
                       </Link>
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Business Plan */}
-              <div className="group relative">
-                <div className="absolute -inset-0.5 bg-gradient-to-br from-teal-400/30 to-teal-500/30 opacity-75 blur-lg rounded-3xl -z-10 group-hover:opacity-100 transition-opacity"></div>
-                <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl border border-gray-100">
-                  <div className="p-6 space-y-4">
-                    <div className="bg-teal-50 w-14 h-14 rounded-2xl flex items-center justify-center mb-4 border border-teal-100">
-                      <Shield className="h-7 w-7 text-teal-600" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900">Business</h3>
-                    <p className="text-gray-500 h-12">Complete solution for businesses and teams</p>
-                    <div className="flex items-baseline text-gray-900 pt-4">
-                      <span className="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
-                        {pricing[billingPeriod].business.price}
-                      </span>
-                      <span className="ml-2 text-sm font-medium text-gray-500">
-                        {pricing[billingPeriod].business.period}
-                      </span>
-                    </div>
-                    {billingPeriod === "yearly" && (
-                      <div className="mt-1 text-sm font-medium text-teal-600">{pricing.yearly.business.saving}</div>
-                    )}
-                  </div>
-
-                  <div className="border-t border-gray-100"></div>
-
-                  <div className="p-6">
-                    <ul className="space-y-4">
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Everything in Pro</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Multi-user access</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Role-based permissions</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Advanced reporting and forecasting</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">API access</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
-                          <Check className="h-4 w-4 text-teal-600" />
-                        </div>
-                        <span className="text-gray-600">Priority support</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="p-6 bg-gray-50">
-                    <button className="w-full border border-teal-500 hover:bg-teal-50 text-teal-600 font-medium py-3 px-4 rounded-xl transition-colors">
-                      Contact Sales
                     </button>
                   </div>
                 </div>
@@ -346,11 +311,16 @@ export default function PricingPageWhiteteal() {
           <div className="container mx-auto px-4 relative">
             <div className="text-center mb-16">
               <div className="inline-flex items-center justify-center bg-teal-50 rounded-full px-4 py-1.5 mb-4 border border-teal-100">
-                <span className="text-sm font-medium text-teal-800">Compare Plans</span>
+                <span className="text-sm font-medium text-teal-800">
+                  Compare Plans
+                </span>
               </div>
-              <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">Feature Comparison</h2>
+              <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">
+                Feature Comparison
+              </h2>
               <p className="max-w-2xl mx-auto text-gray-600 text-lg">
-                Compare our plans to find the perfect fit for your financial needs.
+                Compare our plans to find the perfect fit for your financial
+                needs.
               </p>
             </div>
 
@@ -359,49 +329,81 @@ export default function PricingPageWhiteteal() {
                 <table className="w-full min-w-[800px] border-collapse">
                   <thead>
                     <tr>
-                      <th className="bg-gray-50 px-6 py-5 text-left text-sm font-semibold text-gray-900">Features</th>
-                      <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">Free</th>
+                      <th className="bg-gray-50 px-6 py-5 text-left text-sm font-semibold text-gray-900">
+                        Features
+                      </th>
+                      <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">
+                        Free
+                      </th>
                       <th className="bg-gradient-to-r from-teal-50 to-teal-100 px-6 py-5 text-center text-sm font-semibold text-gray-900">
                         Pro
                       </th>
-                      <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">Business</th>
+                      <th className="bg-gray-50 px-6 py-5 text-center text-sm font-semibold text-gray-900">
+                        Business
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr className="border-t border-gray-200">
-                      <td className="px-6 py-4 text-sm text-gray-900">Budget Creation</td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Basic</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        Budget Creation
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Basic
+                      </td>
                       <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Advanced
                       </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Advanced</td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Advanced
+                      </td>
                     </tr>
                     <tr className="border-t border-gray-200">
-                      <td className="px-6 py-4 text-sm text-gray-900">Expense Tracking</td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Limited (50/mo)</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        Expense Tracking
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Limited (50/mo)
+                      </td>
                       <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Unlimited
                       </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Unlimited</td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Unlimited
+                      </td>
                     </tr>
                     <tr className="border-t border-gray-200">
-                      <td className="px-6 py-4 text-sm text-gray-900">Data Visualization</td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Basic</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        Data Visualization
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Basic
+                      </td>
                       <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         Advanced
                       </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">Advanced+</td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        Advanced+
+                      </td>
                     </tr>
                     <tr className="border-t border-gray-200">
-                      <td className="px-6 py-4 text-sm text-gray-900">Export Options</td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">CSV only</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        Export Options
+                      </td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        CSV only
+                      </td>
                       <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
                         CSV, PDF
                       </td>
-                      <td className="px-6 py-4 text-center text-sm text-gray-600">All formats</td>
+                      <td className="px-6 py-4 text-center text-sm text-gray-600">
+                        All formats
+                      </td>
                     </tr>
                     <tr className="border-t border-gray-200">
-                      <td className="px-6 py-4 text-sm text-gray-900">Time Tracking</td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        Time Tracking
+                      </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">
                         <svg
                           className="w-5 h-5 mx-auto text-gray-400"
@@ -409,7 +411,12 @@ export default function PricingPageWhiteteal() {
                           fill="none"
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M6 18L18 6M6 6l12 12"
+                          />
                         </svg>
                       </td>
                       <td className="px-6 py-4 text-center bg-gradient-to-r from-teal-50 to-teal-100 text-sm text-gray-900">
@@ -419,7 +426,12 @@ export default function PricingPageWhiteteal() {
                           fill="none"
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </td>
                       <td className="px-6 py-4 text-center text-sm text-gray-600">
@@ -429,7 +441,12 @@ export default function PricingPageWhiteteal() {
                           fill="none"
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </td>
                     </tr>
@@ -452,40 +469,58 @@ export default function PricingPageWhiteteal() {
               <div className="inline-flex items-center justify-center bg-teal-50 rounded-full px-4 py-1.5 mb-4 border border-teal-100">
                 <span className="text-sm font-medium text-teal-800">FAQ</span>
               </div>
-              <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">Frequently Asked Questions</h2>
-              <p className="max-w-2xl mx-auto text-gray-600 text-lg">Got questions? We&apos;ve got answers.</p>
+              <h2 className="text-4xl font-bold mb-6 text-gray-900 tracking-tight">
+                Frequently Asked Questions
+              </h2>
+              <p className="max-w-2xl mx-auto text-gray-600 text-lg">
+                Got questions? We&apos;ve got answers.
+              </p>
             </div>
 
             <div className="max-w-4xl mx-auto grid gap-6">
               <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Can I switch plans later?</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Can I switch plans later?
+                </h3>
                 <p className="text-gray-600">
-                  Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next
-                  billing cycle. We make it easy to adjust your subscription as your needs change.
+                  Yes, you can upgrade or downgrade your plan at any time.
+                  Changes will be reflected in your next billing cycle. We make
+                  it easy to adjust your subscription as your needs change.
                 </p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Is there a free trial?</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Is there a free trial?
+                </h3>
                 <p className="text-gray-600">
-                  We offer a 14-day free trial for our Pro and Business plans. No credit card required to get started.
-                  Experience all the premium features before making a commitment.
+                  We offer a 14-day free trial for our Pro and Business plans.
+                  No credit card required to get started. Experience all the
+                  premium features before making a commitment.
                 </p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">How secure is my financial data?</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  How secure is my financial data?
+                </h3>
                 <p className="text-gray-600">
-                  We use bank-level encryption to protect your data. Your security is our top priority. All data is
-                  encrypted both in transit and at rest, and we never share your information with third parties.
+                  We use bank-level encryption to protect your data. Your
+                  security is our top priority. All data is encrypted both in
+                  transit and at rest, and we never share your information with
+                  third parties.
                 </p>
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Can I cancel my subscription?</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Can I cancel my subscription?
+                </h3>
                 <p className="text-gray-600">
-                  Yes, you can cancel your subscription at any time from your account settings. There are no long-term
-                  contracts or cancellation fees. You&apos;ll maintain access until the end of your billing period.
+                  Yes, you can cancel your subscription at any time from your
+                  account settings. There are no long-term contracts or
+                  cancellation fees. You&apos;ll maintain access until the end
+                  of your billing period.
                 </p>
               </div>
             </div>
@@ -510,7 +545,8 @@ export default function PricingPageWhiteteal() {
                 Ready to transform your financial management?
               </h2>
               <p className="text-gray-600 text-xl max-w-2xl">
-                Join thousands of users who have already discovered the power of Apture. Start your journey today.
+                Join thousands of users who have already discovered the power of
+                Apture. Start your journey today.
               </p>
               <div className="flex flex-col sm:flex-row gap-6 w-full max-w-md">
                 <button className="group relative overflow-hidden bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white rounded-2xl px-10 py-4 font-medium text-base shadow-md hover:shadow-lg transition-all duration-500 hover:-translate-y-1 flex-1">
@@ -523,7 +559,12 @@ export default function PricingPageWhiteteal() {
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                      />
                     </svg>
                   </span>
                 </button>
@@ -543,22 +584,34 @@ export default function PricingPageWhiteteal() {
                 <div className="relative w-10 h-10 flex items-center justify-center">
                   <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
                   {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
-                  <Image src="/apture.png" width={100} height={100} className="w-full" alt="" />
+                  <Image
+                    src="/apture.png"
+                    width={100}
+                    height={100}
+                    className="w-full"
+                    alt=""
+                  />
                 </div>
                 <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-400 bg-clip-text text-transparent">
                   Apture
                 </span>
               </div>
               <p className="text-gray-500 mb-6 max-w-sm">
-                Modern budgeting and expense tracking for everyone. Take control of your finances with powerful,
-                intuitive tools designed for real people.
+                Modern budgeting and expense tracking for everyone. Take control
+                of your finances with powerful, intuitive tools designed for
+                real people.
               </p>
               <div className="flex items-center gap-4">
                 <a
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
                 >
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84"></path>
                   </svg>
                 </a>
@@ -566,7 +619,12 @@ export default function PricingPageWhiteteal() {
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
                 >
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
@@ -578,7 +636,12 @@ export default function PricingPageWhiteteal() {
                   href="#"
                   className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors border border-gray-200"
                 >
-                  <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <svg
+                    className="w-5 h-5 text-gray-600"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
                     <path
                       fillRule="evenodd"
                       d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c5.51 0 10-4.48 10-10S17.51 2 12 2zm6.605 4.61a8.502 8.502 0 011.93 5.314c-.281-.054-3.101-.629-5.943-.271-.065-.141-.12-.293-.184-.445a25.416 25.416 0 00-.564-1.236c3.145-1.28 4.577-3.124 4.761-3.362zM12 3.475c2.17 0 4.154.813 5.662 2.148-.152.216-1.443 1.941-4.48 3.08-1.399-2.57-2.95-4.675-3.189-5A8.687 8.687 0 0112 3.475zm-3.633.803a53.896 53.896 0 013.167 4.935c-3.992 1.063-7.517 1.04-7.896 1.04a8.581 8.581 0 014.729-5.975zM3.453 12.01v-.26c.37.01 4.512.065 8.775-1.215.25.477.477.965.694 1.453-.109.033-.228.065-.336.098-4.404 1.42-6.747 5.303-6.942 5.629a8.522 8.522 0 01-2.19-5.705zM12 20.547a8.482 8.482 0 01-5.239-1.8c.152-.315 1.888-3.656 6.703-5.337.022-.01.033-.01.054-.022a35.318 35.318 0 011.823 6.475 8.4 8.4 0 01-3.341.684zm4.761-1.465c-.086-.52-.542-3.015-1.659-6.084 2.679-.423 5.022.271 5.314.369a8.468 8.468 0 01-3.655 5.715z"
@@ -590,15 +653,23 @@ export default function PricingPageWhiteteal() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">Quick links</h3>
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4">
+                Quick links
+              </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="#" className="text-gray-500 hover:text-teal-600 transition-colors">
+                  <Link
+                    href="#"
+                    className="text-gray-500 hover:text-teal-600 transition-colors"
+                  >
                     Home
                   </Link>
                 </li>
                 <li>
-                  <Link href="/pricing" className="text-gray-500 hover:text-teal-600 transition-colors">
+                  <Link
+                    href="/pricing"
+                    className="text-gray-500 hover:text-teal-600 transition-colors"
+                  >
                     Pricing
                   </Link>
                 </li>
@@ -608,15 +679,26 @@ export default function PricingPageWhiteteal() {
         </div>
         <div className="border-t border-gray-200 py-8">
           <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-sm text-gray-500">© {new Date().getFullYear()} Apture. All rights reserved.</p>
+            <p className="text-sm text-gray-500">
+              © {new Date().getFullYear()} Apture. All rights reserved.
+            </p>
             <div className="flex gap-6">
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-gray-500 hover:text-teal-600 transition-colors"
+              >
                 Privacy Policy
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-gray-500 hover:text-teal-600 transition-colors"
+              >
                 Terms of Service
               </Link>
-              <Link href="#" className="text-sm text-gray-500 hover:text-teal-600 transition-colors">
+              <Link
+                href="#"
+                className="text-sm text-gray-500 hover:text-teal-600 transition-colors"
+              >
                 Cookie Policy
               </Link>
             </div>
@@ -624,5 +706,5 @@ export default function PricingPageWhiteteal() {
         </div>
       </footer>
     </div>
-  )
+  );
 }
