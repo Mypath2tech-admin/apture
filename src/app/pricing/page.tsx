@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useState } from "react";
 export default function PricingPageWhiteteal() {
   const [billingPeriod, setBillingPeriod] = useState<"monthly" | "yearly">(
-    "monthly"
+    "yearly"
   );
 
   // Define pricing for both billing periods
