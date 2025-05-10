@@ -24,7 +24,7 @@ interface DatePickerProps {
 export function DatePickerDemo({
   name,
   id,
-  
+
   value,
   onChange,
 }: DatePickerProps) {
@@ -51,7 +51,7 @@ export function DatePickerDemo({
             !dateValue && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className={`mr-2 h-4 w-4 ${id}`}/>
+          <CalendarIcon className={`mr-2 h-4 w-4 ${id}`} />
           {dateValue ? format(dateValue, "PPP") : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
