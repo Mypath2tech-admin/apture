@@ -18,7 +18,7 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
   const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
   const mailOptions = {
-    from: '"Finn - Apture" <auth@apture.app>',
+    from: '"Verify - Apture" <auth@apture.app>',
     to: email,
     subject: "Verify Your Email Address",
     html: `
@@ -103,9 +103,6 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
       </head>
       <body>
         <div class="container">
-          <div class="header">
-            <h2 style="color: #10b981;">Apture</h2>
-          </div>
           <div class="content">
             <h1>Verify Your Email Address</h1>
             <p>Hi ${name},</p>
@@ -136,7 +133,7 @@ export const sendWelcomeEmail = async (user: User) => {
   const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
   const mailOptions = {
-    from: '"Finn - Apture" <catch@apture.app>',
+    from: '"Finn - Apture" <hi@apture.app>',
     to: email,
     subject: "Welcome to Apture!",
     html: `
@@ -220,9 +217,6 @@ export const sendWelcomeEmail = async (user: User) => {
       </head>
       <body>
         <div class="container">
-          <div class="header">
-            <h2 style="color: #10b981;">Apture</h2>
-          </div>
           <div class="content">
             <h1>Welcome to Apture!</h1>
             <p>Hi ${name},</p>
@@ -261,7 +255,7 @@ export const sendWelcomeEmail = async (user: User) => {
 export async function sendEmail(to: string, subject: string, text: string, html: string) {
   try {
     const info = await transporter.sendMail({
-      from: '"Finn - Apture" <catch@apture.app>',
+      from: '"Apture" <no-reply@apture.app>',
       to: to,
       subject: subject,
       text: text, // plain text body
