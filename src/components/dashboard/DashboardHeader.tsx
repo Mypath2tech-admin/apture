@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 export default function DashboardHeader() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isProUser, setIsProUser] = useState("free");
+  const [isProUser, setIsProUser] = useState("PRO");
   const { logout } = useAuthStore();
   const router = useRouter();
   const handleLogout = async () => {
@@ -16,7 +16,7 @@ export default function DashboardHeader() {
   };
 
   const checkSubscription = () => {
-    setIsProUser("free");
+    setIsProUser("PRO");
   };
 
   useEffect(() => {
@@ -62,9 +62,9 @@ export default function DashboardHeader() {
               >
                 <span className="sr-only">Open user menu</span>
                 <div className="relative h-8 w-8 rounded-full bg-teal-600 flex items-center justify-center text-white">
-                  <User className="h-5 w-5" aria-hidden="true" />
-                  <div className="absolute -bottom-1 -right-4 bg-gray-500 text-xs text-white px-1 rounded-full border border-teal-500 text-[10px] font-bold">
-                    {isProUser ? "Pro" : "Free"}
+                  <User className="h-5 w-5 cursor-pointer" aria-hidden="true" />
+                  <div className="italic absolute -bottom-1 -right-4 bg-blue-500 text-xs text-white px-1 rounded-full border border-teal-500 text-[10px] font-extrabold">
+                    {isProUser}
                   </div>
                 </div>
               </button>
