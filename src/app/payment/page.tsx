@@ -27,10 +27,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PaymentInfo } from "@/types/members";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { PaymentInfo } from "@/types/members";
 
 export default function PaymentPage() {
   const searchParams = useSearchParams();
@@ -40,11 +40,12 @@ export default function PaymentPage() {
     : 0;
   const paymentType = searchParams.get("type") || "monthly-dues";
 
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
+  // Convert from useState to regular const since we don't update this value
+  const paymentInfo: PaymentInfo = {
     memberId: memberId || "",
     amount: amount || 0,
     type: paymentType || "monthly-dues",
-  });
+  };
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
