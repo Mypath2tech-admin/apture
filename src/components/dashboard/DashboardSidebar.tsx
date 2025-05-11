@@ -84,6 +84,7 @@ export default function DashboardSidebar() {
       userTypes: ["organization"],
       locked: false,
     },
+
     {
       name: "Settings",
       href: "/dashboard/settings",

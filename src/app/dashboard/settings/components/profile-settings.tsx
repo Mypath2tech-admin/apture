@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
 import { AlertTriangle, Loader2, Upload } from "lucide-react"
 import { toast } from "react-toastify"
 import { useAuthStore } from "@/lib/store/authStore"
@@ -133,6 +134,7 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
             setIsLoading(false)
         }
     }
+
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmation !== "DELETE") {
@@ -273,6 +275,7 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
                     </div>
                 </form>
             </CardContent>
+
             <CardFooter>
                    <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
             <DialogTrigger asChild>
