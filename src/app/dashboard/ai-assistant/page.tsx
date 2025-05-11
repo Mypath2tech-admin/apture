@@ -148,7 +148,7 @@ export default function AIAssistantPage() {
             <div className="h-full flex flex-col items-center justify-center space-y-6">
               <div className="text-center space-y-2">
                 <h2 className="text-2xl font-bold my-4 text-gray-600">
-                  Hi 👋, I'm Finn
+                  Hi 👋, I&apos;m Finn
                 </h2>
                 <h2 className="text-2xl font-semibold">
                   How may I help you today?

@@ -4,16 +4,25 @@ import { useAuthStore } from "@/lib/store/authStore";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 export default function DashboardHeader() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [isProUser, setIsProUser] = useState(false);
+  const [isProUser, setIsProUser] = useState("free");
   const { logout } = useAuthStore();
   const router = useRouter();
   const handleLogout = async () => {
     await logout();
     router.push("/signin");
   };
+
+  const checkSubscription = () => {
+    setIsProUser("free");
+  };
+
+  useEffect(() => {
+    checkSubscription();
+  }, []);
+
   return (
     <header className="bg-transparent z-10">
       <div className="px-4 sm:px-6 lg:px-8">

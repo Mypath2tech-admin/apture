@@ -72,10 +72,10 @@ export default function DashboardSidebar() {
     },
     {
       name: "Membership",
-      href: "/dashboard/membership",
+      href: "/dashboard/members",
       icon: Lock,
       userTypes: ["organization"],
-      locked: true,
+      locked: false,
     },
     {
       name: "Ask Finn",
