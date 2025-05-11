@@ -29,6 +29,14 @@ export default function AIAssistantPage() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Predefined prompts
+  const predefinedPrompts = [
+    "What are the activities for this month?",
+    "How much have we spent from the budget?",
+    "Suggest activities to  help us reach our goal",
+    "Are we on track to reach our goal?",
+  ];
+
   // Scroll to the bottom when messages change
   useEffect(() => {
     scrollToBottom();
@@ -47,8 +55,14 @@ export default function AIAssistantPage() {
     });
   };
 
-  const handleSend = async () => {
-    if ((!input.trim() && attachments.length === 0) || isLoading) return;
+  const handlePromptClick = (prompt: string) => {
+    setInput(prompt);
+    handleSend(prompt);
+  };
+
+  const handleSend = async (promptText?: string) => {
+    const messageText = promptText || input;
+    if ((!messageText.trim() && attachments.length === 0) || isLoading) return;
 
     setIsLoading(true);
 
@@ -56,7 +70,7 @@ export default function AIAssistantPage() {
       // Create user message
       const userMessage: Message = {
         id: Date.now().toString(),
-        content: input,
+        content: messageText,
         role: "user",
         timestamp: new Date(),
         attachments: attachments.length > 0 ? [...attachments] : undefined,
@@ -127,51 +141,79 @@ export default function AIAssistantPage() {
   };
 
   return (
-    <div className="h-full">
-      <Card className="h-full flex flex-col">
+    <div className="h-full bg-transparent">
+      <Card className="h-full flex flex-col bg-transparent border-none shadow-none py-0">
         <div className="flex-1 p-4 overflow-y-auto">
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+          {messages.length === 0 ? (
+            <div className="h-full flex flex-col items-center justify-center space-y-6">
+              <div className="text-center space-y-2">
+                <h2 className="text-2xl font-bold my-4 text-gray-600">
+                  Hi 👋, I'm Finn
+                </h2>
+                <h2 className="text-2xl font-semibold">
+                  How may I help you today?
+                </h2>
+                <p className="text-muted-foreground">
+                  Ask me anything or try one of these suggestions
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full max-w-2xl">
+                {predefinedPrompts.map((prompt, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    className="p-4 h-auto text-left justify-start rounded-full cursor-pointer"
+                    onClick={() => handlePromptClick(prompt)}
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {messages.map((message) => (
                 <div
-                  className={`max-w-[80%] rounded-lg p-4 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                  key={message.id}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.isMarkdown ? (
-                    <div className="prose dark:prose-invert prose-sm max-w-none">
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  )}
-                  {message.attachments && message.attachments.length > 0 && (
-                    <div className="mt-2 space-y-2">
-                      {message.attachments.map((file, index) => (
-                        <div
-                          key={index}
-                          className="text-sm flex items-center gap-2"
-                        >
-                          <Paperclip className="w-4 h-4" />
-                          <span>{file.name}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div
+                    className={`max-w-[80%] rounded-full py-2 px-4 ${
+                      message.role === "user"
+                        ? "bg-gray-200 text-black"
+                        : "bg-transparent"
+                    }`}
+                  >
+                    {message.isMarkdown ? (
+                      <div className="prose dark:prose-invert prose-sm max-w-none">
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    )}
+                    {message.attachments && message.attachments.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {message.attachments.map((file, index) => (
+                          <div
+                            key={index}
+                            className="text-sm flex items-center gap-2"
+                          >
+                            <Paperclip className="w-4 h-4" />
+                            <span>{file.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          )}
         </div>
-        <div className="p-4 border-t">
+        <div className="p-8 border-1 rounded-xl">
           <div className="flex gap-2">
             <Input
               value={input}
@@ -195,7 +237,7 @@ export default function AIAssistantPage() {
                 </div>
               </Button>
             </label>
-            <Button onClick={handleSend} disabled={isLoading}>
+            <Button onClick={() => handleSend()} disabled={isLoading}>
               {isLoading ? (
                 <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent" />
               ) : (

@@ -1,20 +1,21 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import {  User } from 'lucide-react'
-import Link from 'next/link'
-import { useAuthStore } from "@/lib/store/authStore"
-import {useRouter} from 'next/navigation'
+import { useAuthStore } from "@/lib/store/authStore";
+import { User } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 export default function DashboardHeader() {
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const { logout } = useAuthStore()
-  const router = useRouter()
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isProUser, setIsProUser] = useState(false);
+  const { logout } = useAuthStore();
+  const router = useRouter();
   const handleLogout = async () => {
-    await logout()
-    router.push('/signin')
-  }
+    await logout();
+    router.push("/signin");
+  };
   return (
-    <header className="bg-white border-b border-gray-200 z-10">
+    <header className="bg-transparent z-10">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Search */}
@@ -30,7 +31,7 @@ export default function DashboardHeader() {
               />
             </div> */}
           </div>
-          
+
           {/* Right section */}
           <div className="flex items-center space-x-4">
             {/* Notifications */}
@@ -42,7 +43,7 @@ export default function DashboardHeader() {
               <Bell className="h-6 w-6" aria-hidden="true" />
               <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
             </button> */}
-            
+
             {/* Profile dropdown */}
             <div className="relative">
               <button
@@ -51,15 +52,18 @@ export default function DashboardHeader() {
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <span className="sr-only">Open user menu</span>
-                <div className="h-8 w-8 rounded-full bg-teal-600 flex items-center justify-center text-white">
+                <div className="relative h-8 w-8 rounded-full bg-teal-600 flex items-center justify-center text-white">
                   <User className="h-5 w-5" aria-hidden="true" />
+                  <div className="absolute -bottom-1 -right-4 bg-gray-500 text-xs text-white px-1 rounded-full border border-teal-500 text-[10px] font-bold">
+                    {isProUser ? "Pro" : "Free"}
+                  </div>
                 </div>
               </button>
-              
+
               {isProfileOpen && (
                 <div className="origin-top-right absolute right-0 mt-2 w-40 rounded-md shadow-lg py-1 bg-white border border-gray-300 focus:outline-none">
-                  <Link 
-                    href="/dashboard/profile" 
+                  <Link
+                    href="/dashboard/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsProfileOpen(false)}
                   >
@@ -75,7 +79,7 @@ export default function DashboardHeader() {
                   >
                     Settings
                   </Link> */}
-                  <button 
+                  <button
                     className="block px-4 w-full text-left py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={handleLogout}
                   >
@@ -88,5 +92,5 @@ export default function DashboardHeader() {
         </div>
       </div>
     </header>
-  )
+  );
 }
