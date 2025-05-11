@@ -1,28 +1,27 @@
-import nodemailer from "nodemailer"
-import type { User } from "../../generated/prisma"
+import nodemailer from "nodemailer";
+import type { User } from "../../generated/prisma";
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-    service:"gmail",
-    host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
-    secure: process.env.EMAIL_SERVER_SECURE === "true",
-    auth: {
-        user: process.env.EMAIL_SERVER_USER,
-        pass: process.env.EMAIL_SERVER_PASSWORD,
-    },
-})
+  host: process.env.EMAIL_SERVER_HOST,
+  port: Number(process.env.EMAIL_SERVER_PORT),
+  secure: true, // true for port 465 with SSL
+  auth: {
+    user: process.env.EMAIL_SERVER_USER,
+    pass: process.env.EMAIL_SERVER_PASSWORD,
+  }
+});
 
 // Email verification template
 export const sendVerificationEmail = async (user: User, verificationUrl: string) => {
-    const { email, firstName, lastName } = user
-    const name = firstName && lastName ? `${firstName} ${lastName}` : email
+  const { email, firstName, lastName } = user
+  const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
-    const mailOptions = {
-        from: `"Apture" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: "Verify Your Email Address",
-        html: `
+  const mailOptions = {
+    from: '"Finn - Apture" <auth@apture.app>',
+    to: email,
+    subject: "Verify Your Email Address",
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -126,21 +125,21 @@ export const sendVerificationEmail = async (user: User, verificationUrl: string)
       </body>
       </html>
     `,
-    }
+  }
 
-    return transporter.sendMail(mailOptions)
+  return transporter.sendMail(mailOptions)
 }
 
 // Welcome email template after verification
 export const sendWelcomeEmail = async (user: User) => {
-    const { email, firstName, lastName } = user
-    const name = firstName && lastName ? `${firstName} ${lastName}` : email
+  const { email, firstName, lastName } = user
+  const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
-    const mailOptions = {
-        from: `"Apture" <${process.env.EMAIL_FROM}>`,
-        to: email,
-        subject: "Welcome to Apture!",
-        html: `
+  const mailOptions = {
+    from: '"Finn - Apture" <catch@apture.app>',
+    to: email,
+    subject: "Welcome to Apture!",
+    html: `
       <!DOCTYPE html>
       <html>
       <head>
@@ -228,7 +227,7 @@ export const sendWelcomeEmail = async (user: User) => {
             <h1>Welcome to Apture!</h1>
             <p>Hi ${name},</p>
             <p>Thank you for verifying your email address. Your account is now active and you can start using Apture!</p>
-            <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard" class="button">Go to Dashboard</a>
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://apture.app'}/dashboard" class="button">Go to Dashboard</a>
             <div style="margin-top: 30px; text-align: left;">
               <h3>Here's what you can do with Apture:</h3>
               <div class="feature">
@@ -253,7 +252,25 @@ export const sendWelcomeEmail = async (user: User) => {
       </body>
       </html>
     `,
-    }
+  }
 
-    return transporter.sendMail(mailOptions)
+  return transporter.sendMail(mailOptions)
+}
+
+// General email sending function
+export async function sendEmail(to: string, subject: string, text: string, html: string) {
+  try {
+    const info = await transporter.sendMail({
+      from: '"Finn - Apture" <catch@apture.app>',
+      to: to,
+      subject: subject,
+      text: text, // plain text body
+      html: html  // html body
+    });
+    console.log('Message sent: %s', info.messageId);
+    return info;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
 }

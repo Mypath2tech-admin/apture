@@ -214,7 +214,7 @@ export default function Dashboard() {
               )}
             </DashboardCard>
 
-            <DashboardCard title="Recent Expenses333">
+            <DashboardCard title="Recent Expenses">
               {dashboardData.recentExpenses.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">No expenses found</p>

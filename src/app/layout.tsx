@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Apture",
+  title: `${process.env.NODE_ENV === "production" ? "Apture" : "Staging - Apture"}`,
   description: "Your Friendly Budget and expense planner",
 };
 

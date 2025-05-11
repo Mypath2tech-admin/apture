@@ -21,17 +21,22 @@ export default function Header() {
   }
   
   return (
-    <header className="backdrop-blur-xl bg-[#f8fafc] sticky top-0 z-50 ">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(34,197,94,0.05)_0%,rgba(255,255,255,0)_60%)]"></div>
+    <header className="bg-gradient-to-r from-transparent to-transparent backdrop-blur-md sticky top-0 z-50">
+      <div className="absolute inset-00bg-[radial-gradient(circle_at_30%_50%,rgba(34,197,94,0.08)_100%,rgba(255,255,255,0)_90%)]"></div>
       <div className="container mx-auto px-4 flex h-20 items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <div className="relative w-10 h-10 flex items-center justify-center">
             <div className="absolute inset-0 bg-gradient-to-tr rounded-lg opacity-90"></div>
-            {/* <DollarSign className="h-6 w-6 text-white z-10" /> */}
-            <Image src="/apture.png" width={100} height={100} className="" alt="" />
+            <Image
+              src="/apture.png"
+              width={200}
+              height={200}
+              className="w-10 h-10"
+              alt=""
+            />
           </div>
-          <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-teal-500 bg-clip-text text-transparent">
-            Apture
+          <span className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-teal-700 bg-clip-text text-transparent">
+            pture
           </span>
         </div>
         <nav className="hidden md:flex gap-8 items-center justify-center">
@@ -67,16 +72,27 @@ export default function Header() {
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
                   {user?.profileImage ? (
-                    <Image src={user.profileImage} alt="Profile" className="w-full h-full rounded-full object-cover" width={12} height={12} />
+                    <Image
+                      src={user.profileImage}
+                      alt="Profile"
+                      className="w-full h-full rounded-full object-cover"
+                      width={12}
+                      height={12}
+                    />
                   ) : (
                     <User className="w-4 h-4" />
                   )}
                 </div>
-                <Link href='/dashboard' className="text-sm font-medium text-gray-800">
-                  {user?.firstName || user?.username || user?.email.split('@')[0]}
+                <Link
+                  href="/dashboard"
+                  className="text-sm font-medium text-gray-800"
+                >
+                  {user?.firstName ||
+                    user?.username ||
+                    user?.email.split("@")[0]}
                 </Link>
               </div>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="flex items-center text-sm relative cursor-pointer z-30 font-medium text-gray-700 hover:text-gray-900 transition-all duration-300"
               >
@@ -92,46 +108,66 @@ export default function Header() {
               >
                 Log in
               </Link> */}
-              <Link  href="/signin" className="relative overflow-hidden group bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md">
+              <Link
+                href="/signin"
+                className="relative overflow-hidden group bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 text-white px-4 py-2 rounded-2xl transition-all duration-300 shadow-md"
+              >
                 <div className="absolute -inset-full top-0 block bg-gradient-to-r from-transparent via-white/25 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-shimmer transition-all"></div>
                 <span className="font-medium flex items-center">
-                Log in
+                  Log in
                   <svg
                     className="w-5 h-5 ml-2 -mr-1 transition-transform duration-300 group-hover:translate-x-1"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M14 5l7 7m0 0l-7 7m7-7H3"
+                    />
                   </svg>
                 </span>
               </Link>
             </>
           )}
         </div>
-        <button className="md:hidden text-gray-800" onClick={() => setMenuOpen(!menuOpen)}>
+        <button
+          className="md:hidden text-gray-800"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
       {/* Mobile menu */}
       {menuOpen && (
         <div className="md:hidden bg-white shadow-lg px-4 py-4 flex flex-col gap-4">
-          <Link href="/" className="text-sm font-medium hover:text-gray-600 transition-colors">
+          <Link
+            href="/"
+            className="text-sm font-medium hover:text-gray-600 transition-colors"
+          >
             Home
           </Link>
-          
+
           {isAuthenticated && (
-            <Link href="/dashboard" className="text-sm font-medium hover:text-gray-600 transition-colors">
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium hover:text-gray-600 transition-colors"
+            >
               Dashboard
             </Link>
           )}
-          
-          <Link href="/pricing" className="text-sm font-medium hover:text-gray-600 transition-colors">
+
+          <Link
+            href="/pricing"
+            className="text-sm font-medium hover:text-gray-600 transition-colors"
+          >
             Pricing
           </Link>
-          
+
           {isAuthenticated ? (
-            <button 
+            <button
               onClick={handleLogout}
               className="text-sm font-medium hover:text-gray-600 transition-colors flex items-center"
             >
@@ -139,7 +175,10 @@ export default function Header() {
             </button>
           ) : (
             <>
-              <Link href="/signin" className="text-sm font-medium hover:text-gray-600 transition-colors">
+              <Link
+                href="/signin"
+                className="text-sm font-medium hover:text-gray-600 transition-colors"
+              >
                 Log in
               </Link>
               <button className="bg-gradient-to-tr from-teal-600 to-teal-500 hover:from-teal-700 hover:to-teal-600 p-2 px-4 rounded-full text-white w-full">
@@ -150,5 +189,5 @@ export default function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }
