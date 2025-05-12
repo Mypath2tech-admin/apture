@@ -134,6 +134,7 @@ export const sendWelcomeEmail = async (user: User) => {
 
   const mailOptions = {
     from: '"Finn - Apture" <catch@apture.app>', // This is correct
+
     to: email,
     subject: "Welcome to Apture!",
     html: `
