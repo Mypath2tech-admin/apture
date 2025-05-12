@@ -142,7 +142,6 @@ model Timesheet {
   description    String?
   startDate      DateTime
   endDate        DateTime?
-  status         String           @default("DRAFT")
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   userId         String?

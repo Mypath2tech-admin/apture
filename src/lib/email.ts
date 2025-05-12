@@ -133,7 +133,7 @@ export const sendWelcomeEmail = async (user: User) => {
   const name = firstName && lastName ? `${firstName} ${lastName}` : email
 
   const mailOptions = {
-    from: '"Finn - Apture" <hi@apture.app>',
+    from: '"Finn - Apture" <catch@apture.app>', // This is correct
     to: email,
     subject: "Welcome to Apture!",
     html: `
