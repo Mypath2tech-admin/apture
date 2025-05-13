@@ -12,15 +12,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Loader2, Upload, AlertCircle } from "lucide-react"
 import { toast } from "react-toastify"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import type { Organization, User } from "@/types/dashboard"
+import { useAuthStore } from "@/lib/store/authStore"
+// import type { Organization } from "@/types/dashboard"
+import { useOrganizationDetails } from "@/lib/hooks/use-organization-users"
 
 interface OrganizationSettingsProps {
     setIsLoading: (loading: boolean) => void
 }
 
 export default function OrganizationSettings({ setIsLoading }: OrganizationSettingsProps) {
-    const [user, setUser] = useState<User | null>(null)
-    const [organization, setOrganization] = useState<Organization | null>(null)
+    const { data: organization, isLoading: isLoadingOrg, error: orgError } = useOrganizationDetails()
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -30,50 +31,40 @@ export default function OrganizationSettings({ setIsLoading }: OrganizationSetti
     const [logo, setLogo] = useState<File | null>(null)
     const [logoPreview, setLogoPreview] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [isAdmin, setIsAdmin] = useState(false)
+    const { user } = useAuthStore()
     const router = useRouter()
 
+    const isAdmin = user?.role === "ORGANIZATION_ADMIN"
+    //  console.log("org names",organization)
+    // Set form data when organization data is loaded
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true)
-            try {
-                // Fetch user data
-                const userResponse = await fetch("/api/users/me")
-                if (!userResponse.ok) throw new Error("Failed to fetch user data")
+        if (organization) {
+            setFormData({
+                name: organization.organization.name || "",
+                email: organization.organization.email || "",
+                // website: organization.website || "",
+                // description: organization.description || "",
+            })
 
-                const userData = await userResponse.json()
-                setUser(userData)
-                setIsAdmin(userData.role === "ORGANIZATION_ADMIN")
-
-                if (userData.organizationId) {
-                    // Fetch organization data
-                    const orgResponse = await fetch(`/api/organization`)
-                    if (!orgResponse.ok) throw new Error("Failed to fetch organization data")
-
-                    const orgData = await orgResponse.json()
-                    setOrganization(orgData)
-                    setFormData({
-                        name: orgData.name || "",
-                        email: orgData.email || "",
-                        // website: orgData.website || "",
-                        // description: orgData.description || "",
-                    })
-
-                    if (orgData.logo) {
-                        setLogoPreview(orgData.logo)
-                    }
-                }
-            } catch (error) {
-                console.error("Error fetching data:", error)
-                toast.error("Failed to load organization data")
-            } finally {
-                setIsLoading(false)
+            if (organization.logo) {
+                setLogoPreview(organization.logo)
             }
         }
+    }, [organization])
 
-        fetchData()
-    }, [setIsLoading])
-    console.log(user, organization)
+    // Update the parent loading state when our query loading state changes
+    useEffect(() => {
+        setIsLoading(isLoadingOrg)
+    }, [isLoadingOrg, setIsLoading])
+
+    // Show error toast if there's an error fetching organization data
+    useEffect(() => {
+        if (orgError) {
+            toast.error("Failed to load organization data")
+            console.error("Error fetching organization data:", orgError)
+        }
+    }, [orgError])
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
@@ -124,11 +115,9 @@ export default function OrganizationSettings({ setIsLoading }: OrganizationSetti
                 throw new Error("Failed to update organization")
             }
 
-            const updatedOrg = await response.json()
-            setOrganization(updatedOrg)
-
             toast.success("Organization settings have been updated successfully")
-
+            
+            // Refresh the page to show updated data
             router.refresh()
         } catch (error) {
             console.error("Error updating organization:", error)
@@ -137,6 +126,40 @@ export default function OrganizationSettings({ setIsLoading }: OrganizationSetti
             setIsSubmitting(false)
             setIsLoading(false)
         }
+    }
+
+    // Show loading state
+    if (isLoadingOrg) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Organization Settings</CardTitle>
+                    <CardDescription>Manage your organization&apos;s profile and settings</CardDescription>
+                </CardHeader>
+                <CardContent className="flex justify-center py-10">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </CardContent>
+            </Card>
+        )
+    }
+
+    // Show error state
+    if (orgError) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>Organization Settings</CardTitle>
+                    <CardDescription>Manage your organization&apos;s profile and settings</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>Failed to load organization data. Please try again later.</AlertDescription>
+                    </Alert>
+                </CardContent>
+            </Card>
+        )
     }
 
     if (!isAdmin) {

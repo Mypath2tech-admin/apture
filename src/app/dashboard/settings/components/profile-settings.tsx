@@ -9,28 +9,26 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
+import { Separator } from "@radix-ui/react-dropdown-menu"
 import { AlertTriangle, Loader2, Upload } from "lucide-react"
 import { toast } from "react-toastify"
 import { useAuthStore } from "@/lib/store/authStore"
-import type { User } from "@/types/dashboard"
+// import type { User } from "@/types/dashboard"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog"
-import { Separator } from "@radix-ui/react-dropdown-menu"
 
 interface ProfileSettingsProps {
     setIsLoading: (loading: boolean) => void
 }
 
 export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) {
-    const [user, setUser] = useState<User | null>(null)
     const [formData, setFormData] = useState({
         firstName: "",
         lastName: "",
@@ -43,38 +41,32 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
     const [isDeleting, setIsDeleting] = useState(false)
     const [deleteConfirmation, setDeleteConfirmation] = useState("")
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-    const { logout } = useAuthStore()
+    const { logout, user } = useAuthStore()
     const router = useRouter()
 
     useEffect(() => {
-        const fetchUserData = async () => {
-            setIsLoading(true)
-            try {
-                const response = await fetch("/api/users/me")
-                if (!response.ok) throw new Error("Failed to fetch user data")
-
-                const userData = await response.json()
-                setUser(userData)
+        setIsLoading(true)
+        
+        try {
+            if (user) {
                 setFormData({
-                    firstName: userData.firstName || "",
-                    lastName: userData.lastName || "",
-                    email: userData.email || "",
-                    phoneNumber: userData.phoneNumber || "",
+                    firstName: user.firstName || "",
+                    lastName: user.lastName || "",
+                    email: user.email || "",
+                    phoneNumber: user.phoneNumber || "",
                 })
 
-                if (userData.profileImage) {
-                    setProfileImagePreview(userData.profileImage)
+                if (user.profileImage) {
+                    setProfileImagePreview(user.profileImage)
                 }
-            } catch (error) {
-                console.error("Error fetching user data:", error)
-                toast.error("Failed to load user profile data")
-            } finally {
-                setIsLoading(false)
             }
+        } catch (error) {
+            console.error("Error setting user data:", error)
+            toast.error("Failed to load user profile data")
+        } finally {
+            setIsLoading(false)
         }
-
-        fetchUserData()
-    }, [setIsLoading])
+    }, [setIsLoading, user])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -120,9 +112,7 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
                 throw new Error("Failed to update profile")
             }
 
-            const updatedUser = await response.json()
-            setUser(updatedUser)
-
+            await response.json()
             toast.success("Your profile has been updated successfully")
 
             router.refresh()
@@ -134,7 +124,6 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
             setIsLoading(false)
         }
     }
-
 
     const handleDeleteAccount = async () => {
         if (deleteConfirmation !== "DELETE") {
@@ -277,73 +266,73 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
             </CardContent>
 
             <CardFooter>
-                   <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="destructive">Delete Account</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle className="text-red-600">Delete Account</DialogTitle>
-                <DialogDescription>
-                  This action is permanent and cannot be undone. All your data will be permanently deleted.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="rounded-md bg-red-50 p-4">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <AlertTriangle className="h-5 w-5 text-red-500" />
-                    </div>
-                    <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">Warning</h3>
-                      <div className="mt-2 text-sm text-red-700">
-                        <p>Deleting your account will permanently remove all your data, including:</p>
-                        <ul className="list-disc pl-5 mt-2">
-                          <li>Personal profile information</li>
-                          <li>All budgets and budget categories</li>
-                          <li>All expenses and expense records</li>
-                          <li>Organization data (if you are the owner)</li>
-                          <li>Timesheet records</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <Separator />
-                <div className="space-y-2">
-                  <Label htmlFor="deleteConfirmation" className="text-sm font-medium">
-                    To confirm, type <span className="font-bold">DELETE</span> in the field below:
-                  </Label>
-                  <Input
-                    id="deleteConfirmation"
-                    value={deleteConfirmation}
-                    onChange={(e) => setDeleteConfirmation(e.target.value)}
-                    placeholder="Type DELETE to confirm"
-                    className="border-red-300 focus:border-red-500 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDeleteAccount}
-                  disabled={isDeleting || deleteConfirmation !== "DELETE"}
-                >
-                  {isDeleting ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Deleting...
-                    </>
-                  ) : (
-                    "Delete Account"
-                  )}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+                    <DialogTrigger asChild>
+                        <Button variant="destructive">Delete Account</Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="text-red-600">Delete Account</DialogTitle>
+                            <DialogDescription>
+                                This action is permanent and cannot be undone. All your data will be permanently deleted.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                            <div className="rounded-md bg-red-50 p-4">
+                                <div className="flex">
+                                    <div className="flex-shrink-0">
+                                        <AlertTriangle className="h-5 w-5 text-red-500" />
+                                    </div>
+                                    <div className="ml-3">
+                                        <h3 className="text-sm font-medium text-red-800">Warning</h3>
+                                        <div className="mt-2 text-sm text-red-700">
+                                            <p>Deleting your account will permanently remove all your data, including:</p>
+                                            <ul className="list-disc pl-5 mt-2">
+                                                <li>Personal profile information</li>
+                                                <li>All budgets and budget categories</li>
+                                                <li>All expenses and expense records</li>
+                                                <li>Organization data (if you are the owner)</li>
+                                                <li>Timesheet records</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <Separator />
+                            <div className="space-y-2">
+                                <Label htmlFor="deleteConfirmation" className="text-sm font-medium">
+                                    To confirm, type <span className="font-bold">DELETE</span> in the field below:
+                                </Label>
+                                <Input
+                                    id="deleteConfirmation"
+                                    value={deleteConfirmation}
+                                    onChange={(e) => setDeleteConfirmation(e.target.value)}
+                                    placeholder="Type DELETE to confirm"
+                                    className="border-red-300 focus:border-red-500 focus:ring-red-500"
+                                />
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={handleDeleteAccount}
+                                disabled={isDeleting || deleteConfirmation !== "DELETE"}
+                            >
+                                {isDeleting ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Deleting...
+                                    </>
+                                ) : (
+                                    "Delete Account"
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </CardFooter>
         </Card>
     )

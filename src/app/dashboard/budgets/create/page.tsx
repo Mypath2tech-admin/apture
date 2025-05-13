@@ -77,7 +77,7 @@ export default function CreateBudget() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    console.log(formData)
+    // console.log(formData)
   }
 
   const handleToggleTimeframe = (checked: boolean) => {

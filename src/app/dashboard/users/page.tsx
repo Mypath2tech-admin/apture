@@ -15,7 +15,7 @@ import { useOrganizationUsers } from "@/lib/hooks/use-organization-users"
 export default function OrganizationUsers() {
   const router = useRouter()
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore()
-  console.log("uses", user)
+  // console.log("uses", user)
 
   const [searchTerm, setSearchTerm] = useState("")
   const [updatingPermission, setUpdatingPermission] = useState<string | null>(null)
