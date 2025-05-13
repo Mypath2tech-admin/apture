@@ -15,7 +15,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import type { Budget } from "@/types/dashboard"
 import { DatePickerDemo } from "@/components/ui/date-picker"
-
+import { useQueryClient } from "@tanstack/react-query"
+import { budgetKeys } from "@/lib/hooks/use-budgets"
+import { dashboardKeys } from "@/lib/hooks/use-dashboard"
 export default function EditBudget() {
   const params = useParams()
   const router = useRouter()
@@ -73,7 +75,7 @@ export default function EditBudget() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-
+  const queryClient = useQueryClient()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
@@ -113,6 +115,8 @@ export default function EditBudget() {
       }
 
       toast.success("Budget updated successfully")
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+         await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
       router.push(`/dashboard/budgets/${params.id}`)
     } catch (err) {
       console.error("Error updating budget:", err)

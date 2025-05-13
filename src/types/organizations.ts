@@ -9,7 +9,7 @@ export interface OrganizationUser {
   isActive?: boolean
   createdAt?: string
   updatedAt?: string
-  organization?:UserOrg
+  organization:UserOrg
 }
 export interface UserOrg{
   id:string

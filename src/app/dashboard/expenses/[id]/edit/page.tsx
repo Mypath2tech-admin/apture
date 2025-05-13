@@ -16,7 +16,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Expense, ExpenseCategory, Budget } from "@/types/dashboard"
 import { DatePickerDemo } from "@/components/ui/date-picker"
-
+import { useQueryClient } from "@tanstack/react-query"
+import { expenseKeys } from "@/lib/hooks/use-expense"
+import { dashboardKeys } from "@/lib/hooks/use-dashboard"
 export default function EditExpense() {
   const params = useParams()
   const router = useRouter()
@@ -94,7 +96,7 @@ export default function EditExpense() {
   const handleSelectChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-
+  const queryClient = useQueryClient()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
@@ -139,6 +141,8 @@ export default function EditExpense() {
       }
 
       toast.success("Expense updated successfully")
+      await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
       router.push(`/dashboard/expenses`)
     } catch (err) {
       console.error("Error updating expense:", err)

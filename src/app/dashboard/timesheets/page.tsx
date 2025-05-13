@@ -1,8 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-// import { useRouter } from "next/navigation"
-import { format, parseISO } from "date-fns"
+import { format, parseISO, startOfWeek, endOfWeek, isWithinInterval } from "date-fns"
 import { Plus, Clock, FileText, Download } from "lucide-react"
 import { toast } from "react-toastify"
 import PageHeader from "@/components/dashboard/PageHeader"
@@ -17,22 +16,31 @@ export default function TimesheetsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  // const router = useRouter()
+  const [stats, setStats] = useState({
+    currentWeekHours: 0,
+    totalMonthHours: 0,
+    avgWeeklyHours: 0,
+    weeklyGoal: 40,
+  })
 
   useEffect(() => {
     fetchTimesheets()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]) // Add currentPage as a dependency
 
   const fetchTimesheets = async () => {
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/timesheets?page=${currentPage}&limit=10`)
+      // Fetch all timesheets for statistics calculation
+      const response = await fetch(`/api/timesheets?page=${currentPage}&limit=100`)
       if (!response.ok) throw new Error("Failed to fetch timesheets")
 
       const data = (await response.json()) as TimesheetListResponse
       setTimesheets(data.timesheets)
       setTotalPages(data.pagination.pages)
+
+      // Calculate statistics
+      calculateStats(data.timesheets)
     } catch (error) {
       console.error("Error fetching timesheets:", error)
       toast.error("Failed to load timesheets")
@@ -41,24 +49,73 @@ export default function TimesheetsPage() {
     }
   }
 
-  // const getStatusBadgeClass = (status: string) => {
-  //   switch (status.toUpperCase()) {
-  //     case "ACCEPTED":
-  //       return "bg-green-100 text-green-800"
-  //     case "SUBMITTED":
-  //       return "bg-blue-100 text-blue-800"
-  //     case "REJECTED":
-  //       return "bg-red-100 text-red-800"
-  //     default:
-  //       return "bg-gray-100 text-gray-800"
-  //   }
-  // }
+  const calculateStats = (timesheetData: TimesheetListResponse["timesheets"]) => {
+    const now = new Date()
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 }) // Monday as week start
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
+    // const monthStart = startOfMonth(now)
+    // const monthEnd = endOfMonth(now)
+
+    let currentWeekHours = 0
+    let totalMonthHours = 0
+    const weeksWithEntries = new Set()
+
+    // Process each timesheet
+    timesheetData.forEach((timesheet) => {
+      if (!timesheet.entries) return
+
+      const timesheetDate = parseISO(timesheet.startDate)
+      const timesheetMonth = timesheetDate.getMonth()
+      const timesheetYear = timesheetDate.getFullYear()
+      const currentMonth = now.getMonth()
+      const currentYear = now.getFullYear()
+
+      // Get week number for this timesheet
+      const weekNumber = format(timesheetDate, "w")
+
+      // Calculate total hours for this timesheet
+      const timesheetHours = timesheet.entries.reduce((sum, entry) => sum + entry.duration, 0)
+
+      // Check if timesheet is in current week
+      if (isWithinInterval(timesheetDate, { start: weekStart, end: weekEnd })) {
+        currentWeekHours += timesheetHours
+      }
+
+      // Check if timesheet is in current month
+      if (timesheetMonth === currentMonth && timesheetYear === currentYear) {
+        totalMonthHours += timesheetHours
+        weeksWithEntries.add(weekNumber)
+      }
+    })
+
+    // Calculate average weekly hours
+    const avgWeeklyHours = weeksWithEntries.size > 0 ? totalMonthHours / weeksWithEntries.size : 0
+
+    setStats({
+      currentWeekHours,
+      totalMonthHours,
+      avgWeeklyHours,
+      weeklyGoal: 40,
+    })
+  }
 
   const formatDateRange = (startDate: string, endDate: string | null) => {
     const start = format(parseISO(startDate), "MMM d, yyyy")
     if (!endDate) return start
     const end = format(parseISO(endDate), "MMM d, yyyy")
     return `${start} - ${end}`
+  }
+
+  // Calculate total hours for a timesheet
+  const calculateTotalHours = (timesheet: TimesheetListResponse["timesheets"][0]) => {
+    console.log(timesheet)
+    if (!timesheet.entries || !timesheet.entries.length) return 0
+    return timesheet.entries.reduce((sum, entry) => sum + entry.duration, 0)
+  }
+
+  // Calculate progress percentage
+  const calculateProgress = () => {
+    return Math.min(100, Math.round((stats.currentWeekHours / stats.weeklyGoal) * 100))
   }
 
   return (
@@ -87,7 +144,11 @@ export default function TimesheetsPage() {
                 <dt className="text-sm font-medium text-gray-500 truncate">Hours Logged This Week</dt>
                 <dd>
                   <div className="text-lg font-medium text-gray-900">
-                    {isLoading ? <Skeleton className="h-6 w-20" /> : "0 / 40"}
+                    {isLoading ? (
+                      <Skeleton className="h-6 w-20" />
+                    ) : (
+                      `${stats.currentWeekHours.toFixed(1)} / ${stats.weeklyGoal}`
+                    )}
                   </div>
                 </dd>
               </dl>
@@ -97,11 +158,14 @@ export default function TimesheetsPage() {
             <div className="flex items-center justify-between mb-1">
               <h4 className="text-xs font-medium text-gray-500">Progress</h4>
               <span className="text-xs font-medium text-gray-900">
-                {isLoading ? <Skeleton className="h-4 w-8" /> : "0%"}
+                {isLoading ? <Skeleton className="h-4 w-8" /> : `${calculateProgress()}%`}
               </span>
             </div>
             <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-teal-600 rounded-full" style={{ width: isLoading ? "0%" : "0%" }} />
+              <div
+                className="h-full bg-teal-600 rounded-full"
+                style={{ width: isLoading ? "0%" : `${calculateProgress()}%` }}
+              />
             </div>
           </div>
           <div className="mt-6 ">
@@ -116,21 +180,15 @@ export default function TimesheetsPage() {
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Total Hours (This Month)</h4>
               <p className="mt-1 text-2xl font-semibold text-gray-900">
-                {isLoading ? <Skeleton className="h-8 w-16" /> : "0"}
+                {isLoading ? <Skeleton className="h-8 w-16" /> : stats.totalMonthHours.toFixed(1)}
               </p>
             </div>
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Avg. Hours/Week</h4>
               <p className="mt-1 text-2xl font-semibold text-gray-900">
-                {isLoading ? <Skeleton className="h-8 w-16" /> : "0"}
+                {isLoading ? <Skeleton className="h-8 w-16" /> : stats.avgWeeklyHours.toFixed(1)}
               </p>
             </div>
-            {/* <div>
-              <h4 className="text-xs font-medium uppercase text-gray-500">Pending Approval</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">
-                {isLoading ? <Skeleton className="h-8 w-16" /> : "0"}
-              </p>
-            </div> */}
           </div>
         </DashboardCard>
       </div>
@@ -180,9 +238,6 @@ export default function TimesheetsPage() {
                   <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                     Hours
                   </th>
-                  {/* <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Status
-                  </th> */}
                   <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-0">
                     <span className="sr-only">Actions</span>
                   </th>
@@ -195,17 +250,8 @@ export default function TimesheetsPage() {
                       {formatDateRange(timesheet.startDate, timesheet.endDate)}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {timesheet._count?.entries || 0} entries
+                      {calculateTotalHours(timesheet)} hrs
                     </td>
-                    {/* <td className="whitespace-nowrap px-3 py-4 text-sm">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(
-                          timesheet.status,
-                        )}`}
-                      >
-                        {timesheet.status}
-                      </span>
-                    </td> */}
                     <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
                       <div className="flex justify-end space-x-2">
                         <Link
@@ -259,7 +305,7 @@ export default function TimesheetsPage() {
                 <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                   <Button
                     variant="outline"
-                    className="rounded-l-md bg-teal-500"
+                    className="rounded-l-md"
                     onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                     disabled={currentPage === 1}
                   >
