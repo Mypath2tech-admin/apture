@@ -2,7 +2,7 @@
 
 import { useState, useEffect, type FormEvent, type ChangeEvent } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, PlusCircle } from "lucide-react"
+import { Loader2, PlusCircle, Percent } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -19,12 +19,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type {  ExpenseCategory } from "@/types/dashboard"
+import type { ExpenseCategory } from "@/types/dashboard"
 import { DatePickerDemo } from "@/components/ui/date-picker"
 import { useQueryClient } from "@tanstack/react-query"
 import { expenseKeys } from "@/lib/hooks/use-expense"
-import { useBudgets } from "@/lib/hooks/use-budgets"
+import { budgetKeys, useBudgets } from "@/lib/hooks/use-budgets"
 import { dashboardKeys } from "@/lib/hooks/use-dashboard"
+import { cn } from "@/lib/utils"
 
 // Define interfaces for our component state
 interface FormData {
@@ -34,6 +35,7 @@ interface FormData {
   date: string
   budgetId: string
   categoryId: string
+  taxRate: string
 }
 
 interface NewCategoryData {
@@ -46,7 +48,7 @@ export default function CreateExpensePage() {
   // const [isLoading, setIsLoading] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   // const [budgets, setBudgets] = useState<Budget[]>([])
-   const { data: budgets = [], isLoading, } = useBudgets()
+  const { data: budgets = [], isLoading, } = useBudgets()
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
   const [filteredCategories, setFilteredCategories] = useState<ExpenseCategory[]>([])
   const [isCategoryDialogOpen, setIsCategoryDialogOpen] = useState(false)
@@ -54,10 +56,13 @@ export default function CreateExpensePage() {
     name: "",
     description: "",
   })
+  const [taxAmount, setTaxAmount] = useState<number>(0)
+  const [totalAmount, setTotalAmount] = useState<number>(0)
 
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
+    taxRate: "",
     amount: "",
     date: new Date().toISOString().split("T")[0],
     budgetId: "",
@@ -66,37 +71,17 @@ export default function CreateExpensePage() {
 
   const [formErrors, setFormErrors] = useState<Partial<Record<keyof FormData, string>>>({})
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setIsLoading(true)
-  //     try {
-  //       // Fetch budgets
-  //       const budgetsResponse = await fetch("/api/budget")
-  //       if (!budgetsResponse.ok) {
-  //         throw new Error("Failed to fetch budgets")
-  //       }
-  //       const budgetsData = await budgetsResponse.json()
-  //       setBudgets(budgetsData)
+  // Calculate tax and total amount when amount or tax rate changes
+  useEffect(() => {
+    const amount = parseFloat(formData.amount) || 0
+    const taxRate = parseFloat(formData.taxRate) || 0
 
-  //       // Fetch categories
-  //       const categoriesResponse = await fetch("/api/categories")
-  //       if (!categoriesResponse.ok) {
-  //         throw new Error("Failed to fetch categories")
-  //       }
-  //       const categoriesData = await categoriesResponse.json()
-  //       setCategories(categoriesData)
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error)
+    const calculatedTaxAmount = amount * (taxRate / 100)
+    const calculatedTotalAmount = amount + calculatedTaxAmount
 
-  //       toast.error("Failed to load data. Please try again.")
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
-
-  //   fetchData()
-  // }, [])
-
+    setTaxAmount(calculatedTaxAmount)
+    setTotalAmount(calculatedTotalAmount)
+  }, [formData.amount, formData.taxRate])
   // Filter categories based on selected budget
   useEffect(() => {
     if (formData.budgetId) {
@@ -175,51 +160,54 @@ export default function CreateExpensePage() {
   // Handle form submission
 
   const queryClient = useQueryClient()
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+  // const handleSubmit = async (e: FormEvent) => {
+  //   e.preventDefault()
 
-    if (!validateForm()) {
-      return
-    }
+  //   if (!validateForm()) {
+  //     return
+  //   }
 
-    setIsSubmitting(true)
+  //   setIsSubmitting(true)
+  //   // console.log("Tax Rate",formData.taxRate)
 
-    try {
-      const response = await fetch("/api/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          description: formData.description,
-          amount: Number(formData.amount),
-          date: formData.date,
-          budgetId: formData.budgetId,
-          categoryId: formData.categoryId,
-        }),
-      })
+  //   try {
+  //     const response = await fetch("/api/expenses", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         title: formData.title,
+  //         description: formData.description,
+  //         amount: Number(formData.amount),
+  //         date: formData.date,
+  //         budgetId: formData.budgetId,
+  //         categoryId: formData.categoryId,
+  //         taxRate: formData.taxRate ? Number.parseFloat(formData.taxRate) : null,
+  //       }),
+  //     })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Failed to create expense")
-      }
+  //     if (!response.ok) {
+  //       const error = await response.json()
+  //       throw new Error(error.error || "Failed to create expense")
+  //     }
 
 
-      toast.success("Expense created successfully")
+  //     toast.success("Expense created successfully")
 
-      // Redirect to expenses list
-      await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
-         await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
-      router.push("/dashboard/expenses")
-    } catch (error) {
-      console.error("Error creating expense:", error)
+  //     // Redirect to expenses list
+  //     await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
+  //     await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+  //     await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
+  //     router.push("/dashboard/expenses")
+  //   } catch (error) {
+  //     console.error("Error creating expense:", error)
 
-      toast.error("Failed to create expense")
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+  //     toast.error("Failed to create expense")
+  //   } finally {
+  //     setIsSubmitting(false)
+  //   }
+  // }
 
   // Handle creating a new category
   const handleCreateCategory = async (e: FormEvent) => {
@@ -305,7 +293,7 @@ export default function CreateExpensePage() {
 
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form className="space-y-6">
               <div className="space-y-4">
                 <div className="grid gap-2">
                   <Label htmlFor="title" className={formErrors.title ? "text-destructive" : ""}>
@@ -334,24 +322,65 @@ export default function CreateExpensePage() {
                   />
                 </div>
 
-
-                <div className="grid gap-2">
-                  <Label htmlFor="amount" className={formErrors.amount ? "text-destructive" : ""}>
-                    Amount
-                  </Label>
-                  <Input
-                    id="amount"
-                    name="amount"
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    placeholder="0.00"
-                    className={formErrors.amount ? "border-destructive" : ""}
-                  />
-                  {formErrors.amount && <p className="text-sm text-destructive">{formErrors.amount}</p>}
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="amount" className={formErrors.amount ? "text-destructive" : ""}>
+                      Amount
+                    </Label>
+                    <Input
+                      id="amount"
+                      name="amount"
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={formData.amount}
+                      onChange={handleInputChange}
+                      placeholder="0.00"
+                      className={formErrors.amount ? "border-destructive" : ""}
+                    />
+                    {formErrors.amount && <p className="text-sm text-destructive">{formErrors.amount}</p>}
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="taxRate" className={formErrors.taxRate ? "text-destructive" : ""}>
+                      Tax Rate (%)
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="taxRate"
+                        name="taxRate"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.taxRate}
+                        onChange={handleInputChange}
+                        placeholder="0.00"
+                        className={cn(formErrors.taxRate && "border-destructive")}
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        <Percent className="h-4 w-4" />
+                      </span>
+                    </div>
+                    {formErrors.taxRate && <p className="text-sm text-destructive mt-1">{formErrors.taxRate}</p>}
+                  </div>
                 </div>
+                {/* Tax calculation summary */}
+                {(formData.amount || formData.taxRate) && (
+                  <div className="bg-gray-50 p-3 rounded-md">
+                    <div className="flex justify-between text-sm">
+                      <span>Subtotal:</span>
+                      <span>${parseFloat(formData.amount || "0").toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm mt-1">
+                      <span>Tax ({parseFloat(formData.taxRate || "0").toFixed(2)}%):</span>
+                      <span>${taxAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-medium mt-1 pt-1 border-t border-gray-200">
+                      <span>Total:</span>
+                      <span>${totalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
+                )}
+
 
                 <div className="grid gap-2">
                   <Label htmlFor="date" className={formErrors.date ? "text-destructive" : ""}>
@@ -481,6 +510,8 @@ export default function CreateExpensePage() {
                       date: formData.date,
                       budgetId: formData.budgetId,
                       categoryId: formData.categoryId,
+                      taxRate: formData.taxRate ? Number.parseFloat(formData.taxRate) : null,
+
                     }),
                   });
 
@@ -491,7 +522,9 @@ export default function CreateExpensePage() {
 
 
                   toast.success("Expense created successfully");
-
+                  await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
+                  await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+                  await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
                   // Reset form for new entry
                   setFormData({
                     title: "",
@@ -500,6 +533,7 @@ export default function CreateExpensePage() {
                     date: new Date().toISOString().split("T")[0],
                     budgetId: formData.budgetId, // Keep the same budget
                     categoryId: formData.categoryId, // Keep the same category
+                    taxRate: formData.taxRate
                   });
                 } catch (error) {
                   console.error("Error creating expense:", error);
@@ -538,6 +572,7 @@ export default function CreateExpensePage() {
                       date: formData.date,
                       budgetId: formData.budgetId,
                       categoryId: formData.categoryId,
+                      taxRate: formData.taxRate ? Number.parseFloat(formData.taxRate) : null,
                     }),
                   });
 
@@ -550,6 +585,9 @@ export default function CreateExpensePage() {
                   toast.success("Expense created successfully");
 
                   // Redirect to expenses list
+                  await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
+                  await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+                  await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
                   router.push("/dashboard/expenses");
                 } catch (error) {
                   console.error("Error creating expense:", error);

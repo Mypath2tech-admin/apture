@@ -43,6 +43,8 @@ export interface TimesheetResponse {
     // status: string
     userId: string
     organizationId: string | null
+    taxRate?: number
+    taxAmount?: number
     entries: TimesheetEntry[]
     user?: {
         id: string

@@ -10,6 +10,7 @@ import ProfileSettings from "./components/profile-settings"
 import OrganizationSettings from "./components/organization-settings"
 import SecuritySettings from "./components/security-question"
 import NotificationSettings from "./components/notification-settings"
+import TaxSettings from "./components/tax-settings"
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -39,6 +40,7 @@ export default function SettingsPage() {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="organization">Organization</TabsTrigger>
+            <TabsTrigger value="tax">Tax Settings</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
@@ -48,6 +50,9 @@ export default function SettingsPage() {
             </TabsContent>
             <TabsContent value="organization">
               <OrganizationSettings setIsLoading={setIsLoading} />
+            </TabsContent>
+            <TabsContent value="tax">
+              <TaxSettings setIsLoading={setIsLoading} />
             </TabsContent>
             <TabsContent value="security">
               <SecuritySettings setIsLoading={setIsLoading} />

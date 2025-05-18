@@ -162,7 +162,7 @@ export default function CreateTimesheet() {
 
       <DashboardCard title="Weekly Timesheet">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="weekStarting">Week Starting (Monday)</Label>
 
@@ -179,6 +179,18 @@ export default function CreateTimesheet() {
               <Input
                 type="number"
                 id="hourlyRate"
+                value={formData.hourlyRate}
+                onChange={handleHourlyRateChange}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+              />
+            </div>
+              <div className="space-y-2">
+              <Label htmlFor="hourlyRate">Organization Tax ($)</Label>
+              <Input
+                type="number"
+                id="tax"
                 value={formData.hourlyRate}
                 onChange={handleHourlyRateChange}
                 placeholder="0.00"

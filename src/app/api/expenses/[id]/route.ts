@@ -51,6 +51,10 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     if (user.role !== "ADMIN" && expense.userId !== user.id && expense.organizationId !== user.organizationId) {
       return NextResponse.json({ error: "You don't have access to this expense" }, { status: 403 })
     }
+    const taxRate = expense.tax_rate !== null ? Number(expense.tax_rate) : null
+    const amount = Number(expense.amount)
+    const taxAmount = taxRate !== null ? (amount * taxRate) / 100 : null
+    const totalAmount = taxAmount !== null ? amount + taxAmount : amount
 
     return NextResponse.json({
       id: expense.id,
@@ -58,8 +62,11 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       amount: Number(expense.amount),
       date: expense.date.toISOString(),
       description: expense.description,
+      taxRate: taxRate,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
       receipt: expense.receiptUrl,
-    //   status: expense.status,
+      //   status: expense.status,
       categoryId: expense.categoryId,
       budgetId: expense.budgetId,
       userId: expense.userId,
@@ -72,9 +79,9 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
       },
       budget: expense.budget
         ? {
-            id: expense.budget.id,
-            name: expense.budget.name,
-          }
+          id: expense.budget.id,
+          name: expense.budget.name,
+        }
         : undefined,
     })
   } catch (error) {
@@ -126,7 +133,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
     }
 
     const body = await request.json()
-    const { title, amount, date, description, receipt, categoryId, budgetId } = body
+    const { title, taxRate, amount, date, description, receipt, categoryId, budgetId } = body
 
     // Update expense
     const updatedExpense = await prisma.expense.update({
@@ -134,6 +141,7 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
       data: {
         title,
         amount: amount !== undefined ? Number(amount) : undefined,
+        tax_rate: taxRate !== undefined && taxRate !== "" ? Number(taxRate) : null,
         date: date ? new Date(date) : undefined,
         description,
         receiptUrl: receipt,
@@ -151,30 +159,36 @@ export async function PUT(request: NextRequest, context: { params: Promise<{ id:
         },
       },
     })
-
+    // Calculate tax amount and total
+    const expenseTaxRate = expense.tax_rate !== null ? Number(expense.tax_rate) : null
+    const expenseAmount = Number(expense.amount)
+    const taxAmount = expenseTaxRate !== null ? (expenseAmount * expenseTaxRate) / 100 : null
+    const totalAmount = taxAmount !== null ? expenseAmount + taxAmount : expenseAmount
     return NextResponse.json({
       id: updatedExpense.id,
       title: updatedExpense.title,
       amount: Number(updatedExpense.amount),
       date: updatedExpense.date.toISOString(),
+      taxRate: expenseTaxRate,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
       description: updatedExpense.description || undefined,
       receipt: updatedExpense.receiptUrl || undefined,
-    //   status: updatedExpense.status,
       categoryId: updatedExpense.categoryId,
       budgetId: updatedExpense.budgetId || undefined,
       userId: updatedExpense.userId,
       organizationId: updatedExpense.organizationId || undefined,
       createdAt: updatedExpense.createdAt.toISOString(),
       updatedAt: updatedExpense.updatedAt.toISOString(),
-      category: updatedExpense.category? {
+      category: updatedExpense.category ? {
         id: updatedExpense.category.id,
         name: updatedExpense.category.name,
       } : null,
       budget: updatedExpense.budget
         ? {
-            id: updatedExpense.budget.id,
-            name: updatedExpense.budget.name,
-          }
+          id: updatedExpense.budget.id,
+          name: updatedExpense.budget.name,
+        }
         : undefined,
     })
   } catch (error) {
@@ -228,7 +242,7 @@ export async function DELETE(request: NextRequest, context: { params: Promise<{ 
 
     // Delete expense
     await prisma.expense.delete({
-      where: { id},
+      where: { id },
     })
 
     return NextResponse.json({ success: true })
