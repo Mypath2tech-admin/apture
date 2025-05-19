@@ -42,6 +42,7 @@ export default function ProfileSettings({ setIsLoading }: ProfileSettingsProps) 
     const [deleteConfirmation, setDeleteConfirmation] = useState("")
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const { logout, user } = useAuthStore()
+    console.log(user)
     const router = useRouter()
 
     useEffect(() => {

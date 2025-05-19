@@ -41,6 +41,12 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
             lastName: true,
           },
         },
+        organization: {
+          select: {
+            name: true,
+            tax_rate: true, // Using snake_case as per schema
+          },
+        },
       },
     })
 
@@ -93,27 +99,39 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
     // Calculate total duration
     const totalDuration = entriesByDay.reduce((sum, entry) => sum + entry.duration, 0)
 
+    // Calculate financial information
+    const hourlyRate = timesheet.hourlyRate || 0
+    const taxRate = timesheet.organization?.tax_rate ? Number.parseFloat(timesheet.organization.tax_rate.toString()) : 0
+    const subtotal = totalDuration * hourlyRate
+    const taxAmount = subtotal * (taxRate / 100)
+    const totalAmount = subtotal + taxAmount
+
     if (exportFormat === "xlsx") {
       // Create Excel workbook
       const wb = XLSX.utils.book_new()
 
       // Create worksheet data
       const wsData = [
-        ["Timesheet", "", ""],
-        ["Week:", weekRange, ""],
-        ["User:", userName, ""],
-        ["", "", ""],
-        ["Day", "Hours", "Description"],
+        ["Timesheet", "", "", ""],
+        ["Week:", weekRange, "", ""],
+        ["User:", userName, "", ""],
+        ["", "", "", ""],
+        ["Day", "Hours", "Description", ""],
       ]
 
       // Add entries
       entriesByDay.forEach((entry) => {
-        wsData.push([entry.day, entry.duration.toString(), entry.description])
+        wsData.push([entry.day, entry.duration.toString(), entry.description, ""])
       })
 
       // Add totals
-      wsData.push(["", "", ""])
-      wsData.push(["Total Hours:", totalDuration.toString(),])
+      wsData.push(["", "", "", ""])
+      wsData.push(["Total Hours:", totalDuration.toString(), "", ""])
+      wsData.push(["Hourly Rate:", `$${hourlyRate.toFixed(2)}`, "", ""])
+      wsData.push(["Subtotal:", `$${subtotal.toFixed(2)}`, "", ""])
+      wsData.push(["Tax Rate:", `${taxRate}%`, "", ""])
+      wsData.push(["Tax Amount:", `$${taxAmount.toFixed(2)}`, "", ""])
+      wsData.push(["Total Amount:", `$${totalAmount.toFixed(2)}`, "", ""])
 
       // Create worksheet and add to workbook
       const ws = XLSX.utils.aoa_to_sheet(wsData)
@@ -128,11 +146,50 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
           "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.xlsx"`,
         },
       })
+    } else if (exportFormat === "csv") {
+      // Create CSV data
+      const csvData = [["Timesheet"], ["Week:", weekRange], ["User:", userName], [], ["Day", "Hours", "Description"]]
+
+      // Add entries
+      entriesByDay.forEach((entry) => {
+        csvData.push([entry.day, entry.duration.toString(), entry.description])
+      })
+
+      // Add totals
+      csvData.push([])
+      csvData.push(["Total Hours:", totalDuration.toString()])
+      csvData.push(["Hourly Rate:", `$${hourlyRate.toFixed(2)}`])
+      csvData.push(["Subtotal:", `$${subtotal.toFixed(2)}`])
+      csvData.push(["Tax Rate:", `${taxRate}%`])
+      csvData.push(["Tax Amount:", `$${taxAmount.toFixed(2)}`])
+      csvData.push(["Total Amount:", `$${totalAmount.toFixed(2)}`])
+
+      // Convert to CSV string
+      const csvString = csvData
+        .map((row) =>
+          row
+            .map((cell) => {
+              // Escape quotes and wrap in quotes if contains comma
+              if (typeof cell === "string" && (cell.includes(",") || cell.includes('"'))) {
+                return `"${cell.replace(/"/g, '""')}"`
+              }
+              return cell
+            })
+            .join(","),
+        )
+        .join("\n")
+
+      return new NextResponse(csvString, {
+        headers: {
+          "Content-Type": "text/csv",
+          "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.csv"`,
+        },
+      })
     } else {
       // Create PDF document
       const pdfDoc = await PDFDocument.create()
       const page = pdfDoc.addPage()
-      const { height } = page.getSize()
+      const {  height } = page.getSize()
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
@@ -211,7 +268,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       })
 
       // Add totals
-      const totalsY = height - 200 - entriesByDay.length * 20 - 30
+      let totalsY = height - 200 - entriesByDay.length * 20 - 30
 
       page.drawText("Total Hours:", {
         x: 50,
@@ -221,6 +278,86 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       })
 
       page.drawText(totalDuration.toString(), {
+        x: 150,
+        y: totalsY,
+        size: 12,
+        font,
+      })
+
+      totalsY -= 20
+
+      page.drawText("Hourly Rate:", {
+        x: 50,
+        y: totalsY,
+        size: 12,
+        font: boldFont,
+      })
+
+      page.drawText(`$${hourlyRate.toFixed(2)}`, {
+        x: 150,
+        y: totalsY,
+        size: 12,
+        font,
+      })
+
+      totalsY -= 20
+
+      page.drawText("Subtotal:", {
+        x: 50,
+        y: totalsY,
+        size: 12,
+        font: boldFont,
+      })
+
+      page.drawText(`$${subtotal.toFixed(2)}`, {
+        x: 150,
+        y: totalsY,
+        size: 12,
+        font,
+      })
+
+      totalsY -= 20
+
+      page.drawText("Tax Rate:", {
+        x: 50,
+        y: totalsY,
+        size: 12,
+        font: boldFont,
+      })
+
+      page.drawText(`${taxRate}%`, {
+        x: 150,
+        y: totalsY,
+        size: 12,
+        font,
+      })
+
+      totalsY -= 20
+
+      page.drawText("Tax Amount:", {
+        x: 50,
+        y: totalsY,
+        size: 12,
+        font: boldFont,
+      })
+
+      page.drawText(`$${taxAmount.toFixed(2)}`, {
+        x: 150,
+        y: totalsY,
+        size: 12,
+        font,
+      })
+
+      totalsY -= 20
+
+      page.drawText("Total Amount:", {
+        x: 50,
+        y: totalsY,
+        size: 12,
+        font: boldFont,
+      })
+
+      page.drawText(`$${totalAmount.toFixed(2)}`, {
         x: 150,
         y: totalsY,
         size: 12,

@@ -8,45 +8,28 @@ import { Button } from "@/components/ui/button"
 import { Loader2, AlertCircle } from 'lucide-react'
 import { toast } from "react-toastify"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-
+import { useAuthStore } from "@/lib/store/authStore"
+import { useOrganizationDetails } from "@/lib/hooks/use-organization-users"
 interface TaxSettingsProps {
   setIsLoading: (loading: boolean) => void
 }
 
 export default function TaxSettings({ setIsLoading }: TaxSettingsProps) {
   const [taxRate, setTaxRate] = useState<number>(0)
+  const [inputValue, setInputValue] = useState("0");
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const { data: organization, isLoading } = useOrganizationDetails()
   const [isAdmin, setIsAdmin] = useState(false)
-  const [initialLoad, setInitialLoad] = useState(true)
-
+  const { user } = useAuthStore()
   useEffect(() => {
-    const fetchTaxRate = async () => {
-      setIsLoading(true)
-      try {
-        // Fetch user data to check if admin
-        const userResponse = await fetch("/api/users/me")
-        if (!userResponse.ok) throw new Error("Failed to fetch user data")
-
-        const userData = await userResponse.json()
-        setIsAdmin(userData.role === "ADMIN" || userData.role === "ORGANIZATION_ADMIN")
-
-        // Fetch organization tax rate
-        const taxResponse = await fetch("/api/organization/tax-rate")
-        if (!taxResponse.ok) throw new Error("Failed to fetch tax rate")
-
-        const taxData = await taxResponse.json()
-        setTaxRate(taxData.taxRate)
-      } catch (error) {
-        console.error("Error fetching tax rate:", error)
-        toast.error("Failed to load tax rate")
-      } finally {
-        setIsLoading(false)
-        setInitialLoad(false)
-      }
+    setIsAdmin(user?.role === "ADMIN" || user?.role === "ORGANIZATION_ADMIN")
+    if (organization) {
+      setInputValue(organization.organization.tax_rate )
+      // console.log("org", organization.organization.tax_rate )
     }
+    
 
-    fetchTaxRate()
-  }, [setIsLoading])
+  }, [user, organization])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -74,6 +57,7 @@ export default function TaxSettings({ setIsLoading }: TaxSettingsProps) {
 
       const data = await response.json()
       console.log(data)
+
       toast.success("Tax rate updated successfully")
     } catch (error) {
       console.error("Error updating tax rate:", error)
@@ -84,7 +68,7 @@ export default function TaxSettings({ setIsLoading }: TaxSettingsProps) {
     }
   }
 
-  if (initialLoad) {
+  if (isLoading) {
     return (
       <Card>
         <CardHeader>
@@ -115,13 +99,13 @@ export default function TaxSettings({ setIsLoading }: TaxSettingsProps) {
           </Alert>
           <div className="mt-4">
             <Label htmlFor="current-tax-rate">Current Organization Tax Rate</Label>
-            <div className="mt-1 flex items-center">
+            <div className="mt-1 flex md:w-1/4 items-center">
               <Input
                 id="current-tax-rate"
                 type="text"
                 value={`${taxRate}%`}
                 disabled
-                className="bg-gray-50"
+                className="bg-gray-50  "
               />
             </div>
           </div>
@@ -141,15 +125,36 @@ export default function TaxSettings({ setIsLoading }: TaxSettingsProps) {
           <div className="space-y-4">
             <div>
               <Label htmlFor="tax-rate">Organization Tax Rate (%)</Label>
-              <div className="mt-1 relative rounded-md shadow-sm">
+              <div className="mt-1 relative rounded-md shadow-sm md:w-1/4 ">
                 <Input
                   id="tax-rate"
                   type="number"
                   min="0"
                   max="100"
                   step="0.01"
-                  value={taxRate}
-                  onChange={(e) => setTaxRate(Number(e.target.value))}
+                  value={inputValue}
+                  onChange={(e) => {
+                    let value = e.target.value;
+
+                    // Allow empty string temporarily
+                    if (value === "") {
+                      setInputValue("");
+                      return;
+                    }
+
+                    // Remove leading zeros unless it's "0." for decimals
+                    value = value.replace(/^0+(?=\d)/, "");
+
+                    // Allow only valid numbers (up to 2 decimals)
+                    if (/^\d*\.?\d{0,2}$/.test(value)) {
+                      setInputValue(value);
+                      const parsed = parseFloat(value);
+                      if (!isNaN(parsed)) {
+                        setTaxRate(parsed);
+                      }
+                    }
+                  }}
+
                   className="pr-12"
                 />
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">

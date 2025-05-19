@@ -8,6 +8,7 @@ export interface TimesheetEntry {
 }
 
 export interface Timesheet {
+    hourlyRate: number
     id?: string
     name: string
     description?: string
@@ -32,6 +33,9 @@ export interface TimesheetFormData {
 }
 
 export interface TimesheetResponse {
+    totalAmount:number
+    hourlyRate:number
+    subtotal: number | undefined
     _count?: {
         entries: number
     }
