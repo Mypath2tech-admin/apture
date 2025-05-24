@@ -9,7 +9,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import ProfileSettings from "./components/profile-settings"
 import OrganizationSettings from "./components/organization-settings"
 import SecuritySettings from "./components/security-question"
-import NotificationSettings from "./components/notification-settings"
+// import NotificationSettings from "./components/notification-settings"
 import TaxSettings from "./components/tax-settings"
 
 export default function SettingsPage() {
@@ -37,12 +37,12 @@ export default function SettingsPage() {
 
       <div className="mt-8">
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="organization">Organization</TabsTrigger>
             <TabsTrigger value="tax">Tax Settings</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            {/* <TabsTrigger value="notifications">Notifications</TabsTrigger> */}
           </TabsList>
           <div className="mt-6">
             <TabsContent value="profile">
@@ -57,9 +57,9 @@ export default function SettingsPage() {
             <TabsContent value="security">
               <SecuritySettings setIsLoading={setIsLoading} />
             </TabsContent>
-            <TabsContent value="notifications">
+            {/* <TabsContent value="notifications">
               <NotificationSettings setIsLoading={setIsLoading} />
-            </TabsContent>
+            </TabsContent> */}
           </div>
         </Tabs>
       </div>
