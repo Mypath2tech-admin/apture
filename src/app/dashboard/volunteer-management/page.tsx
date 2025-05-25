@@ -34,7 +34,7 @@ export default function VolunteerManagement() {
     {
       id: "1",
       name: "John Doe",
-      email: "john@example.com",
+      email: "johnD@example.com",
       status: "active",
       role: "Event Coordinator",
       joinDate: "2024-03-15",
