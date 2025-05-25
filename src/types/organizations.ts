@@ -15,6 +15,7 @@ export interface UserOrg{
   id:string
   logo:string
   name:string
+  taxRate:number
 }
 export interface AddUserFormData {
   email: string

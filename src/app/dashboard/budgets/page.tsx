@@ -122,8 +122,8 @@ export default function Budgets() {
         title="Budgets"
         description="Manage and track your financial allocations"
         action={
-          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-teal-600 hover:bg-teal-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
+          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
+            <PlusCircle className="mr-2 h-4 w-4 cursor-pointer" />
             Create Budget
           </Button>
         }
@@ -143,7 +143,7 @@ export default function Budgets() {
 
         <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
           <Tabs defaultValue="all" className="w-full sm:w-auto" onValueChange={setViewType}>
-            <TabsList className="grid grid-cols-3 w-full sm:w-[300px]">
+            <TabsList className="grid grid-cols-3 w-full sm:w-[300px] cursor-pointer">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
@@ -165,7 +165,7 @@ export default function Budgets() {
 
 
           <Link href="budgets/export">
-            <Button variant="outline" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto cursor-pointer">
               <Download className="mr-2 h-4 w-4" />
               Export
             </Button>
@@ -207,7 +207,7 @@ export default function Budgets() {
             </p>
             <Button
               onClick={() => router.push("/dashboard/budgets/create")}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-teal-600 hover:bg-teal-700 cursor-pointer"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Budget
@@ -228,7 +228,7 @@ export default function Budgets() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="cursor-pointer">
                         <MoreHorizontal className="h-5 w-5" />
                         <span className="sr-only">Actions</span>
                       </Button>
@@ -327,7 +327,7 @@ export default function Budgets() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-teal-600 hover:text-teal-700 cursor-pointer hover:bg-teal-50"
+                    className="text-teal-600 hover:text-teal-700 cursor-pointer  hover:bg-teal-50"
                     onClick={() => router.push(`/dashboard/budgets/${budget.id}`)}
                   >
                     View Details

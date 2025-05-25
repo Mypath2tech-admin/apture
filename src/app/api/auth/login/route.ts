@@ -58,15 +58,15 @@ export async function POST(request: NextRequest) {
     })
 
     // Log login in audit log
-    await prisma.auditLog.create({
-      data: {
-        action: "LOGIN",
-        entity: "User",
-        entityId: user.id,
-        details: JSON.stringify({ timestamp: new Date() }),
-        userId: user.id,
-      },
-    })
+    // await prisma.auditLog.create({
+    //   data: {
+    //     action: "LOGIN",
+    //     entity: "User",
+    //     entityId: user.id,
+    //     details: JSON.stringify({ timestamp: new Date() }),
+    //     userId: user.id,
+    //   },
+    // })
 
     // Return user data (excluding sensitive information)
     return NextResponse.json({

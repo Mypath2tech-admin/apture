@@ -11,9 +11,9 @@ export default function QueryProvider({ children }: { children: ReactNode }) {
         defaultOptions: {
           queries: {
             // Keep cached data for 5 minutes before considering it stale
-            staleTime: 20 * 60 * 1000,
+            staleTime: 20 * 60 * 3000,
             // Cache data for 10 minutes before garbage collection
-            gcTime: 30 * 60 * 1000,
+            gcTime: 30 * 60 * 3000,
             // Don't refetch on window focus by default
             refetchOnWindowFocus: false,
           },
