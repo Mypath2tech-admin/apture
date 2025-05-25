@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         hostname: "placehold.co",
        
       },
+      {
+        protocol: "https",
+        hostname: "otf.ca",
+       
+      },
     ],
     dangerouslyAllowSVG: true, // Allow SVG images
     contentSecurityPolicy: "default-src 'self'; img-src * data: blob:;", // Ensure CSP allows SVGs

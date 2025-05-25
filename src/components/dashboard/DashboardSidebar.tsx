@@ -11,8 +11,10 @@ import {
   Home,
   Lock,
   Menu,
+  NotebookTabs,
   PieChart,
   Settings,
+  Smile,
   Sparkles,
   Users,
   X,
@@ -74,33 +76,33 @@ export default function DashboardSidebar({
           } as NavItem,
         ]
       : []),
-    {
-      name: "Team Members",
-      href: "/dashboard/users",
-      icon: Users,
-      userTypes: ["organization"],
-    },
-    {
-      name: "Community Membership",
-      href: "/dashboard/members",
-      icon: Lock,
-      userTypes: ["organization"],
-      locked: false,
-    },
-    {
-      name: "Ask Finn",
-      href: "/dashboard/ai-assistant",
-      icon: Brain,
-      userTypes: ["organization"],
-      locked: false,
-    },
-    {
-      name: "Volunteer Management",
-      href: "/dashboard/volunteer-management",
-      icon: Users,
-      userTypes: ["organization"],
-      locked: false,
-    },
+      {
+        name: "Community Members",
+        href: "/dashboard/members",
+        icon: NotebookTabs,
+        userTypes: ["organization"],
+        locked: false,
+      },
+      {
+        name: "Ask Finn",
+        href: "/dashboard/ai-assistant",
+        icon: Brain,
+        userTypes: ["organization"],
+        locked: false,
+      },
+      {
+        name: "Volunteer Members",
+        href: "/dashboard/volunteer-management",
+        icon: Smile,
+        userTypes: ["organization"],
+        locked: false,
+      },
+      {
+        name: "Team Members",
+        href: "/dashboard/users",
+        icon: Users,
+        userTypes: ["organization"],
+      },
     {
       name: "Settings",
       href: "/dashboard/settings",
@@ -267,9 +269,11 @@ export default function DashboardSidebar({
             {/* Organization Features Group */}
             {filteredNavigation
               .filter((item) =>
-                ["Team Members", "Community Membership", "Volunteer Management"].includes(
-                  item.name
-                )
+                [
+                  "Team Members",
+                  "Community Members",
+                  "Volunteer Members",
+                ].includes(item.name)
               )
               .map((item) => {
                 const isActive = isPathActive(item.href);
