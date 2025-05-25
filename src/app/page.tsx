@@ -1,30 +1,28 @@
-"use client"
-import Link from "next/link"
+"use client";
+import Header from "@/components/navbar";
 import {
   ArrowRight,
+  BarChart2,
   BarChart3,
+  CheckCircle2,
   ChevronRight,
-  DollarSign,
-  PieChart,
-  Sparkles,
+  ClipboardList,
   Clock,
   CreditCard,
-  Target,
-  X,
-  ClipboardList,
-  BarChart2,
-  PieChartIcon as PieChart2,
-  Wallet,
+  DollarSign,
   FileText,
-  CheckCircle2,
   NotebookIcon,
-} from "lucide-react"
-import Image from "next/image"
-import Header from "@/components/navbar"
-
+  PieChart,
+  PieChartIcon as PieChart2,
+  Sparkles,
+  Target,
+  Wallet,
+  X,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function LandingPage() {
-
   return (
     <div className="flex flex-col min-h-screen text-gray-800 overflow-hidden bg-white">
       <Header />
@@ -68,7 +66,6 @@ export default function LandingPage() {
                   AI Powered Nonprofit Management
                 </span>
               </div>
-
               <h1
                 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-gray-900 mb-8 leading-tight"
                 data-aos="fade-up"
@@ -87,7 +84,6 @@ export default function LandingPage() {
                   <span className="absolute -bottom-2 -right-8 w-12 h-12 bg-[#358f82]/10 rounded-full blur-xl z-0"></span>
                 </span>
               </h1>
-
               <p
                 className="text-gray-600 text-xl max-w-[900px] mb-10 leading-relaxed"
                 data-aos="fade-up"
@@ -97,7 +93,6 @@ export default function LandingPage() {
                 single powerful platform. Streamline your workflow and boost
                 productivity with our all-in-one solution.
               </p>
-
               <div
                 className="flex flex-col sm:flex-row gap-6"
                 data-aos="fade-up"
@@ -113,10 +108,60 @@ export default function LandingPage() {
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
                   </Link>
                 </button>
+
                 {/* <button className="relative overflow-hidden bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 rounded-2xl px-10 py-4 font-medium text-base transition-all duration-300 shadow-sm">
                   <span className="relative z-10">Learn more</span>
                   <div className="absolute inset-0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left bg-gray-100/50"></div>
                 </button> */}
+              </div>
+
+              {/* Stats Section - Enhanced Sleek Design */}
+              <div className="mt-24 px-4" data-aos="fade-up">
+                <div className="max-w-6xl mx-auto">
+                  <div className="flex flex-col md:flex-row md:justify-between items-stretch gap-8 md:gap-6">
+                    <div className="flex-1 relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-[28px] transform transition-transform group-hover:scale-[1.02]"></div>
+                      <div className="relative h-full bg-white/80 backdrop-blur-sm rounded-[28px] p-10 border border-teal-100/20 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.06)]">
+                        <div className="flex flex-col items-center justify-center h-full space-y-2">
+                          <h3 className="text-[44px] font-bold bg-gradient-to-br from-gray-900 to-gray-800 bg-clip-text text-transparent">
+                            $230,000+
+                          </h3>
+                          <p className="text-[13px] font-medium text-gray-500 tracking-[0.08em]">
+                            MANAGED GRANTS
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-[28px] transform transition-transform group-hover:scale-[1.02]"></div>
+                      <div className="relative h-full bg-white/80 backdrop-blur-sm rounded-[28px] p-10 border border-teal-100/20 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.06)]">
+                        <div className="flex flex-col items-center justify-center h-full space-y-2">
+                          <h3 className="text-[44px] font-bold bg-gradient-to-br from-gray-900 to-gray-800 bg-clip-text text-transparent">
+                            134
+                          </h3>
+                          <p className="text-[13px] font-medium text-gray-500 tracking-[0.08em] text-nowrap">
+                            HOURS TRACKED
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex-1 relative group">
+                      <div className="absolute inset-0 bg-gradient-to-br from-teal-50 to-emerald-50 rounded-[28px] transform transition-transform group-hover:scale-[1.02]"></div>
+                      <div className="relative h-full bg-white/80 backdrop-blur-sm rounded-[28px] p-10 border border-teal-100/20 shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-shadow hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.06)]">
+                        <div className="flex flex-col items-center justify-center h-full space-y-2">
+                          <h3 className="text-[44px] font-bold bg-gradient-to-br from-gray-900 to-gray-800 bg-clip-text text-transparent">
+                            1
+                          </h3>
+                          <p className="text-[13px] font-medium text-gray-500 tracking-[0.08em]">
+                            AUDIT SAVE
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -363,6 +408,43 @@ export default function LandingPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Funders Section - Enhanced */}
+          <div className="mt-24 text-center" data-aos="fade-up">
+            <div className="inline-flex items-center justify-center bg-white backdrop-blur-md rounded-full px-6 py-2.5 mb-8 border border-gray-200/80 shadow-sm">
+              <span className="text-sm font-medium text-gray-700">
+                Trusted By Organizations Funded By
+              </span>
+            </div>
+            <h2
+              className="text-4xl md:text-5xl font-bold mb-16 text-gray-900 tracking-tight"
+              data-aos="fade-up"
+              data-aos-delay="100"
+            >
+              Our Users Are{" "}
+              <span className="bg-gradient-to-r from-[#358f82] via-[#317f82] to-emerald-500 bg-clip-text text-transparent">
+                Funded By
+              </span>
+            </h2>
+            <div className="flex justify-center items-center max-w-5xl mx-auto cursor-pointer">
+              <div
+                className="w-full max-w-sm group relative p-4 bg-white rounded-2xl border border-gray-200/80 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                data-aos="fade-up"
+                data-aos-delay="200"
+              >
+                <div className="aspect-video bg-gray-50 rounded-xl flex items-center justify-center overflow-hidden border border-gray-100">
+                  {/* Placeholder for actual logo image */}
+                  <Image
+                    src="https://otf.ca/themes/otf/images/logos/OTF-HORIZ_colour.svg"
+                    alt="Major Foundation"
+                    width={440}
+                    height={160}
+                    className="object-contain max-h-32 grayscale group-hover:grayscale-0 transition-all duration-300"
+                  />
                 </div>
               </div>
             </div>
