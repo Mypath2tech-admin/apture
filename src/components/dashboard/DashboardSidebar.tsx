@@ -81,7 +81,7 @@ export default function DashboardSidebar({
       userTypes: ["organization"],
     },
     {
-      name: "Membership",
+      name: "Community Membership",
       href: "/dashboard/members",
       icon: Lock,
       userTypes: ["organization"],
@@ -267,7 +267,7 @@ export default function DashboardSidebar({
             {/* Organization Features Group */}
             {filteredNavigation
               .filter((item) =>
-                ["Team Members", "Membership", "Volunteer Management"].includes(
+                ["Team Members", "Community Membership", "Volunteer Management"].includes(
                   item.name
                 )
               )
