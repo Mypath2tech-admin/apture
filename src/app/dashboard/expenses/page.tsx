@@ -427,7 +427,7 @@ export default function Expenses() {
                       </span>
                     </td> */}
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
-                      {formatCurrency(expense.amount)}
+                      {formatCurrency(expense.totalAmount)}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                       <div className="flex justify-end space-x-2">

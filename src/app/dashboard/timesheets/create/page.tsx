@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { format, startOfWeek, addDays, parseISO } from "date-fns"
 import { toast } from "react-toastify"
@@ -13,13 +13,21 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2 } from "lucide-react"
+import { Loader2, Percent, AlertCircle } from "lucide-react"
 import type { TimesheetFormData } from "@/types/timesheet"
 import { DatePickerDemo } from "@/components/ui/date-picker"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function CreateTimesheet() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingRate, setIsLoadingRate] = useState(true)
+  const [isLoadingTaxRate, setIsLoadingTaxRate] = useState(true)
+  const [organizationTaxRate, setOrganizationTaxRate] = useState<number>(0)
+  const [taxAmount, setTaxAmount] = useState<number>(0)
+  const [totalEarnings, setTotalEarnings] = useState<number>(0)
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
+
 
   // Get the current week's Monday
   const monday = startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -38,6 +46,52 @@ export default function CreateTimesheet() {
         description: "",
       })),
   })
+
+  // Fetch user's hourly rate and organization tax rate
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        // Fetch hourly rate
+        const hourlyRateResponse = await fetch("/api/user/hourly-rate")
+        if (hourlyRateResponse.ok) {
+          const hourlyRateData = await hourlyRateResponse.json()
+          setFormData((prev) => ({
+            ...prev,
+            hourlyRate: hourlyRateData.currentRate.toString(),
+          }))
+        }
+        setIsLoadingRate(false)
+
+        // Fetch organization tax rate
+        const taxRateResponse = await fetch("/api/organization/tax-rate")
+        if (taxRateResponse.ok) {
+          const taxRateData = await taxRateResponse.json()
+          setOrganizationTaxRate(taxRateData.taxRate)
+        }
+        setIsLoadingTaxRate(false)
+      } catch (error) {
+        console.error("Error fetching rates:", error)
+        toast.error("Failed to load rate information")
+        setIsLoadingRate(false)
+        setIsLoadingTaxRate(false)
+      }
+    }
+
+    fetchRates()
+  }, [])
+
+  // Calculate tax and total earnings when hours or rates change
+  useEffect(() => {
+    const totalHours = getTotalHours()
+    const hourlyRate = Number.parseFloat(formData.hourlyRate) || 0
+    const subtotal = totalHours * hourlyRate
+    const calculatedTaxAmount = subtotal * (organizationTaxRate / 100)
+    const calculatedTotalEarnings = subtotal + calculatedTaxAmount
+
+    setTaxAmount(calculatedTaxAmount)
+    setTotalEarnings(calculatedTotalEarnings)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.entries, formData.hourlyRate, organizationTaxRate])
 
   const handleWeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newWeekStarting = e.target.value
@@ -72,6 +126,24 @@ export default function CreateTimesheet() {
       ...prev,
       entries: newEntries,
     }))
+
+    // Validate hours
+    validateHours(dayIndex, value)
+  }
+
+  const validateHours = (dayIndex: number, value: string) => {
+    const hours = Number.parseFloat(value)
+    const errors = { ...validationErrors }
+
+    if (hours > 24) {
+      errors[`day-${dayIndex}`] = "Hours cannot exceed 24 per day"
+    } else if (hours > 12) {
+      errors[`day-${dayIndex}`] = "Warning: Hours exceed 12 per day"
+    } else {
+      delete errors[`day-${dayIndex}`]
+    }
+
+    setValidationErrors(errors)
   }
 
   const handleDayDescriptionChange = (dayIndex: number, value: string) => {
@@ -92,8 +164,39 @@ export default function CreateTimesheet() {
     }, 0)
   }
 
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {}
+
+    // Check for excessive hours
+    formData.entries.forEach((entry, index) => {
+      const hours = Number.parseFloat(entry.duration)
+      if (hours > 24) {
+        errors[`day-${index}`] = "Hours cannot exceed 24 per day"
+      }
+    })
+
+    // Check for excessive total hours
+    const totalHours = getTotalHours()
+    if (totalHours > 168) {
+      // 24 * 7 = 168 (max possible hours in a week)
+      errors.total = "Total hours cannot exceed 168 per week"
+    } else if (totalHours > 80) {
+      errors.total = "Warning: Total hours exceed 80 per week"
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).filter((key) => errors[key].includes("cannot")).length === 0
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error("Please fix validation errors before submitting")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -109,7 +212,7 @@ export default function CreateTimesheet() {
         description: formData.description,
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        // status: "DRAFT",
+        hourlyRate: Number.parseFloat(formData.hourlyRate) || 0,
         entries: validEntries.map((entry) => {
           const entryDate = addDays(startDate, entry.dayIndex)
           return {
@@ -165,14 +268,12 @@ export default function CreateTimesheet() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="weekStarting">Week Starting (Monday)</Label>
-
-              {/* <Input type="date" id="weekStarting" value={formData.weekStarting} onChange={handleWeekChange} required /> */}
               <DatePickerDemo
                 name="weekStarting"
                 id="weekStarting"
-                // required={formData.hasTimeframe}
                 value={formData.weekStarting}
-                onChange={handleWeekChange} />
+                onChange={handleWeekChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
@@ -184,6 +285,7 @@ export default function CreateTimesheet() {
                 placeholder="0.00"
                 min="0"
                 step="0.01"
+                disabled={isLoadingRate}
               />
             </div>
           </div>
@@ -199,8 +301,30 @@ export default function CreateTimesheet() {
             />
           </div>
 
+          {/* Organization Tax Rate Display */}
+          <div className="bg-gray-50 p-4 rounded-md">
+            <div className="flex items-center mb-2">
+              <Percent className="h-4 w-4 text-gray-500 mr-2" />
+              <Label className="font-medium">Organization Tax Rate</Label>
+            </div>
+            {isLoadingTaxRate ? (
+              <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
+            ) : (
+              <div className="text-sm text-gray-600">
+                All timesheet entries are subject to a {organizationTaxRate}% tax rate as set by your organization.
+              </div>
+            )}
+          </div>
+
           <div className="space-y-4">
             <h3 className="text-lg font-medium">Daily Hours</h3>
+
+            {validationErrors.total && (
+              <Alert >
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{validationErrors.total}</AlertDescription>
+              </Alert>
+            )}
 
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
@@ -214,6 +338,9 @@ export default function CreateTimesheet() {
                 <tbody>
                   {formData.entries.map((entry, index) => {
                     const date = addDays(parseISO(formData.weekStarting), index)
+                    const hasError = validationErrors[`day-${index}`]
+                    const isErrorSevere = hasError && hasError.includes("cannot")
+
                     return (
                       <tr key={index} className="border-b">
                         <td className="py-3 px-4">
@@ -221,16 +348,23 @@ export default function CreateTimesheet() {
                           <div className="text-sm text-gray-500">{format(date, "MMM d, yyyy")}</div>
                         </td>
                         <td className="py-3 px-4">
-                          <Input
-                            type="number"
-                            value={entry.duration}
-                            onChange={(e) => handleDurationChange(index, e.target.value)}
-                            min="0"
-                            max="24"
-                            step="0.5"
-                            className="w-24"
-                            placeholder="0"
-                          />
+                          <div className="space-y-1">
+                            <Input
+                              type="number"
+                              value={entry.duration}
+                              onChange={(e) => handleDurationChange(index, e.target.value)}
+                              min="0"
+                              max="24"
+                              step="0.5"
+                              className={`w-24 ${isErrorSevere ? "border-red-500" : hasError ? "border-yellow-500" : ""}`}
+                              placeholder="0"
+                            />
+                            {hasError && (
+                              <div className={`text-xs ${isErrorSevere ? "text-red-500" : "text-yellow-500"}`}>
+                                {validationErrors[`day-${index}`]}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="py-3 px-4">
                           <Input
@@ -249,7 +383,22 @@ export default function CreateTimesheet() {
                   <tr className="bg-gray-50">
                     <td className="py-3 px-4 font-medium">Total</td>
                     <td className="py-3 px-4 font-medium">{getTotalHours()} hrs</td>
-                    <td className="py-3 px-4"></td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>Subtotal:</span>
+                          <span>${(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Tax ({organizationTaxRate}%):</span>
+                          <span>${taxAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-medium pt-1 border-t border-gray-200">
+                          <span>Total Earnings:</span>
+                          <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 </tfoot>
               </table>

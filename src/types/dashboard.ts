@@ -16,6 +16,7 @@ export interface Organization {
   description?: string
   logo?: string
   website?: string
+  taxRate?: number
   memberCount?: number
   totalBudgets?: number
   totalExpenses?: number
@@ -56,11 +57,14 @@ export interface ExpenseCategory {
 }
 
 export interface Expense {
+  totalAmount: number
   user: User
   id: string
   title: string
   description?: string
   amount: number
+  taxRate?: number
+  taxAmount?: number
   date: string
   receipt?: string
   categoryId?: string

@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
-import { type TimesheetEntry } from "@/types/timesheet"
+import type { TimesheetEntry } from "@/types/timesheet"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -40,6 +40,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
           select: {
             id: true,
             name: true,
+            tax_rate: true, // Using snake_case as per schema
           },
         },
       },
@@ -66,7 +67,23 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       }
     }
 
-    return NextResponse.json(timesheet)
+    // Calculate totals
+    const totalHours = timesheet.entries.reduce((sum, entry) => sum + entry.duration, 0)
+    const hourlyRate = timesheet.hourlyRate || 0
+    const taxRate = timesheet.organization?.tax_rate ? Number.parseFloat(timesheet.organization.tax_rate.toString()) : 0
+    const subtotal = totalHours * hourlyRate
+    const taxAmount = subtotal * (taxRate / 100)
+    const totalAmount = subtotal + taxAmount
+
+    return NextResponse.json({
+      ...timesheet,
+      totalHours,
+      subtotal,
+      taxAmount,
+      totalAmount,
+      hourlyRate,
+      taxRate,
+    })
   } catch (error) {
     console.error("Error fetching timesheet:", error)
     return NextResponse.json({ error: "Failed to fetch timesheet" }, { status: 500 })
@@ -95,7 +112,14 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     // Check if timesheet exists and user has access
     const existingTimesheet = await prisma.timesheet.findUnique({
       where: { id },
-      include: { entries: true },
+      include: {
+        entries: true,
+        organization: {
+          select: {
+            tax_rate: true, // Using snake_case as per schema
+          },
+        },
+      },
     })
 
     if (!existingTimesheet) {
@@ -106,13 +130,23 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 
+    // Get hourly rate from request or use existing
+    const hourlyRate = data.hourlyRate
+      ? Number.parseFloat(data.hourlyRate.toString())
+      : existingTimesheet.hourlyRate || 0
+
+    // Get tax rate from organization
+    const taxRate = existingTimesheet.organization?.tax_rate
+      ? Number.parseFloat(existingTimesheet.organization.tax_rate.toString())
+      : 0
+
     // Update timesheet
     const updatedTimesheet = await prisma.timesheet.update({
       where: { id },
       data: {
         name: data.name,
         description: data.description,
-        // status: data.status,
+        hourlyRate,
       },
     })
 
@@ -125,28 +159,56 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
 
       // Create new entries
       for (const entry of data.entries as TimesheetEntry[]) {
+        const duration = entry.duration || 0
+
         await prisma.timesheetEntry.create({
           data: {
             description: entry.description,
-            // dayOfWeek: entry.dayOfWeek,
-            // hours: entry.hours,
             startTime: new Date(entry.startTime),
             endTime: new Date(entry.endTime),
-            duration: entry.duration,
+            duration,
             timesheet: { connect: { id } },
           },
         })
       }
     }
 
-    return NextResponse.json(updatedTimesheet)
+    // Get updated timesheet with entries
+    const timesheet = await prisma.timesheet.findUnique({
+      where: { id },
+      include: {
+        entries: true,
+        organization: {
+          select: {
+            tax_rate: true,
+          },
+        },
+      },
+    })
+
+    // Calculate totals
+    const totalHours = timesheet?.entries.reduce((sum, entry) => sum + entry.duration, 0) || 0
+    const subtotal = totalHours * hourlyRate
+    const taxAmount = subtotal * (taxRate / 100)
+    const totalAmount = subtotal + taxAmount
+
+    return NextResponse.json({
+      ...updatedTimesheet,
+      entries: timesheet?.entries,
+      totalHours,
+      subtotal,
+      taxAmount,
+      totalAmount,
+      hourlyRate,
+      taxRate,
+    })
   } catch (error) {
     console.error("Error updating timesheet:", error)
     return NextResponse.json({ error: "Failed to update timesheet" }, { status: 500 })
   }
 }
 
-export async function DELETE(req: NextRequest,  context: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get("auth-token")?.value
@@ -161,7 +223,7 @@ export async function DELETE(req: NextRequest,  context: { params: Promise<{ id:
     }
 
     const userId = decoded.userId
-      const params = await context.params
+    const params = await context.params
     const { id } = params
 
     // Check if timesheet exists and user has access

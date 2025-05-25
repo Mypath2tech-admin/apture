@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { ArrowLeft, Save } from "lucide-react"
+import { ArrowLeft, Save, Percent } from "lucide-react"
 import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
@@ -19,6 +19,7 @@ import { DatePickerDemo } from "@/components/ui/date-picker"
 import { useQueryClient } from "@tanstack/react-query"
 import { expenseKeys } from "@/lib/hooks/use-expense"
 import { dashboardKeys } from "@/lib/hooks/use-dashboard"
+import { budgetKeys } from "@/lib/hooks/use-budgets"
 export default function EditExpense() {
   const params = useParams()
   const router = useRouter()
@@ -28,6 +29,8 @@ export default function EditExpense() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [taxAmount, setTaxAmount] = useState<number>(0)
+  const [totalAmount, setTotalAmount] = useState<number>(0)
 
   // Form state
   const [formData, setFormData] = useState({
@@ -35,6 +38,7 @@ export default function EditExpense() {
     description: "",
     amount: "",
     date: "",
+    taxRate: "",
     categoryId: "",
     budgetId: "",
   })
@@ -59,8 +63,16 @@ export default function EditExpense() {
           date: formattedDate,
           categoryId: expenseData.categoryId || "",
           budgetId: expenseData.budgetId || "",
+          taxRate: expenseData.taxRate !== null && expenseData.taxRate !== undefined ? expenseData.taxRate.toString() : "",
         })
+        // Calculate tax amount and total
+        const amount = expenseData.amount
+        const taxRate = expenseData.taxRate || 0
+        const calculatedTaxAmount = amount * (taxRate / 100)
+        const calculatedTotalAmount = amount + calculatedTaxAmount
 
+        setTaxAmount(calculatedTaxAmount)
+        setTotalAmount(calculatedTotalAmount)
         // Fetch categories
         const categoriesRes = await fetch("/api/categories")
         if (categoriesRes.ok) {
@@ -88,6 +100,18 @@ export default function EditExpense() {
     }
   }, [params.id])
 
+  // Calculate tax and total amount when amount or tax rate changes
+  useEffect(() => {
+    const amount = parseFloat(formData.amount) || 0
+    const taxRate = parseFloat(formData.taxRate) || 0
+
+    const calculatedTaxAmount = amount * (taxRate / 100)
+    const calculatedTotalAmount = amount + calculatedTaxAmount
+
+    setTaxAmount(calculatedTaxAmount)
+    setTotalAmount(calculatedTotalAmount)
+  }, [formData.amount, formData.taxRate])
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
@@ -111,6 +135,9 @@ export default function EditExpense() {
       if (!formData.amount || isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) {
         throw new Error("Please enter a valid amount")
       }
+      if (formData.taxRate && (isNaN(Number(formData.taxRate)) || Number(formData.taxRate) < 0)) {
+        throw new Error("Please enter a valid tax rate")
+      }
 
       if (!formData.date) {
         throw new Error("Date is required")
@@ -129,6 +156,7 @@ export default function EditExpense() {
           title: formData.title,
           description: formData.description,
           amount: Number(formData.amount),
+          taxRate: formData.taxRate ? Number(formData.taxRate) : null,
           date: formData.date,
           categoryId: formData.categoryId,
           budgetId: formData.budgetId || null,
@@ -142,6 +170,7 @@ export default function EditExpense() {
 
       toast.success("Expense updated successfully")
       await queryClient.invalidateQueries({ queryKey: expenseKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
       await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
       router.push(`/dashboard/expenses`)
     } catch (err) {
@@ -245,6 +274,40 @@ export default function EditExpense() {
                   step="0.01"
                   required
                 />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="taxRate">Tax Rate (%)</Label>
+              <div className="mt-1 relative rounded-md shadow-sm">
+                <Input
+                  type="number"
+                  id="taxRate"
+                  name="taxRate"
+                  value={formData.taxRate}
+                  onChange={handleChange}
+                  className="pr-8"
+                  min="0"
+                  step="0.01"
+                />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                  <Percent className="h-4 w-4 text-gray-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Tax calculation summary */}
+            <div className="col-span-2 bg-gray-50 p-4 rounded-md">
+              <div className="flex justify-between text-sm">
+                <span>Subtotal:</span>
+                <span>${parseFloat(formData.amount || "0").toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span>Tax ({parseFloat(formData.taxRate || "0").toFixed(2)}%):</span>
+                <span>${taxAmount.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between font-medium mt-1 pt-1 border-t border-gray-200">
+                <span>Total:</span>
+                <span>${totalAmount.toFixed(2)}</span>
               </div>
             </div>
 
