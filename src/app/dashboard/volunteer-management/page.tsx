@@ -30,7 +30,7 @@ interface Volunteer {
 }
 
 export default function VolunteerManagement() {
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([
+  const [volunteers] = useState<Volunteer[]>([
     {
       id: "1",
       name: "John Doe",

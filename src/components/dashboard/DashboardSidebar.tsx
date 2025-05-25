@@ -9,7 +9,6 @@ import {
   Film,
   FolderOpen,
   Home,
-  Lock,
   Menu,
   NotebookTabs,
   PieChart,
