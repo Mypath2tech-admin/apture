@@ -31,7 +31,13 @@ type NavItem = {
   locked?: boolean;
 };
 
-export default function DashboardSidebar() {
+interface DashboardSidebarProps {
+  organizationName?: string;
+}
+
+export default function DashboardSidebar({
+  organizationName,
+}: DashboardSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [accordionOpen, setAccordionOpen] = useState(false);
   const pathname = usePathname();
@@ -58,12 +64,16 @@ export default function DashboardSidebar() {
       icon: DollarSign,
       userTypes: ["user", "organization"],
     },
-    {
-      name: "Timesheets",
-      href: "/dashboard/timesheets",
-      icon: Clock,
-      userTypes: ["user", "organization"],
-    },
+    ...(organizationName === "MyPath2Tech"
+      ? [
+          {
+            name: "Timesheets",
+            href: "/dashboard/timesheets",
+            icon: Clock,
+            userTypes: ["user", "organization"],
+          } as NavItem,
+        ]
+      : []),
     {
       name: "Team Members",
       href: "/dashboard/users",
@@ -84,7 +94,13 @@ export default function DashboardSidebar() {
       userTypes: ["organization"],
       locked: false,
     },
-
+    {
+      name: "Volunteer Management",
+      href: "/dashboard/volunteer-management",
+      icon: Users,
+      userTypes: ["organization"],
+      locked: false,
+    },
     {
       name: "Settings",
       href: "/dashboard/settings",
@@ -179,30 +195,141 @@ export default function DashboardSidebar() {
 
           {/* Navigation */}
           <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
-            {filteredNavigation.map((item) => {
-              const isActive = isPathActive(item.href);
-              return (
-                <Link
-                  key={item.name}
-                  href={item.locked ? "#" : item.href}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-teal-50 text-teal-700"
-                      : "text-gray-700 hover:bg-gray-100"
-                  } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
-                >
-                  <item.icon
-                    className={`mr-3 h-5 w-5 ${
-                      isActive ? "text-teal-600" : "text-gray-500"
-                    } ${
-                      item.locked ? "text-yellow-300 cursor-not-allowed" : ""
-                    }`}
-                    aria-hidden="true"
-                  />
-                  {item.name}
-                </Link>
-              );
-            })}
+            {filteredNavigation
+              .filter((item) => ["Dashboard", "Ask Finn"].includes(item.name))
+              .map((item) => {
+                const isActive = isPathActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.locked ? "#" : item.href}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-teal-50 text-teal-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 ${
+                        isActive ? "text-teal-600" : "text-gray-500"
+                      } ${
+                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            <div className="mx-4 my-2 border-t border-gray-200" />
+
+            <div className="px-4 py-2">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Finance
+              </span>
+            </div>
+            {filteredNavigation
+              .filter((item) =>
+                ["Budgets", "Expenses", "Timesheets"].includes(item.name)
+              )
+              .map((item) => {
+                const isActive = isPathActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.locked ? "#" : item.href}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-teal-50 text-teal-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 ${
+                        isActive ? "text-teal-600" : "text-gray-500"
+                      } ${
+                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })}
+
+            <div className="mx-4 my-2 border-t border-gray-200" />
+            <div className="px-4 py-2">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Organization
+              </span>
+            </div>
+
+            {/* Organization Features Group */}
+            {filteredNavigation
+              .filter((item) =>
+                ["Team Members", "Membership", "Volunteer Management"].includes(
+                  item.name
+                )
+              )
+              .map((item) => {
+                const isActive = isPathActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.locked ? "#" : item.href}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-teal-50 text-teal-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 ${
+                        isActive ? "text-teal-600" : "text-gray-500"
+                      } ${
+                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })}
+
+            <div className="mx-4 my-2 border-t border-gray-200" />
+            <div className="px-4 py-2">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Settings & Library
+              </span>
+            </div>
+
+            {/* Library & Settings Group */}
+            {filteredNavigation
+              .filter((item) => ["Settings"].includes(item.name))
+              .map((item) => {
+                const isActive = isPathActive(item.href);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.locked ? "#" : item.href}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-teal-50 text-teal-700"
+                        : "text-gray-700 hover:bg-gray-100"
+                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <item.icon
+                      className={`mr-3 h-5 w-5 ${
+                        isActive ? "text-teal-600" : "text-gray-500"
+                      } ${
+                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                    {item.name}
+                  </Link>
+                );
+              })}
           </nav>
 
           {/* Accordion */}
