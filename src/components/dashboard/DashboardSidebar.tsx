@@ -302,7 +302,7 @@ export default function DashboardSidebar({
             <div className="mx-4 my-2 border-t border-gray-200" />
             <div className="px-4 py-2">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Settings & Library
+                Settings & Integrations
               </span>
             </div>
 
