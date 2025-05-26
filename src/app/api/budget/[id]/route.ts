@@ -54,7 +54,12 @@ export async function GET(request: NextRequest, context: { params: Promise<{ id:
     }
 
     // Calculate spent, remaining, and progress
-    const spent = budget.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+    const spent = budget.expenses.reduce((sum, expense) => {
+      const baseAmount = Number(expense.amount)
+      const taxRate = expense.tax_rate ? Number(expense.tax_rate) / 100 : 0
+      const totalWithTax = baseAmount + baseAmount * taxRate
+      return sum + totalWithTax
+    }, 0)
     const remaining = Number(budget.amount) - spent
     const progress = budget.amount > 0 ? (spent / Number(budget.amount)) * 100 : 0
 

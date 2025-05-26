@@ -17,10 +17,12 @@ interface User {
         name: string
         logo: string | null
         email:string
+        taxRate:number
     } | null
     createdAt: string
     canViewOrgDashboard? : boolean
     organizationId?: string
+    
 }
 
 interface DashboardData {
@@ -109,6 +111,7 @@ export const useAuthStore = create<AuthState>()(
                     }
                     toast.success("Login Successful")
                     const data = await res.json()
+                    
                     set({ isAuthenticated: true, user: data.user })
                     await get().fetchDashboardData()
                 } catch (err) {

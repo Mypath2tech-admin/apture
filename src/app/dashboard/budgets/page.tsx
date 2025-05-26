@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   PlusCircle,
@@ -29,92 +29,77 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "react-toastify"
+// import { toast } from "react-toastify"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useBudgets, useDeleteBudget } from "@/lib/hooks/use-budgets"
 import Link from "next/link"
 
-interface Budget {
-  id: string
-  name: string
-  amount: number
-  spent: number
-  remaining: number
-  progress: number
-  startDate: string
-  endDate?: string
-  description?: string
-  categories?: { id: string; name: string }[]
-  createdBy?: { name: string; email: string }
-  organization?: { name: string }
-  canEdit?: boolean
-}
+
+// interface Budget {
+//   id: string
+//   name: string
+//   amount: number
+//   spent: number
+//   remaining: number
+//   progress: number
+//   startDate: string
+//   endDate?: string
+//   description?: string
+//   categories?: { id: string; name: string }[]
+//   createdBy?: { name: string; email: string }
+//   organization?: { name: string }
+//   canEdit?: boolean
+// }
 
 export default function Budgets() {
   const router = useRouter()
-  const [budgets, setBudgets] = useState<Budget[]>([])
-  const [filteredBudgets, setFilteredBudgets] = useState<Budget[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [sortBy, setSortBy] = useState<string>("newest")
   const [viewType, setViewType] = useState<string>("all")
 
-  useEffect(() => {
-    const fetchBudgets = async () => {
-      try {
-        setLoading(true)
-        const res = await fetch("/api/budget")
-        if (!res.ok) throw new Error("Failed to fetch budgets")
-        const data = await res.json()
-        setBudgets(data)
-        setFilteredBudgets(data)
-      } catch (error) {
-        console.error("Error fetching budgets:", error)
-        toast.error("Failed to load budgets.")
-      } finally {
-        setLoading(false)
+  // Use the custom hook to fetch budgets with caching
+  const { data: budgets = [], isLoading, } = useBudgets()
+  const deleteBudgetMutation = useDeleteBudget()
+
+  // Filter and sort budgets
+  const filteredBudgets = budgets
+    .filter((budget) => {
+      // Apply search filter
+      if (
+        searchQuery &&
+        !budget.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
+        !budget.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      ) {
+        return false
       }
-    }
 
-    fetchBudgets()
-  }, [])
+      // Apply view type filter
+      if (viewType === "active" && budget.progress >= 100) return false
+      if (viewType === "completed" && budget.progress < 100) return false
 
-  useEffect(() => {
-    // Filter and sort budgets
-    let result = [...budgets]
+      return true
+    })
+    .sort((a, b) => {
+      // Apply sorting
+      if (sortBy === "newest") {
+        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
+      } else if (sortBy === "oldest") {
+        return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+      } else if (sortBy === "highest") {
+        return b.amount - a.amount
+      } else if (sortBy === "lowest") {
+        return a.amount - b.amount
+      } else if (sortBy === "progress") {
+        return b.progress - a.progress
+      }
+      return 0
+    })
 
-    // Apply search filter
-    if (searchQuery) {
-      result = result.filter(
-        (budget) =>
-          budget.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          budget.description?.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    }
-
-    // Apply view type filter
-    if (viewType === "active") {
-      result = result.filter((budget) => budget.progress < 100)
-    } else if (viewType === "completed") {
-      result = result.filter((budget) => budget.progress >= 100)
-    }
-
-    // Apply sorting
-    if (sortBy === "newest") {
-      result.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())
-    } else if (sortBy === "oldest") {
-      result.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-    } else if (sortBy === "highest") {
-      result.sort((a, b) => b.amount - a.amount)
-    } else if (sortBy === "lowest") {
-      result.sort((a, b) => a.amount - b.amount)
-    } else if (sortBy === "progress") {
-      result.sort((a, b) => b.progress - a.progress)
-    }
-
-    setFilteredBudgets(result)
-  }, [budgets, searchQuery, sortBy, viewType])
-
-
+  // const getProgressColor = (progress: number) => {
+  //   if (progress >= 90) return "bg-red-500"
+  //   if (progress >= 70) return "bg-amber-500"
+  //   return "bg-green-500"
+  // }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -127,19 +112,7 @@ export default function Budgets() {
 
   const handleDelete = async (id: string) => {
     if (confirm("Are you sure you want to delete this budget?")) {
-      try {
-        const res = await fetch(`/api/budget/${id}`, {
-          method: "DELETE",
-        })
-
-        if (!res.ok) throw new Error("Failed to delete budget")
-
-        setBudgets(budgets.filter((budget) => budget.id !== id))
-        toast.success("Budget deleted successfully")
-      } catch (error) {
-        console.error("Error deleting budget:", error)
-        toast.error("Failed to delete budget")
-      }
+      deleteBudgetMutation.mutate(id)
     }
   }
 
@@ -149,8 +122,8 @@ export default function Budgets() {
         title="Budgets"
         description="Manage and track your financial allocations"
         action={
-          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-teal-600 hover:bg-teal-700">
-            <PlusCircle className="mr-2 h-4 w-4" />
+          <Button onClick={() => router.push("/dashboard/budgets/create")} className="bg-teal-600 hover:bg-teal-700 cursor-pointer">
+            <PlusCircle className="mr-2 h-4 w-4 cursor-pointer" />
             Create Budget
           </Button>
         }
@@ -170,7 +143,7 @@ export default function Budgets() {
 
         <div className="flex flex-col sm:flex-row w-full md:w-auto gap-2">
           <Tabs defaultValue="all" className="w-full sm:w-auto" onValueChange={setViewType}>
-            <TabsList className="grid grid-cols-3 w-full sm:w-[300px]">
+            <TabsList className="grid grid-cols-3 w-full sm:w-[300px] cursor-pointer">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="active">Active</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
@@ -191,18 +164,18 @@ export default function Budgets() {
           </Select>
 
 
-        <Link href="budgets/export">
-           <Button variant="outline" className="w-full sm:w-auto">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
+          <Link href="budgets/export">
+            <Button variant="outline" className="w-full sm:w-auto cursor-pointer">
+              <Download className="mr-2 h-4 w-4" />
+              Export
+            </Button>
           </Link>
-       
+
         </div>
       </div>
 
       <div ></div>
-      {loading ? (
+      {isLoading ? (
         <div className="grid grid-cols-1 gap-6">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="overflow-hidden">
@@ -234,7 +207,7 @@ export default function Budgets() {
             </p>
             <Button
               onClick={() => router.push("/dashboard/budgets/create")}
-              className="bg-teal-600 hover:bg-teal-700"
+              className="bg-teal-600 hover:bg-teal-700 cursor-pointer"
             >
               <PlusCircle className="mr-2 h-4 w-4" />
               Create Budget
@@ -255,7 +228,7 @@ export default function Budgets() {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
+                      <Button variant="ghost" size="icon" className="cursor-pointer">
                         <MoreHorizontal className="h-5 w-5" />
                         <span className="sr-only">Actions</span>
                       </Button>
@@ -354,7 +327,7 @@ export default function Budgets() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-teal-600 hover:text-teal-700 cursor-pointer hover:bg-teal-50"
+                    className="text-teal-600 hover:text-teal-700 cursor-pointer  hover:bg-teal-50"
                     onClick={() => router.push(`/dashboard/budgets/${budget.id}`)}
                   >
                     View Details

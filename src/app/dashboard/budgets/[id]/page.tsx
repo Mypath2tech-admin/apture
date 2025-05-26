@@ -70,6 +70,14 @@ export default function BudgetDetail() {
     }
   }, [params.id])
 
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -133,11 +141,11 @@ export default function BudgetDetail() {
             </div>
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Spent</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">${budget.spent.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{formatCurrency(budget.spent)}</p>
             </div>
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">Remaining</h4>
-              <p className="mt-1 text-2xl font-semibold text-gray-900">${budget.remaining.toLocaleString()}</p>
+              <p className="mt-1 text-2xl font-semibold text-gray-900">{formatCurrency(budget.remaining)}</p>
             </div>
             <div>
               <div className="flex items-center justify-between mb-1">

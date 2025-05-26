@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { ArrowLeft, Receipt, Calendar, Tag, Edit } from "lucide-react"
+import { ArrowLeft, Receipt, Calendar, Tag, Edit, Percent, DollarSign } from "lucide-react"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import type { Expense } from "@/types/dashboard"
@@ -17,7 +17,7 @@ export default function ExpenseDetail() {
 
   useEffect(() => {
     fetchExpense()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id])
 
   const fetchExpense = async () => {
@@ -42,33 +42,7 @@ export default function ExpenseDetail() {
     }
   }
 
-//   const updateExpenseStatus = async (status: "APPROVED" | "REJECTED") => {
-//     try {
-//       if (!expense) return
 
-//       const response = await fetch(`/api/expenses/${expense.id}`, {
-//         method: "PUT",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify({
-//           ...expense,
-//           status,
-//         }),
-//       })
-
-//       if (!response.ok) {
-//         const errorData = await response.json()
-//         throw new Error(errorData.error || `Failed to ${status.toLowerCase()} expense`)
-//       }
-
-//       const updatedExpense = await response.json()
-//       setExpense(updatedExpense)
-//       toast.success(`Expense ${status.toLowerCase()} successfully`)
-//     } catch (err) {
-//       toast.error(err instanceof Error ? err.message : `Failed to ${status.toLowerCase()} expense`)
-//     }
-//   }
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -80,7 +54,17 @@ export default function ExpenseDetail() {
   const formatDate = (dateString: string) => {
     return format(new Date(dateString), "MMM d, yyyy")
   }
+  // Calculate tax amount and total
+  const calculateTaxAmount = () => {
+    if (!expense) return 0
+    return expense.taxRate ? (expense.amount * expense.taxRate) / 100 : 0
+  }
 
+  const calculateTotal = () => {
+    if (!expense) return 0
+    const taxAmount = calculateTaxAmount()
+    return expense.amount + taxAmount
+  }
 
 
   if (loading) {
@@ -122,7 +106,8 @@ export default function ExpenseDetail() {
       </div>
     )
   }
-
+  const taxAmount = calculateTaxAmount()
+  const totalAmount = calculateTotal()
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Back button and header */}
@@ -134,7 +119,7 @@ export default function ExpenseDetail() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Expenses
         </Link>
-        
+
         <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{expense.title}</h1>
@@ -148,38 +133,8 @@ export default function ExpenseDetail() {
               </Link>
             )}
           </div>
-          
-          {/* <div className="mt-4 md:mt-0 flex items-center">
-            <span
-              className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(expense.status)}`}
-            >
-              {getStatusIcon(expense.status)}
-              {expense.status}
-            </span>
-            
-            {expense.status === "PENDING" && (
-              <div className="ml-4 flex space-x-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-teal-600 text-teal-600 hover:bg-teal-50"
-                  onClick={() => updateExpenseStatus("APPROVED")}
-                >
-                  <CheckCircle className="mr-1 h-4 w-4" />
-                  Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-600 text-red-600 hover:bg-red-50"
-                  onClick={() => updateExpenseStatus("REJECTED")}
-                >
-                  <X className="mr-1 h-4 w-4" />
-                  Reject
-                </Button>
-              </div>
-            )}
-          </div> */}
+
+
         </div>
       </div>
 
@@ -191,14 +146,47 @@ export default function ExpenseDetail() {
             <div className="px-6 py-5 border-b border-gray-100">
               <h2 className="text-xl font-semibold text-gray-900">Expense Details</h2>
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Amount</p>
                   <p className="text-2xl font-bold text-gray-900">{formatCurrency(expense.amount)}</p>
                 </div>
-                
+                {expense.taxRate !== null && expense.taxRate !== undefined && (
+                  <>
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <Percent className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h4 className="text-sm font-medium text-gray-500">Tax Rate</h4>
+                        <p className="text-base text-gray-900">{expense.taxRate}%</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <DollarSign className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h4 className="text-sm font-medium text-gray-500">Tax Amount</h4>
+                        <p className="text-base text-gray-900">{formatCurrency(taxAmount)}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start">
+                      <div className="flex-shrink-0 mt-0.5">
+                        <DollarSign className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <div className="ml-3">
+                        <h4 className="text-sm font-medium text-gray-500">Total (with tax)</h4>
+                        <p className="text-base font-semibold text-gray-900">{formatCurrency(totalAmount)}</p>
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Date</p>
                   <div className="flex items-center">
@@ -206,7 +194,7 @@ export default function ExpenseDetail() {
                     <p className="text-base text-gray-900">{formatDate(expense.date)}</p>
                   </div>
                 </div>
-                
+
                 <div className="space-y-1">
                   <p className="text-sm font-medium text-gray-500">Category</p>
                   <div className="flex items-center">
@@ -222,7 +210,7 @@ export default function ExpenseDetail() {
                   </div>
                 )}
               </div>
-              
+
               {expense.description && (
                 <div className="mt-6 pt-6 border-t border-gray-100">
                   <p className="text-sm font-medium text-gray-500 mb-2">Description</p>
@@ -232,7 +220,7 @@ export default function ExpenseDetail() {
             </div>
           </div>
         </div>
-        
+
         {/* Right column - Receipt and actions */}
         <div className="lg:col-span-1">
           {expense.receipt && (
@@ -240,7 +228,7 @@ export default function ExpenseDetail() {
               <div className="px-6 py-5 border-b border-gray-100">
                 <h2 className="text-xl font-semibold text-gray-900">Receipt</h2>
               </div>
-              
+
               <div className="p-6">
                 <div className="aspect-[3/4] bg-gray-50 rounded-lg flex items-center justify-center">
                   <a
@@ -256,12 +244,12 @@ export default function ExpenseDetail() {
               </div>
             </div>
           )}
-          
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 py-5 border-b border-gray-100">
               <h2 className="text-xl font-semibold text-gray-900">Actions</h2>
             </div>
-            
+
             <div className="p-6">
               <Link href={`/dashboard/expenses/${expense.id}/edit`}>
                 <Button className="w-full" variant="default">

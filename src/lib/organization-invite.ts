@@ -34,7 +34,7 @@ export const sendOrganizationInviteEmail = async ({
   const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/signin`;
 
   const mailOptions = {
-    from: `"${organizationName} - Apture" <${process.env.EMAIL_FROM}>`,
+    from: `"${organizationName} - Apture" <${process.env.EMAIL_SERVER_USER}>`,
     to: email,
     subject: `You've been invited to join ${organizationName} on Apture`,
     html: `

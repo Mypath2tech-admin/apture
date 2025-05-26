@@ -37,7 +37,7 @@ export default function UserDetail() {
   // Check if user is authorized to access this page
   const isAuthorized = currentUser?.role === "ADMIN" || currentUser?.role === "ORGANIZATION_ADMIN"
   const hasOrganization = !!currentUser?.organization?.id
-  console.log(currentUser)
+  // console.log(currentUser)
 
   // Fetch user details
   useEffect(() => {
