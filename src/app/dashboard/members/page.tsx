@@ -49,6 +49,7 @@ import { Member } from "@/types/members";
 import { useEffect, useState } from "react";
 
 export default function MembersPage() {
+  const [isBeta, setIsBeta] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -199,13 +200,23 @@ export default function MembersPage() {
   const getDueStatusBadge = (status: string) => {
     switch (status) {
       case "paid":
-        return <Badge className="bg-green-500">Paid</Badge>;
+        return isBeta ? (
+          <Badge className="bg-gray-400">Paid</Badge>
+        ) : (
+          <Badge className="bg-green-500">Paid</Badge>
+        );
       case "overdue":
-        return <Badge className="bg-red-500">Overdue</Badge>;
+        return isBeta ? (
+          <Badge className="bg-gray-400">Overdue</Badge>
+        ) : (
+          <Badge className="bg-red-500">Overdue</Badge>
+        );
       case "pending":
-        return <Badge className="bg-yellow-500">Pending</Badge>;
-      default:
-        return <Badge>{status}</Badge>;
+        return isBeta ? (
+          <Badge className="bg-gray-400">Pending</Badge>
+        ) : (
+          <Badge className="bg-yellow-500">Pending</Badge>
+        );
     }
   };
 
@@ -266,7 +277,15 @@ export default function MembersPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="duesAmount">Monthly Dues ($)</Label>
+                      <Label
+                        htmlFor="duesAmount"
+                        className={isBeta ? "text-gray-400" : ""}
+                      >
+                        Monthly Dues ($)
+                        {isBeta && (
+                          <span className="italic"> (Coming soon)</span>
+                        )}
+                      </Label>
                       <Input
                         id="duesAmount"
                         name="duesAmount"
@@ -274,6 +293,8 @@ export default function MembersPage() {
                         min="0"
                         step="0.01"
                         defaultValue="25"
+                        disabled={isBeta}
+                        className={isBeta ? "opacity-50" : ""}
                       />
                     </div>
                   </div>
@@ -345,9 +366,18 @@ export default function MembersPage() {
                   <TableHead>Join Date</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Membership</TableHead>
-                  <TableHead>Monthly Dues</TableHead>
-                  <TableHead>Last Payment</TableHead>
-                  <TableHead>Due Status</TableHead>
+                  <TableHead className={isBeta ? "text-gray-400" : ""}>
+                    Monthly Dues
+                    {isBeta && <span className="italic"> (Coming soon)</span>}
+                  </TableHead>
+                  <TableHead className={isBeta ? "text-gray-400" : ""}>
+                    Last Payment
+                    {isBeta && <span className="italic"> (Coming soon)</span>}
+                  </TableHead>
+                  <TableHead className={isBeta ? "text-gray-400" : ""}>
+                    Due Status
+                    {isBeta && <span className="italic"> (Coming soon)</span>}
+                  </TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -362,9 +392,13 @@ export default function MembersPage() {
                       <TableCell>{member.joinDate}</TableCell>
                       <TableCell>{getStatusBadge(member.status)}</TableCell>
                       <TableCell>{member.membershipType}</TableCell>
-                      <TableCell>${member.duesAmount.toFixed(2)}</TableCell>
-                      <TableCell>{member.lastPaymentDate || "Never"}</TableCell>
-                      <TableCell>
+                      <TableCell className={isBeta ? "text-gray-400" : ""}>
+                        ${member.duesAmount.toFixed(2)}
+                      </TableCell>
+                      <TableCell className={isBeta ? "text-gray-400" : ""}>
+                        {member.lastPaymentDate || "Never"}
+                      </TableCell>
+                      <TableCell className={isBeta ? "text-gray-400" : ""}>
                         {getDueStatusBadge(member.dueStatus)}
                       </TableCell>
                       <TableCell>
@@ -373,6 +407,10 @@ export default function MembersPage() {
                             size="sm"
                             variant="outline"
                             onClick={() => generatePaymentLink(member)}
+                            disabled={isBeta}
+                            className={
+                              isBeta ? "opacity-50 cursor-not-allowed" : ""
+                            }
                           >
                             Payment Link
                           </Button>
@@ -410,23 +448,30 @@ export default function MembersPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Monthly Dues Collection</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              $
-              {members
-                .reduce((sum, member) => sum + member.duesAmount, 0)
-                .toFixed(2)}
-            </p>
-            <p className="text-sm text-muted-foreground mt-2">
-              {members.filter((m) => m.dueStatus === "overdue").length} overdue
-              payments
-            </p>
-          </CardContent>
-        </Card>
+        <div className={isBeta ? "opacity-50 pointer-events-none" : ""}>
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">
+                Monthly Dues Collection
+                {isBeta && (
+                  <span className="italic text-gray-400"> (Coming soon)</span>
+                )}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-3xl font-bold">
+                $
+                {members
+                  .reduce((sum, member) => sum + member.duesAmount, 0)
+                  .toFixed(2)}
+              </p>
+              <p className="text-sm text-muted-foreground mt-2">
+                {members.filter((m) => m.dueStatus === "overdue").length}{" "}
+                overdue payments
+              </p>
+            </CardContent>
+          </Card>
+        </div>
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-lg">Member Types</CardTitle>

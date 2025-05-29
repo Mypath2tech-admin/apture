@@ -27,7 +27,7 @@ export function StatItem({ title, value, icon, change, className = '' }: StatIte
           </dl>
         </div>
       </div>
-      {change && (
+      {/* {change && (
         <div className="mt-4">
           <div className={`flex items-center text-sm ${
             change.isPositive ? 'text-teal-600' : 'text-red-600'
@@ -38,7 +38,7 @@ export function StatItem({ title, value, icon, change, className = '' }: StatIte
             <span className="ml-1">from previous period</span>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   )
 }
