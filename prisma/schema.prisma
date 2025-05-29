@@ -57,6 +57,7 @@ model Organization {
   timesheets   Timesheet[]
   members      User[]
   invitations  UserInvitation[]
+  volunteers   Volunteer[]
 }
 
 model UserInvitation {
@@ -245,6 +246,24 @@ model playing_with_neon {
   value Float? @db.Real
 }
 
+model Volunteer {
+  id             String           @id @default(cuid())
+  name           String
+  email          String
+  phone          String?
+  address        String?
+  status         VolunteerStatus  @default(PENDING)
+  joinDate       DateTime         @default(now())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  organizationId String
+  inviteToken    String?          @unique
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([email])
+}
+
 enum UserRole {
   ADMIN
   USER
@@ -256,4 +275,10 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   EXPIRED
+}
+
+enum VolunteerStatus {
+  PENDING
+  ACTIVE
+  INACTIVE
 }

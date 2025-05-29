@@ -36,27 +36,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
-
-interface Volunteer {
-  id: string;
-  name: string;
-  email: string;
-  status: "active" | "inactive";
-  joinDate: string;
-}
+import { Volunteer } from "@/types/volunteers";
+import { useEffect, useState } from "react";
 
 export default function VolunteerManagement() {
-  const [volunteers, setVolunteers] = useState<Volunteer[]>([
-    {
-      id: "1",
-      name: "John Doe",
-      email: "johnD@example.com",
-      status: "active",
-      joinDate: "2024-03-15",
-    },
-    // Add more sample data as needed
-  ]);
+  const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+  const [filteredVolunteers, setFilteredVolunteers] = useState<Volunteer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [inviteLink, setInviteLink] = useState("");
   const [showInviteDialog, setShowInviteDialog] = useState(false);
@@ -65,14 +53,76 @@ export default function VolunteerManagement() {
     null
   );
 
+  // Fetch volunteers on component mount
+  useEffect(() => {
+    fetchVolunteers();
+  }, []);
+
+  // Filter volunteers based on search and status
+  useEffect(() => {
+    let filtered = volunteers;
+
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (volunteer) =>
+          volunteer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          volunteer.email.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter(
+        (volunteer) => volunteer.status.toLowerCase() === statusFilter
+      );
+    }
+
+    setFilteredVolunteers(filtered);
+  }, [searchTerm, statusFilter, volunteers]);
+
+  // Fetch volunteers from API
+  const fetchVolunteers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("/api/volunteers");
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch volunteers");
+      }
+
+      const data = await response.json();
+      setVolunteers(data.volunteers || []);
+    } catch (error) {
+      console.error("Error fetching volunteers:", error);
+      // You might want to show a toast notification here
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Generate invite link
-  const generateInviteLink = () => {
-    // In a real application, this would create a unique link
-    const link = `${
-      window.location.origin
-    }/volunteer-signup?token=${Date.now()}`;
-    setInviteLink(link);
-    setShowInviteDialog(true);
+  const generateInviteLink = async () => {
+    try {
+      const response = await fetch("/api/volunteers/invite", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          baseUrl: window.location.origin,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate invite link");
+      }
+
+      const data = await response.json();
+      setInviteLink(data.inviteLink);
+      setShowInviteDialog(true);
+    } catch (error) {
+      console.error("Error generating invite link:", error);
+      // You might want to show a toast notification here
+    }
   };
 
   // Open edit dialog
@@ -82,27 +132,78 @@ export default function VolunteerManagement() {
   };
 
   // Handle edit volunteer
-  const handleEditVolunteer = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleEditVolunteer = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
     if (!selectedVolunteer) return;
 
     const formData = new FormData(event.currentTarget);
-    const updatedVolunteer: Volunteer = {
-      ...selectedVolunteer,
-      name: formData.get("name") as string,
-      email: formData.get("email") as string,
-      status: formData.get("status") as "active" | "inactive",
-    };
 
-    setVolunteers(
-      volunteers.map((v) =>
-        v.id === selectedVolunteer.id ? updatedVolunteer : v
-      )
-    );
+    try {
+      const response = await fetch(`/api/volunteers/${selectedVolunteer.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.get("name") as string,
+          email: formData.get("email") as string,
+          status: formData.get("status") as "PENDING" | "ACTIVE" | "INACTIVE",
+        }),
+      });
 
-    setIsEditDialogOpen(false);
-    setSelectedVolunteer(null);
+      if (!response.ok) {
+        throw new Error("Failed to update volunteer");
+      }
+
+      // Refresh volunteers list
+      await fetchVolunteers();
+      setIsEditDialogOpen(false);
+      setSelectedVolunteer(null);
+    } catch (error) {
+      console.error("Error updating volunteer:", error);
+      // You might want to show a toast notification here
+    }
   };
+
+  // Handle delete volunteer
+  const handleDeleteVolunteer = async (volunteerId: string) => {
+    if (!confirm("Are you sure you want to remove this volunteer?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/volunteers/${volunteerId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete volunteer");
+      }
+
+      // Refresh volunteers list
+      await fetchVolunteers();
+    } catch (error) {
+      console.error("Error deleting volunteer:", error);
+      // You might want to show a toast notification here
+    }
+  };
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto py-6 space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading volunteers...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -128,16 +229,18 @@ export default function VolunteerManagement() {
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">
-              {volunteers.filter((v) => v.status === "active").length}
+              {volunteers.filter((v) => v.status === "ACTIVE").length}
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>New This Month</CardTitle>
+            <CardTitle>Pending Volunteers</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">0</p>
+            <p className="text-3xl font-bold">
+              {volunteers.filter((v) => v.status === "PENDING").length}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -147,8 +250,13 @@ export default function VolunteerManagement() {
           <div className="flex justify-between items-center">
             <CardTitle>Volunteer List</CardTitle>
             <div className="flex gap-4">
-              <Input placeholder="Search volunteers..." className="w-[300px]" />
-              <Select>
+              <Input
+                placeholder="Search volunteers..."
+                className="w-[300px]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Filter by status" />
                 </SelectTrigger>
@@ -156,6 +264,7 @@ export default function VolunteerManagement() {
                   <SelectItem value="all">All</SelectItem>
                   <SelectItem value="active">Active</SelectItem>
                   <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -173,38 +282,52 @@ export default function VolunteerManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {volunteers.map((volunteer) => (
-                <TableRow key={volunteer.id}>
-                  <TableCell>{volunteer.name}</TableCell>
-                  <TableCell>{volunteer.email}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        volunteer.status === "active"
-                          ? "bg-green-100 text-green-800"
-                          : "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {volunteer.status}
-                    </span>
-                  </TableCell>
-                  <TableCell>{volunteer.joinDate}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(volunteer)}
+              {filteredVolunteers.length > 0 ? (
+                filteredVolunteers.map((volunteer) => (
+                  <TableRow key={volunteer.id}>
+                    <TableCell>{volunteer.name}</TableCell>
+                    <TableCell>{volunteer.email}</TableCell>
+                    <TableCell>
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs ${
+                          volunteer.status === "ACTIVE"
+                            ? "bg-green-100 text-green-800"
+                            : volunteer.status === "PENDING"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
                       >
-                        Edit
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        Remove
-                      </Button>
-                    </div>
+                        {volunteer.status.toLowerCase()}
+                      </span>
+                    </TableCell>
+                    <TableCell>{formatDate(volunteer.joinDate)}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(volunteer)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleDeleteVolunteer(volunteer.id)}
+                        >
+                          Remove
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6">
+                    No volunteers found.
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -244,14 +367,15 @@ export default function VolunteerManagement() {
                 <Label htmlFor="edit-status">Status</Label>
                 <Select
                   name="status"
-                  defaultValue={selectedVolunteer?.status || "active"}
+                  defaultValue={selectedVolunteer?.status || "ACTIVE"}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
+                    <SelectItem value="ACTIVE">Active</SelectItem>
+                    <SelectItem value="INACTIVE">Inactive</SelectItem>
+                    <SelectItem value="PENDING">Pending</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -259,7 +383,11 @@ export default function VolunteerManagement() {
                 <Label htmlFor="join-date">Join Date</Label>
                 <Input
                   id="join-date"
-                  value={selectedVolunteer?.joinDate || ""}
+                  value={
+                    selectedVolunteer
+                      ? formatDate(selectedVolunteer.joinDate)
+                      : ""
+                  }
                   disabled
                   className="bg-gray-100"
                 />

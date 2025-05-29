@@ -11,13 +11,71 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+
+interface OrganizationInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
 
 export default function VolunteerSignup() {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [organization, setOrganization] = useState<OrganizationInfo | null>(
+    null
+  );
+  const [token, setToken] = useState<string | null>(null);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    validateInvite();
+  }, []);
+
+  const validateInvite = async () => {
+    try {
+      const inviteToken = searchParams.get("token");
+      const orgId = searchParams.get("org");
+
+      if (!inviteToken || !orgId) {
+        setError("Invalid invite link. Please check the URL and try again.");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(
+        `/api/volunteers/signup?token=${inviteToken}&org=${orgId}`
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Invalid invite link");
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      setOrganization(data.organization);
+      setToken(inviteToken);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error validating invite:", error);
+      setError("Failed to validate invite link. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!token || !organization) return;
+
+    setSubmitting(true);
+    setError(null);
+
     const formData = new FormData(event.currentTarget);
 
     const volunteerData = {
@@ -25,12 +83,69 @@ export default function VolunteerSignup() {
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
       address: formData.get("address") as string,
+      token: token,
     };
 
-    // In a real application, you would send this data to your backend
-    console.log("Volunteer registration:", volunteerData);
-    setIsSubmitted(true);
+    try {
+      const response = await fetch(
+        `/api/volunteers/signup?org=${organization.id}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(volunteerData),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "Failed to submit application");
+        setSubmitting(false);
+        return;
+      }
+
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error("Error submitting application:", error);
+      setError("Failed to submit application. Please try again.");
+      setSubmitting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <div className="text-lg">Validating invite...</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl font-bold text-red-600">
+              Invalid Invite
+            </CardTitle>
+            <CardDescription>{error}</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Button onClick={() => window.close()} className="w-full">
+              Close
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   if (isSubmitted) {
     return (
@@ -41,8 +156,9 @@ export default function VolunteerSignup() {
               Thank You!
             </CardTitle>
             <CardDescription>
-              Your volunteer application has been submitted successfully. We'll
-              be in touch soon!
+              Your volunteer application for{" "}
+              <strong>{organization?.name}</strong> has been submitted
+              successfully. We'll be in touch soon!
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">
@@ -60,11 +176,12 @@ export default function VolunteerSignup() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-center">
-            Join Our Volunteer Team
+            Join {organization?.name}
           </CardTitle>
           <CardDescription className="text-center">
-            Thank you for your interest in volunteering with us. Please fill out
-            the form below to get started.
+            {organization?.description
+              ? organization.description
+              : "Thank you for your interest in volunteering with us. Please fill out the form below to get started."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -77,6 +194,7 @@ export default function VolunteerSignup() {
                 type="text"
                 placeholder="Enter your full name"
                 required
+                disabled={submitting}
               />
             </div>
 
@@ -88,6 +206,7 @@ export default function VolunteerSignup() {
                 type="email"
                 placeholder="Enter your email address"
                 required
+                disabled={submitting}
               />
             </div>
 
@@ -99,6 +218,7 @@ export default function VolunteerSignup() {
                 type="tel"
                 placeholder="Enter your phone number"
                 required
+                disabled={submitting}
               />
             </div>
 
@@ -110,11 +230,16 @@ export default function VolunteerSignup() {
                 placeholder="Enter your address"
                 rows={3}
                 required
+                disabled={submitting}
               />
             </div>
 
-            <Button type="submit" className="w-full">
-              Submit Application
+            {error && (
+              <div className="text-red-600 text-sm text-center">{error}</div>
+            )}
+
+            <Button type="submit" className="w-full" disabled={submitting}>
+              {submitting ? "Submitting..." : "Submit Application"}
             </Button>
           </form>
         </CardContent>
