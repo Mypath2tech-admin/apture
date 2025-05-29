@@ -105,19 +105,19 @@ export default function Dashboard() {
               title="Total Budget"
               value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalBudget.toFixed(2)}`}
               icon={<DollarSign className="h-6 w-6 text-teal-500" />}
-              change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.budgetChange}
+              // change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.budgetChange}
             />
             <StatItem
               title="Total Expenses"
               value={dashboardData.shouldMaskFinancials ? "******" : `$${dashboardData.totalExpenses.toFixed(2)}`}
               icon={<TrendingUp className="h-6 w-6 text-teal-500" />}
-              change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
+              // change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
             />
             <StatItem
               title="Timesheet Hours"
               value={dashboardData.timesheetHours.toString()}
               icon={<Clock className="h-6 w-6 text-teal-500" />}
-              change={dashboardData.timesheetChange}
+              // change={dashboardData.timesheetChange}
             />
             <StatItem
               title="Team Members"
