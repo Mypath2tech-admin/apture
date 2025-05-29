@@ -49,7 +49,7 @@ import { Member } from "@/types/members";
 import { useEffect, useState } from "react";
 
 export default function MembersPage() {
-  const [isBeta, setIsBeta] = useState(true);
+  const [isBeta] = useState(true);
   const [members, setMembers] = useState<Member[]>([]);
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([]);
   const [searchTerm, setSearchTerm] = useState("");

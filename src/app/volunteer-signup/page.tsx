@@ -158,7 +158,7 @@ export default function VolunteerSignup() {
             <CardDescription>
               Your volunteer application for{" "}
               <strong>{organization?.name}</strong> has been submitted
-              successfully. We'll be in touch soon!
+              successfully. We&apos;ll be in touch soon!
             </CardDescription>
           </CardHeader>
           <CardContent className="text-center">

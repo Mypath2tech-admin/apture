@@ -340,7 +340,7 @@ export default function VolunteerManagement() {
             <DialogHeader>
               <DialogTitle>Edit Volunteer</DialogTitle>
               <DialogDescription>
-                Update the volunteer's information below.
+                Update the volunteer&apos;s information below.
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
