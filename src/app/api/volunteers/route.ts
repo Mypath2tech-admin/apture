@@ -7,7 +7,7 @@ import { type NextRequest, NextResponse } from "next/server";
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 // GET /api/volunteers - Get all volunteers for the user's organization
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("auth-token")?.value;
