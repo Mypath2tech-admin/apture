@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
         firstName,
         lastName,
         passwordHash,
-        role: "USER", // Default role
+        role: "ORGANIZATION_ADMIN", // Default role
         username: email.split("@")[0],
         isActive: false, // User is inactive until email is verified
         verificationToken,
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         where: { id: user.id },
         data: {
           organizationId: organization.id,
-          role: "ORGANIZATION_ADMIN",
+         
         },
       });
     }

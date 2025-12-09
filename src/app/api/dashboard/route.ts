@@ -103,8 +103,8 @@ export async function GET(request: NextRequest) {
 
     // Get view type from query params (personal or organization)
     const { searchParams } = new URL(request.url)
-    const viewType = searchParams.get("view") || "personal"
-    const forcePersonal = viewType === "personal"
+    const viewType = searchParams.get("view") || "organization"
+    const forcePersonal = viewType === "organization"
 
     // Verify token
     const decoded = jwt.verify(token, JWT_SECRET) as {

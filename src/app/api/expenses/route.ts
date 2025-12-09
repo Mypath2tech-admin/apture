@@ -110,50 +110,61 @@ export async function GET(request: NextRequest) {
       orderBy: { [sortBy]: sortOrder },
     })
 
-    const formattedExpenses = expenses.map((expense) => ({
-      id: expense.id,
-      title: expense.title,
-      amount: Number(expense.amount),
-      date: expense.date.toISOString(),
-      description: expense.description || undefined,
-      receipt: expense.receiptUrl || undefined,
-      categoryId: expense.categoryId,
-      budgetId: expense.budgetId || undefined,
-      userId: expense.userId,
-      organizationId: expense.organizationId || undefined,
-      // status: expense.status || "PENDING",
-      createdAt: expense.createdAt.toISOString(),
-      updatedAt: expense.updatedAt.toISOString(),
-      category: expense.category
-        ? {
+    const formattedExpenses = expenses.map((expense) => {
+      // Calculate tax amount and total if tax rate is present
+      const taxRate = expense.tax_rate !== null ? Number(expense.tax_rate) : null
+      const amount = Number(expense.amount)
+      const taxAmount = taxRate !== null ? (amount * taxRate) / 100 : null
+      const totalAmount = taxAmount !== null ? amount + taxAmount : amount
+
+      return {
+        id: expense.id,
+        title: expense.title,
+        amount: amount,
+        taxRate: taxRate,
+        taxAmount: taxAmount,
+        totalAmount: totalAmount,
+        date: expense.date.toISOString(),
+        description: expense.description || undefined,
+        receipt: expense.receiptUrl || undefined,
+        // status: expense.status || "PENDING",
+        categoryId: expense.categoryId,
+        budgetId: expense.budgetId || undefined,
+        userId: expense.userId,
+        organizationId: expense.organizationId || undefined,
+        createdAt: expense.createdAt.toISOString(),
+        updatedAt: expense.updatedAt.toISOString(),
+        category: expense.category
+          ? {
             id: expense.category.id,
             name: expense.category.name,
           }
-        : undefined,
-      budget: expense.budget
-        ? {
+          : undefined,
+        budget: expense.budget
+          ? {
             id: expense.budget.id,
             name: expense.budget.name,
           }
-        : undefined,
-      user: expense.user
-        ? {
+          : undefined,
+        user: expense.user
+          ? {
             id: expense.user.id,
             name:
               `${expense.user.firstName || ""} ${expense.user.lastName || ""}`.trim() ||
               expense.user.email.split("@")[0],
             email: expense.user.email,
           }
-        : undefined,
-      organization: expense.organization
-        ? {
+          : undefined,
+        organization: expense.organization
+          ? {
             id: expense.organization.id,
             name: expense.organization.name,
           }
-        : undefined,
-      // Add a flag to indicate if the current user can edit this expense
-      canEdit: user.role === "ADMIN" || user.role === "ORGANIZATION_ADMIN" || expense.userId === user.id,
-    }))
+          : undefined,
+        // Add a flag to indicate if the current user can edit this expense
+        canEdit: user.role === "ADMIN" || user.role === "ORGANIZATION_ADMIN" || expense.userId === user.id,
+      }
+    })
 
     return NextResponse.json(formattedExpenses)
   } catch (error) {
@@ -188,8 +199,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { title, amount, date, description, categoryId, budgetId, createAnother = false } = body
-
+    const { title, amount, taxRate, date, description, categoryId, budgetId, createAnother = false } = body
+    console.log("Tax", title, taxRate)
     // Validate required fields
     if (!title || !amount || !date) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -258,6 +269,7 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         amount: Number(amount),
+        tax_rate: taxRate !== undefined && taxRate !== "" ? Number(taxRate) : null,
         date: new Date(date),
         description,
         receiptUrl: null, // Handle file upload separately if needed
@@ -290,11 +302,19 @@ export async function POST(request: NextRequest) {
         },
       },
     })
+    // Calculate tax amount and total
+    const expenseTaxRate = expense.tax_rate !== null ? Number(expense.tax_rate) : null
+    const expenseAmount = Number(expense.amount)
+    const taxAmount = expenseTaxRate !== null ? (expenseAmount * expenseTaxRate) / 100 : null
+    const totalAmount = taxAmount !== null ? expenseAmount + taxAmount : expenseAmount
 
     return NextResponse.json({
       id: expense.id,
       title: expense.title,
       amount: Number(expense.amount),
+      taxRate: expenseTaxRate,
+      taxAmount: taxAmount,
+      totalAmount: totalAmount,
       date: expense.date.toISOString(),
       description: expense.description || undefined,
       receipt: expense.receiptUrl || undefined,
@@ -306,30 +326,30 @@ export async function POST(request: NextRequest) {
       updatedAt: expense.updatedAt.toISOString(),
       category: expense.category
         ? {
-            id: expense.category.id,
-            name: expense.category.name,
-          }
+          id: expense.category.id,
+          name: expense.category.name,
+        }
         : undefined,
       budget: expense.budget
         ? {
-            id: expense.budget.id,
-            name: expense.budget.name,
-          }
+          id: expense.budget.id,
+          name: expense.budget.name,
+        }
         : undefined,
       user: expense.user
         ? {
-            id: expense.user.id,
-            name:
-              `${expense.user.firstName || ""} ${expense.user.lastName || ""}`.trim() ||
-              expense.user.email.split("@")[0],
-            email: expense.user.email,
-          }
+          id: expense.user.id,
+          name:
+            `${expense.user.firstName || ""} ${expense.user.lastName || ""}`.trim() ||
+            expense.user.email.split("@")[0],
+          email: expense.user.email,
+        }
         : undefined,
       organization: expense.organization
         ? {
-            id: expense.organization.id,
-            name: expense.organization.name,
-          }
+          id: expense.organization.id,
+          name: expense.organization.name,
+        }
         : undefined,
       createAnother, // Return this flag so the frontend knows whether to redirect or stay
     })

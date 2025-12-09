@@ -11,7 +11,9 @@ import { toast } from "react-toastify"
 import { Switch } from "@/components/ui/switch"
 import { type User, UserRole } from "../../../../../generated/prisma"
 import { DatePickerDemo } from "@/components/ui/date-picker"
-
+import { useQueryClient } from "@tanstack/react-query"
+import { budgetKeys } from "@/lib/hooks/use-budgets"
+import { dashboardKeys } from "@/lib/hooks/use-dashboard"
 interface CategoryInput {
   name: string
   allocatedAmount: number
@@ -75,7 +77,7 @@ export default function CreateBudget() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-    console.log(formData)
+    // console.log(formData)
   }
 
   const handleToggleTimeframe = (checked: boolean) => {
@@ -108,6 +110,7 @@ export default function CreateBudget() {
       categories: prev.categories.filter((_, i) => i !== index),
     }))
   }
+const queryClient = useQueryClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -140,7 +143,10 @@ export default function CreateBudget() {
       const data = await response.json()
       console.log("Budget created:", data)
       toast.success("Budget created successfully!")
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+      await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
       router.push("/dashboard/budgets")
+      // fetchBudget()
     } catch (error) {
       console.error("Failed to create budget:", error)
       toast.error("Failed to create budget. Please try again.")
@@ -248,11 +254,11 @@ export default function CreateBudget() {
                     className="mt-1 block w-full rounded-md p-2 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
                   /> */}
                   <DatePickerDemo
-                      name="endDate"
-                      id="endDate"
-                      required={formData.hasTimeframe}
-                      value={formData.endDate}
-                      onChange={handleChange} />
+                    name="endDate"
+                    id="endDate"
+                    required={formData.hasTimeframe}
+                    value={formData.endDate}
+                    onChange={handleChange} />
                 </div>
               </>
             )}
@@ -377,3 +383,5 @@ export default function CreateBudget() {
     </div>
   )
 }
+
+

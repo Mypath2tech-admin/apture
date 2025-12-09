@@ -1,9 +1,8 @@
-import nodemailer from "nodemailer"
-import type { User } from "../../generated/prisma"
+import nodemailer from "nodemailer";
+import type { User } from "../../generated/prisma";
 
 // Configure nodemailer
 const transporter = nodemailer.createTransport({
-  service: "gmail",
   host: process.env.EMAIL_SERVER_HOST,
   port: Number(process.env.EMAIL_SERVER_PORT),
   secure: process.env.EMAIL_SERVER_SECURE === "true",
@@ -11,14 +10,16 @@ const transporter = nodemailer.createTransport({
     user: process.env.EMAIL_SERVER_USER,
     pass: process.env.EMAIL_SERVER_PASSWORD,
   },
-})
+  debug: process.env.NODE_ENV !== "production",
+  logger: process.env.NODE_ENV !== "production",
+});
 
 interface OrganizationInviteEmailParams {
-  user: User
-  organizationName: string
-  password: string
-  message?: string
-  inviterName?: string
+  user: User;
+  organizationName: string;
+  password: string;
+  message?: string;
+  inviterName?: string;
 }
 
 export const sendOrganizationInviteEmail = async ({
@@ -28,12 +29,12 @@ export const sendOrganizationInviteEmail = async ({
   message,
   inviterName,
 }: OrganizationInviteEmailParams) => {
-  const { email, firstName, lastName } = user
-  const name = firstName && lastName ? `${firstName} ${lastName}` : email
-  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/signin`
+  const { email, firstName, lastName } = user;
+  const name = firstName && lastName ? `${firstName} ${lastName}` : email;
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/signin`;
 
   const mailOptions = {
-    from: `"Apture" <${process.env.EMAIL_FROM}>`,
+    from: `"${organizationName} - Apture" <${process.env.EMAIL_SERVER_USER}>`,
     to: email,
     subject: `You've been invited to join ${organizationName} on Apture`,
     html: `
@@ -192,7 +193,7 @@ export const sendOrganizationInviteEmail = async ({
       </body>
       </html>
     `,
-  }
+  };
 
-  return transporter.sendMail(mailOptions)
-}
+  return transporter.sendMail(mailOptions);
+};

@@ -14,7 +14,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import type { Budget } from "@/types/dashboard"
-
+import { DatePickerDemo } from "@/components/ui/date-picker"
+import { useQueryClient } from "@tanstack/react-query"
+import { budgetKeys } from "@/lib/hooks/use-budgets"
+import { dashboardKeys } from "@/lib/hooks/use-dashboard"
 export default function EditBudget() {
   const params = useParams()
   const router = useRouter()
@@ -28,6 +31,7 @@ export default function EditBudget() {
     name: "",
     description: "",
     amount: "",
+
     startDate: "",
     endDate: "",
   })
@@ -71,7 +75,7 @@ export default function EditBudget() {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
-
+  const queryClient = useQueryClient()
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSaving(true)
@@ -111,6 +115,8 @@ export default function EditBudget() {
       }
 
       toast.success("Budget updated successfully")
+      await queryClient.invalidateQueries({ queryKey: budgetKeys.lists() })
+         await queryClient.invalidateQueries({ queryKey: dashboardKeys.lists() })
       router.push(`/dashboard/budgets/${params.id}`)
     } catch (err) {
       console.error("Error updating budget:", err)
@@ -163,7 +169,7 @@ export default function EditBudget() {
         }
       />
 
-      <DashboardCard  title="Edit Budget">
+      <DashboardCard title="Edit Budget">
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -218,7 +224,7 @@ export default function EditBudget() {
 
             <div>
               <Label htmlFor="startDate">Start Date</Label>
-              <Input
+              {/* <Input
                 type="date"
                 id="startDate"
                 name="startDate"
@@ -226,19 +232,31 @@ export default function EditBudget() {
                 onChange={handleChange}
                 className="mt-1"
                 required
-              />
+              /> */}
+              <DatePickerDemo
+                name="startDate"
+                id="startDate"
+                value={formData.startDate}
+                onChange={handleChange} />
             </div>
 
             <div>
               <Label htmlFor="endDate">End Date (Optional)</Label>
-              <Input
+              {/* <Input
                 type="date"
                 id="endDate"
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
                 className="mt-1"
-              />
+              /> */}
+              <DatePickerDemo
+                name="endDate"
+                id="endDate"
+                // required={formData.hasTimeframe}
+                value={formData.endDate}
+                onChange={handleChange} />
+
             </div>
 
             <div className="col-span-2">

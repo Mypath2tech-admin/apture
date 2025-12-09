@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/lib/store/authStore"
 import DashboardCard from "@/components/dashboard/DashboardCard"
@@ -8,62 +8,32 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import { Eye, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { DashboardData } from "@/types/dashboard"
 import { DollarSign, TrendingUp, Users, Clock } from "lucide-react"
 import { StatItem } from "@/components/dashboard/DashboardStats"
 import DashboardStats from "@/components/dashboard/DashboardStats"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useDashboardData } from "@/lib/hooks/use-dashboard"
 
 export default function Dashboard() {
   const router = useRouter()
   const { user, isAuthenticated, isLoading } = useAuthStore()
-
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null)
-  const [isLoadingData, setIsLoadingData] = useState(true)
   const [viewType, setViewType] = useState<"personal" | "organization">("personal")
-  const [error, setError] = useState<string | null>(null)
+
+  // Use the React Query hook
+  const { data, error, isLoading: isLoadingData, refetch } = useDashboardData(viewType)
+
+  // Extract dashboard data from the response
+  const dashboardData = data?.dashboardData
 
   // Check if user can view organization data
   const canViewOrgData =
     user?.role === "ADMIN" || user?.role === "ORGANIZATION_ADMIN" || user?.canViewOrgDashboard === true
 
-  // Fetch dashboard data
-  const fetchDashboardData = async (view: "personal" | "organization" = "personal") => {
-    setIsLoadingData(true)
-    setError(null)
-
-    try {
-      const response = await fetch(`/api/dashboard?view=${view}`)
-
-      console.log(response)
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to fetch dashboard data")
-      }
-
-      const data = await response.json()
-      setDashboardData(data.dashboardData)
-    } catch (err) {
-      console.error("Error fetching dashboard data:", err)
-      setError(err instanceof Error ? err.message : "Failed to load dashboard data")
-    } finally {
-      setIsLoadingData(false)
-    }
-  }
-
   // Handle tab change
   const handleViewChange = (value: string) => {
     const newViewType = value as "personal" | "organization"
     setViewType(newViewType)
-    fetchDashboardData(newViewType)
   }
-
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      fetchDashboardData(viewType)
-    }
-  }, [isLoading, isAuthenticated, viewType])
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -144,7 +114,7 @@ export default function Dashboard() {
               change={dashboardData.shouldMaskFinancials ? undefined : dashboardData.expenseChange}
             />
             <StatItem
-              title="Timesheet Hours22"
+              title="Timesheet Hours"
               value={dashboardData.timesheetHours.toString()}
               icon={<Clock className="h-6 w-6 text-teal-500" />}
               change={dashboardData.timesheetChange}
@@ -177,12 +147,13 @@ export default function Dashboard() {
                         <div className="flex items-center mt-1">
                           <div className="w-32 bg-gray-200 rounded-full h-2.5">
                             <div
-                              className={`h-2.5 rounded-full ${budget.progress > 90
+                              className={`h-2.5 rounded-full ${
+                                budget.progress > 90
                                   ? "bg-red-500"
                                   : budget.progress > 70
                                     ? "bg-yellow-500"
                                     : "bg-teal-500"
-                                }`}
+                              }`}
                               style={{ width: `${Math.min(budget.progress, 100)}%` }}
                             ></div>
                           </div>
@@ -214,7 +185,7 @@ export default function Dashboard() {
               )}
             </DashboardCard>
 
-            <DashboardCard title="Recent Expenses333">
+            <DashboardCard title="Recent Expenses">
               {dashboardData.recentExpenses.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-500">No expenses found</p>
@@ -288,8 +259,8 @@ export default function Dashboard() {
         </>
       ) : error ? (
         <div className="text-center py-8">
-          <p className="text-red-500">{error}</p>
-          <Button onClick={() => fetchDashboardData(viewType)} className="mt-4 bg-teal-600 hover:bg-teal-700">
+          <p className="text-red-500">{error instanceof Error ? error.message : "Failed to load dashboard data"}</p>
+          <Button onClick={() => refetch()} className="mt-4 bg-teal-600 hover:bg-teal-700">
             Try Again
           </Button>
         </div>

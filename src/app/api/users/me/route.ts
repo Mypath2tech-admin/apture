@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
             name: true,
             logo: true,
             email:true,
+            tax_rate:true,
           },
         },
       },

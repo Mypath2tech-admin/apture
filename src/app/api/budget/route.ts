@@ -134,14 +134,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get budgets with expenses and categories
+    // Get budgets with expenses and categories
     const budgets = await prisma.budget.findMany({
       where,
       include: {
-        expenses: {
-          select: {
-            amount: true,
-          },
-        },
+        expenses: true,
         categories: true,
       },
       orderBy,
@@ -149,7 +146,14 @@ export async function GET(request: NextRequest) {
 
     // Calculate spent, remaining, and progress
     const formattedBudgets: Budget[] = budgets.map((budget) => {
-      const spent = budget.expenses.reduce((sum, expense) => sum + Number(expense.amount), 0)
+        const spent = budget.expenses.reduce((sum, expense) => {
+        const baseAmount = Number(expense.amount)
+        const taxRate = expense.tax_rate ? Number(expense.tax_rate) / 100 : 0
+        const totalWithTax = baseAmount + baseAmount * taxRate
+        return sum + totalWithTax
+      }, 0)
+
+
       const remaining = Number(budget.amount) - spent
       const progress = budget.amount > 0 ? (spent / Number(budget.amount)) * 100 : 0
 
@@ -243,16 +247,16 @@ export async function POST(request: NextRequest) {
         organizationId: user.organizationId,
         projectId,
         categories:
-        categories && categories.length > 0
-          ? {
+          categories && categories.length > 0
+            ? {
               create: categories.map((cat) => ({
                 name: cat.name,
                 allocatedAmount: Number(cat.allocatedAmount),
                 description: cat.description,
               })),
             }
-          : undefined,
-      
+            : undefined,
+
       },
       include: {
         categories: true,
@@ -280,7 +284,7 @@ export async function POST(request: NextRequest) {
       updatedAt: budget.updatedAt.toISOString(),
       organizationId: budget.organizationId || undefined,
       userId: budget.userId || undefined,
-      remaining:0,
+      remaining: 0,
       categories: mappedCategories,
     }
 

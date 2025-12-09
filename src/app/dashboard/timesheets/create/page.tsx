@@ -1,240 +1,421 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import PageHeader from '@/components/dashboard/PageHeader'
-import DashboardCard from '@/components/dashboard/DashboardCard'
-import Link from 'next/link'
+import type React from "react"
 
-interface DayEntry {
-  date: string
-  hours: string
-  description: string
-}
-
-interface TimesheetFormData {
-  weekStarting: string
-  days: DayEntry[]
-  notes: string
-}
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { format, startOfWeek, addDays, parseISO } from "date-fns"
+import { toast } from "react-toastify"
+import PageHeader from "@/components/dashboard/PageHeader"
+import DashboardCard from "@/components/dashboard/DashboardCard"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Loader2, Percent, AlertCircle } from "lucide-react"
+import type { TimesheetFormData } from "@/types/timesheet"
+import { DatePickerDemo } from "@/components/ui/date-picker"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function CreateTimesheet() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
-  
+  const [isLoadingRate, setIsLoadingRate] = useState(true)
+  const [isLoadingTaxRate, setIsLoadingTaxRate] = useState(true)
+  const [organizationTaxRate, setOrganizationTaxRate] = useState<number>(0)
+  const [taxAmount, setTaxAmount] = useState<number>(0)
+  const [totalEarnings, setTotalEarnings] = useState<number>(0)
+  const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
+
+
   // Get the current week's Monday
-  const getMonday = (d: Date) => {
-    const day = d.getDay()
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is Sunday
-    return new Date(d.setDate(diff))
-  }
-  
-  const monday = getMonday(new Date())
-  
-  // Initialize the week days
-  const initDays = () => {
-    const days: DayEntry[] = []
-    for (let i = 0; i < 7; i++) {
-      const date = new Date(monday)
-      date.setDate(monday.getDate() + i)
-      days.push({
-        date: date.toISOString().split('T')[0],
-        hours: '',
-        description: ''
-      })
-    }
-    return days
-  }
-  
+  const monday = startOfWeek(new Date(), { weekStartsOn: 1 })
+
+  // Initialize the form data
   const [formData, setFormData] = useState<TimesheetFormData>({
-    weekStarting: monday.toISOString().split('T')[0],
-    days: initDays(),
-    notes: ''
+    name: `Week of ${format(monday, "MMM d, yyyy")}`,
+    description: "",
+    hourlyRate: "",
+    weekStarting: format(monday, "yyyy-MM-dd"),
+    entries: Array(7)
+      .fill(null)
+      .map((_, index) => ({
+        dayIndex: index,
+        duration: "",
+        description: "",
+      })),
   })
+
+  // Fetch user's hourly rate and organization tax rate
+  useEffect(() => {
+    const fetchRates = async () => {
+      try {
+        // Fetch hourly rate
+        const hourlyRateResponse = await fetch("/api/user/hourly-rate")
+        if (hourlyRateResponse.ok) {
+          const hourlyRateData = await hourlyRateResponse.json()
+          setFormData((prev) => ({
+            ...prev,
+            hourlyRate: hourlyRateData.currentRate.toString(),
+          }))
+        }
+        setIsLoadingRate(false)
+
+        // Fetch organization tax rate
+        const taxRateResponse = await fetch("/api/organization/tax-rate")
+        if (taxRateResponse.ok) {
+          const taxRateData = await taxRateResponse.json()
+          setOrganizationTaxRate(taxRateData.taxRate)
+        }
+        setIsLoadingTaxRate(false)
+      } catch (error) {
+        console.error("Error fetching rates:", error)
+        toast.error("Failed to load rate information")
+        setIsLoadingRate(false)
+        setIsLoadingTaxRate(false)
+      }
+    }
+
+    fetchRates()
+  }, [])
+
+  // Calculate tax and total earnings when hours or rates change
+  useEffect(() => {
+    const totalHours = getTotalHours()
+    const hourlyRate = Number.parseFloat(formData.hourlyRate) || 0
+    const subtotal = totalHours * hourlyRate
+    const calculatedTaxAmount = subtotal * (organizationTaxRate / 100)
+    const calculatedTotalEarnings = subtotal + calculatedTaxAmount
+
+    setTaxAmount(calculatedTaxAmount)
+    setTotalEarnings(calculatedTotalEarnings)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.entries, formData.hourlyRate, organizationTaxRate])
 
   const handleWeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newWeekStarting = e.target.value
-    const newMonday = new Date(newWeekStarting)
-    
-    // Update all days based on the new week starting date
-    const newDays = formData.days.map((day, index) => {
-      const date = new Date(newMonday)
-      date.setDate(newMonday.getDate() + index)
-      return {
-        ...day,
-        date: date.toISOString().split('T')[0]
-      }
-    })
-    
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       weekStarting: newWeekStarting,
-      days: newDays
-    })
+      name: `Week of ${format(parseISO(newWeekStarting), "MMM d, yyyy")}`,
+    }))
   }
 
-  const handleDayChange = (index: number, field: keyof DayEntry, value: string) => {
-    const newDays = [...formData.days]
-    newDays[index] = {
-      ...newDays[index],
-      [field]: value
+  const handleHourlyRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      hourlyRate: e.target.value,
+    }))
+  }
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      description: e.target.value,
+    }))
+  }
+
+  const handleDurationChange = (dayIndex: number, value: string) => {
+    const newEntries = [...formData.entries]
+    newEntries[dayIndex] = {
+      ...newEntries[dayIndex],
+      duration: value,
     }
-    setFormData({
-      ...formData,
-      days: newDays
-    })
+    setFormData((prev) => ({
+      ...prev,
+      entries: newEntries,
+    }))
+
+    // Validate hours
+    validateHours(dayIndex, value)
   }
 
-  const handleNotesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      notes: e.target.value
-    })
+  const validateHours = (dayIndex: number, value: string) => {
+    const hours = Number.parseFloat(value)
+    const errors = { ...validationErrors }
+
+    if (hours > 24) {
+      errors[`day-${dayIndex}`] = "Hours cannot exceed 24 per day"
+    } else if (hours > 12) {
+      errors[`day-${dayIndex}`] = "Warning: Hours exceed 12 per day"
+    } else {
+      delete errors[`day-${dayIndex}`]
+    }
+
+    setValidationErrors(errors)
+  }
+
+  const handleDayDescriptionChange = (dayIndex: number, value: string) => {
+    const newEntries = [...formData.entries]
+    newEntries[dayIndex] = {
+      ...newEntries[dayIndex],
+      description: value,
+    }
+    setFormData((prev) => ({
+      ...prev,
+      entries: newEntries,
+    }))
   }
 
   const getTotalHours = () => {
-    return formData.days.reduce((total, day) => {
-      return total + (parseFloat(day.hours) || 0)
+    return formData.entries.reduce((total, entry) => {
+      return total + (Number.parseFloat(entry.duration) || 0)
     }, 0)
+  }
+
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {}
+
+    // Check for excessive hours
+    formData.entries.forEach((entry, index) => {
+      const hours = Number.parseFloat(entry.duration)
+      if (hours > 24) {
+        errors[`day-${index}`] = "Hours cannot exceed 24 per day"
+      }
+    })
+
+    // Check for excessive total hours
+    const totalHours = getTotalHours()
+    if (totalHours > 168) {
+      // 24 * 7 = 168 (max possible hours in a week)
+      errors.total = "Total hours cannot exceed 168 per week"
+    } else if (totalHours > 80) {
+      errors.total = "Warning: Total hours exceed 80 per week"
+    }
+
+    setValidationErrors(errors)
+    return Object.keys(errors).filter((key) => errors[key].includes("cannot")).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Validate form before submission
+    if (!validateForm()) {
+      toast.error("Please fix validation errors before submitting")
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      // In a real app, you would submit this data to your API
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate network delay
-      
-      console.log('Timesheet created:', formData)
-      router.push('/dashboard/timesheets')
+      // Filter out entries with zero duration
+      const validEntries = formData.entries.filter((entry) => Number.parseFloat(entry.duration) > 0)
+
+      // Prepare timesheet data
+      const startDate = parseISO(formData.weekStarting)
+      const endDate = addDays(startDate, 6)
+
+      const timesheetData = {
+        name: formData.name,
+        description: formData.description,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        hourlyRate: Number.parseFloat(formData.hourlyRate) || 0,
+        entries: validEntries.map((entry) => {
+          const entryDate = addDays(startDate, entry.dayIndex)
+          return {
+            description: entry.description,
+            startTime: entryDate.toISOString(),
+            endTime: entryDate.toISOString(),
+            duration: Number.parseFloat(entry.duration) || 0,
+          }
+        }),
+      }
+
+      // Submit timesheet
+      const response = await fetch("/api/timesheets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(timesheetData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to create timesheet")
+      }
+
+      toast.success("Timesheet created successfully")
+      router.push("/dashboard/timesheets")
     } catch (error) {
-      console.error('Failed to create timesheet:', error)
+      console.error("Error creating timesheet:", error)
+      toast.error(error instanceof Error ? error.message : "Failed to create timesheet")
+    } finally {
       setIsSubmitting(false)
     }
   }
 
   // Day names for display
-  const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
   return (
     <div>
-      <PageHeader 
-        title="Log Time" 
+      <PageHeader
+        title="Log Time"
         description="Record your working hours for the week"
         action={
-          <Link 
-            href="/dashboard/timesheets"
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-          >
-            Cancel
+          <Link href="/dashboard/timesheets">
+            <Button variant="outline">Cancel</Button>
           </Link>
         }
       />
 
       <DashboardCard title="Weekly Timesheet">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="weekStarting" className="block text-sm font-medium text-gray-700">
-              Week Starting (Monday)
-            </label>
-            <input
-              type="date"
-              name="weekStarting"
-              id="weekStarting"
-              required
-              value={formData.weekStarting}
-              onChange={handleWeekChange}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="weekStarting">Week Starting (Monday)</Label>
+              <DatePickerDemo
+                name="weekStarting"
+                id="weekStarting"
+                value={formData.weekStarting}
+                onChange={handleWeekChange}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+              <Input
+                type="number"
+                id="hourlyRate"
+                value={formData.hourlyRate}
+                onChange={handleHourlyRateChange}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                disabled={isLoadingRate}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Weekly Description (Optional)</Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={handleDescriptionChange}
+              placeholder="General description of work performed this week"
+              rows={3}
             />
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-300">
-              <thead>
-                <tr>
-                  <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0">
-                    Day
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Date
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Hours
-                  </th>
-                  <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                    Description
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {formData.days.map((day, index) => (
-                  <tr key={index}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      {dayNames[index]}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {new Date(day.date).toLocaleDateString()}
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      <input
-                        type="number"
-                        min="0"
-                        max="24"
-                        step="0.5"
-                        value={day.hours}
-                        onChange={(e) => handleDayChange(index, 'hours', e.target.value)}
-                        className="block w-20 rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-                      />
-                    </td>
-                    <td className="px-3 py-4 text-sm text-gray-500">
-                      <input
-                        type="text"
-                        value={day.description}
-                        onChange={(e) => handleDayChange(index, 'description', e.target.value)}
-                        placeholder="What did you work on?"
-                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-                      />
+          {/* Organization Tax Rate Display */}
+          <div className="bg-gray-50 p-4 rounded-md">
+            <div className="flex items-center mb-2">
+              <Percent className="h-4 w-4 text-gray-500 mr-2" />
+              <Label className="font-medium">Organization Tax Rate</Label>
+            </div>
+            {isLoadingTaxRate ? (
+              <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
+            ) : (
+              <div className="text-sm text-gray-600">
+                All timesheet entries are subject to a {organizationTaxRate}% tax rate as set by your organization.
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Daily Hours</h3>
+
+            {validationErrors.total && (
+              <Alert >
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{validationErrors.total}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr>
+                    <th className="text-left py-2 px-4 border-b">Day</th>
+                    <th className="text-left py-2 px-4 border-b">Hours</th>
+                    <th className="text-left py-2 px-4 border-b">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.entries.map((entry, index) => {
+                    const date = addDays(parseISO(formData.weekStarting), index)
+                    const hasError = validationErrors[`day-${index}`]
+                    const isErrorSevere = hasError && hasError.includes("cannot")
+
+                    return (
+                      <tr key={index} className="border-b">
+                        <td className="py-3 px-4">
+                          <div className="font-medium">{dayNames[index]}</div>
+                          <div className="text-sm text-gray-500">{format(date, "MMM d, yyyy")}</div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="space-y-1">
+                            <Input
+                              type="number"
+                              value={entry.duration}
+                              onChange={(e) => handleDurationChange(index, e.target.value)}
+                              min="0"
+                              max="24"
+                              step="0.5"
+                              className={`w-24 ${isErrorSevere ? "border-red-500" : hasError ? "border-yellow-500" : ""}`}
+                              placeholder="0"
+                            />
+                            {hasError && (
+                              <div className={`text-xs ${isErrorSevere ? "text-red-500" : "text-yellow-500"}`}>
+                                {validationErrors[`day-${index}`]}
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-3 px-4">
+                          <Input
+                            type="text"
+                            value={entry.description}
+                            onChange={(e) => handleDayDescriptionChange(index, e.target.value)}
+                            placeholder="What did you work on?"
+                            className="w-full"
+                          />
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="bg-gray-50">
+                    <td className="py-3 px-4 font-medium">Total</td>
+                    <td className="py-3 px-4 font-medium">{getTotalHours()} hrs</td>
+                    <td className="py-3 px-4 text-right">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-sm">
+                          <span>Subtotal:</span>
+                          <span>${(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Tax ({organizationTaxRate}%):</span>
+                          <span>${taxAmount.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between font-medium pt-1 border-t border-gray-200">
+                          <span>Total Earnings:</span>
+                          <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                        </div>
+                      </div>
                     </td>
                   </tr>
-                ))}
-                <tr>
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                    Total
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500"></td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm font-bold text-gray-900">
-                    {getTotalHours()} hrs
-                  </td>
-                  <td className="px-3 py-4 text-sm text-gray-500"></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div>
-            <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
-              Notes (optional)
-            </label>
-            <textarea
-              id="notes"
-              name="notes"
-              rows={3}
-              value={formData.notes}
-              onChange={handleNotesChange}
-              placeholder="Any additional information about this week's work"
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm"
-            />
+                </tfoot>
+              </table>
+            </div>
           </div>
 
           <div className="flex justify-end">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Submitting...' : 'Submit Timesheet'}
-            </button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Timesheet"
+              )}
+            </Button>
           </div>
         </form>
       </DashboardCard>

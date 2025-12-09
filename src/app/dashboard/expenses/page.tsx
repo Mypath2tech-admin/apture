@@ -1,13 +1,13 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Filter, Search, ChevronDown, ChevronUp, Trash2, Edit } from "lucide-react"
+import { Plus, Filter, Search, ChevronDown, ChevronUp, Trash2, Edit, FileUp } from "lucide-react"
 import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import Link from "next/link"
 // import { useRouter } from "next/navigation"
-import type { Expense, ExpenseFilters, ExpenseCategory } from "@/types/dashboard"
+import type { ExpenseFilters, ExpenseCategory } from "@/types/dashboard"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,14 +21,16 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { toast } from "react-toastify"
+import { DatePickerDemo } from "@/components/ui/date-picker"
+import { useExpenses, useDeleteExpense } from "@/lib/hooks/use-expense"
 
 export default function Expenses() {
   // const router = useRouter()
-  const [expenses, setExpenses] = useState<Expense[]>([])
+
+
   const [categories, setCategories] = useState<ExpenseCategory[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  // const [loading, setLoading] = useState(true)
+  // const [error, setError] = useState<string | null>(null)
   const [filters, setFilters] = useState<ExpenseFilters>({
     sortBy: "date",
     sortOrder: "desc",
@@ -36,41 +38,43 @@ export default function Expenses() {
   const [showFilters, setShowFilters] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [deletingExpenseId, setDeletingExpenseId] = useState<string | null>(null)
+  const { data: expenses = [], isLoading, error, refetch } = useExpenses(filters)
+  const deleteExpenseMutation = useDeleteExpense()
 
-  const fetchExpenses = async () => {
-    try {
-      setLoading(true)
-      setError(null)
+  // const fetchExpenses = async () => {
+  //   try {
+  //     setLoading(true)
+  //     setError(null)
 
-      // Build query string from filters
-      const queryParams = new URLSearchParams()
-      if (filters.search) queryParams.append("search", filters.search)
-      if (filters.startDate) queryParams.append("startDate", filters.startDate)
-      if (filters.endDate) queryParams.append("endDate", filters.endDate)
-      if (filters.minAmount !== undefined) queryParams.append("minAmount", filters.minAmount.toString())
-      if (filters.maxAmount !== undefined) queryParams.append("maxAmount", filters.maxAmount.toString())
-      if (filters.categoryId) queryParams.append("categoryId", filters.categoryId)
-      if (filters.budgetId) queryParams.append("budgetId", filters.budgetId)
-      if (filters.status) queryParams.append("status", filters.status)
-      if (filters.sortBy) queryParams.append("sortBy", filters.sortBy)
-      if (filters.sortOrder) queryParams.append("sortOrder", filters.sortOrder)
+  //     // Build query string from filters
+  //     const queryParams = new URLSearchParams()
+  //     if (filters.search) queryParams.append("search", filters.search)
+  //     if (filters.startDate) queryParams.append("startDate", filters.startDate)
+  //     if (filters.endDate) queryParams.append("endDate", filters.endDate)
+  //     if (filters.minAmount !== undefined) queryParams.append("minAmount", filters.minAmount.toString())
+  //     if (filters.maxAmount !== undefined) queryParams.append("maxAmount", filters.maxAmount.toString())
+  //     if (filters.categoryId) queryParams.append("categoryId", filters.categoryId)
+  //     if (filters.budgetId) queryParams.append("budgetId", filters.budgetId)
+  //     if (filters.status) queryParams.append("status", filters.status)
+  //     if (filters.sortBy) queryParams.append("sortBy", filters.sortBy)
+  //     if (filters.sortOrder) queryParams.append("sortOrder", filters.sortOrder)
 
-      const response = await fetch(`/api/expenses?${queryParams.toString()}`)
+  //     const response = await fetch(`/api/expenses?${queryParams.toString()}`)
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to fetch expenses")
-      }
+  //     if (!response.ok) {
+  //       const errorData = await response.json()
+  //       throw new Error(errorData.error || "Failed to fetch expenses")
+  //     }
 
-      const data = await response.json()
-      setExpenses(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
-      toast.error(err instanceof Error ? err.message : "Failed to fetch expenses")
-    } finally {
-      setLoading(false)
-    }
-  }
+  //     const data = await response.json()
+  //     setExpenses(data)
+  //   } catch (err) {
+  //     setError(err instanceof Error ? err.message : "An error occurred")
+  //     toast.error(err instanceof Error ? err.message : "Failed to fetch expenses")
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   const fetchCategories = async () => {
     try {
@@ -89,7 +93,7 @@ export default function Expenses() {
   }
 
   useEffect(() => {
-    fetchExpenses()
+    // fetchExpenses()
     fetchCategories()
   }, [filters])
 
@@ -107,25 +111,9 @@ export default function Expenses() {
 
   const handleDeleteExpense = async () => {
     if (!deletingExpenseId) return
-
-    try {
-      const response = await fetch(`/api/expenses/${deletingExpenseId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || "Failed to delete expense")
-      }
-
-      // Remove the deleted expense from the state
-      setExpenses(expenses.filter((expense) => expense.id !== deletingExpenseId))
-      toast.success("Expense deleted successfully")
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete expense")
-    } finally {
-      setDeletingExpenseId(null)
-    }
+    deleteExpenseMutation.mutate(deletingExpenseId, {
+      onSuccess: () => setDeletingExpenseId(null),
+    })
   }
 
   const formatCurrency = (amount: number) => {
@@ -163,13 +151,22 @@ export default function Expenses() {
         title="Expenses"
         description="Track and manage your expenses"
         action={
-          <Link
-            href="/dashboard/expenses/create"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-          >
-            <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
-            Add Expense
-          </Link>
+          <>
+            <Link
+              href="/dashboard/expenses/create"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Add Expense
+            </Link>
+            <Link
+              href="/dashboard/expenses/export"
+              className="ml-2 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              <FileUp className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
+              Expense Export
+            </Link>
+          </>
         }
       />
 
@@ -198,9 +195,16 @@ export default function Expenses() {
               <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-1">
                 Start Date
               </label>
-              <Input
+              {/* <Input
                 type="date"
                 id="startDate"
+                value={filters.startDate || ""}
+                onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
+              /> */}
+              <DatePickerDemo
+                name="date"
+                id="startDate"
+                // required={formData.hasTimeframe}
                 value={filters.startDate || ""}
                 onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               />
@@ -209,10 +213,17 @@ export default function Expenses() {
               <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-1">
                 End Date
               </label>
-              <Input
+              {/* <Input
                 type="date"
                 id="endDate"
                 value={filters.endDate || ""}
+                onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
+              /> */}
+              <DatePickerDemo
+                name="date"
+                id="endDate"
+                // required={formData.hasTimeframe}
+                value={filters.startDate || ""}
                 onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               />
             </div>
@@ -301,13 +312,13 @@ export default function Expenses() {
             >
               Reset
             </Button>
-            <Button onClick={() => fetchExpenses()}>Apply Filters</Button>
+            <Button onClick={() => refetch()}>Apply Filters</Button>
           </div>
         </DashboardCard>
       )}
 
       <DashboardCard title="All Expenses">
-        {loading ? (
+        {isLoading ? (
           <div className="animate-pulse space-y-4">
             {[...Array(5)].map((_, index) => (
               <div key={index} className="h-16 bg-gray-200 rounded-md"></div>
@@ -315,13 +326,16 @@ export default function Expenses() {
           </div>
         ) : error ? (
           <div className="text-center py-8">
-            <p className="text-red-500 mb-4">{error}</p>
-            <Button onClick={fetchExpenses}>Try Again</Button>
+            <p className="text-red-500 mb-4">{error.message}</p>
+            <Button onClick={() => {
+              // eslint-disable-next-line react-hooks/rules-of-hooks
+              useExpenses()
+            }}>Try Again</Button>
           </div>
         ) : expenses.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">No expenses found</p>
-            <Link href="/dashboard/expenses/create">
+            <Link href="/dashboard/expenses/create" className="bg-teal-600">
               <Button>Add Your First Expense</Button>
             </Link>
           </div>
@@ -413,7 +427,7 @@ export default function Expenses() {
                       </span>
                     </td> */}
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 text-right">
-                      {formatCurrency(expense.amount)}
+                      {formatCurrency(expense.totalAmount)}
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-right">
                       <div className="flex justify-end space-x-2">
