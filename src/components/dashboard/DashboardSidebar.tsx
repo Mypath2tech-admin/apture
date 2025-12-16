@@ -37,6 +37,7 @@ interface DashboardSidebarProps {
 }
 
 export default function DashboardSidebar({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   organizationName,
 }: DashboardSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,43 +66,40 @@ export default function DashboardSidebar({
       icon: DollarSign,
       userTypes: ["user", "organization"],
     },
-    ...(organizationName === "MyPath2Tech"
-      ? [
-          {
-            name: "Timesheets",
-            href: "/dashboard/timesheets",
-            icon: Clock,
-            userTypes: ["user", "organization"],
-          } as NavItem,
-        ]
-      : []),
-      {
-        name: "Community Members",
-        href: "/dashboard/members",
-        icon: NotebookTabs,
-        userTypes: ["organization"],
-        locked: false,
-      },
-      {
-        name: "Ask Finn",
-        href: "/dashboard/ai-assistant",
-        icon: Brain,
-        userTypes: ["organization"],
-        locked: false,
-      },
-      {
-        name: "Volunteer Members",
-        href: "/dashboard/volunteer-management",
-        icon: Smile,
-        userTypes: ["organization"],
-        locked: false,
-      },
-      {
-        name: "Team Members",
-        href: "/dashboard/users",
-        icon: Users,
-        userTypes: ["organization"],
-      },
+
+    {
+      name: "Timesheets",
+      href: "/dashboard/timesheets",
+      icon: Clock,
+      userTypes: ["user", "organization"],
+    },
+    {
+      name: "Community Members",
+      href: "/dashboard/members",
+      icon: NotebookTabs,
+      userTypes: ["organization"],
+      locked: false,
+    },
+    {
+      name: "Ask Finn",
+      href: "/dashboard/ai-assistant",
+      icon: Brain,
+      userTypes: ["organization"],
+      locked: false,
+    },
+    {
+      name: "Volunteer Members",
+      href: "/dashboard/volunteer-management",
+      icon: Smile,
+      userTypes: ["organization"],
+      locked: false,
+    },
+    {
+      name: "Team Members",
+      href: "/dashboard/users",
+      icon: Users,
+      userTypes: ["organization"],
+    },
     {
       name: "Settings",
       href: "/dashboard/settings",
@@ -162,9 +160,8 @@ export default function DashboardSidebar({
 
       {/* Sidebar */}
       <aside
-        className={`fixed h-screen md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${
-          isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
-        }`}
+        className={`fixed h-screen md:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transform transition-transform duration-200 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          }`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
@@ -204,18 +201,15 @@ export default function DashboardSidebar({
                   <Link
                     key={item.name}
                     href={item.locked ? "#" : item.href}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-700 hover:bg-gray-100"
-                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <item.icon
-                      className={`mr-3 h-5 w-5 ${
-                        isActive ? "text-teal-600" : "text-gray-500"
-                      } ${
-                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
-                      }`}
+                      className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                        } ${item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                        }`}
                       aria-hidden="true"
                     />
                     {item.name}
@@ -239,18 +233,15 @@ export default function DashboardSidebar({
                   <Link
                     key={item.name}
                     href={item.locked ? "#" : item.href}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-700 hover:bg-gray-100"
-                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <item.icon
-                      className={`mr-3 h-5 w-5 ${
-                        isActive ? "text-teal-600" : "text-gray-500"
-                      } ${
-                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
-                      }`}
+                      className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                        } ${item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                        }`}
                       aria-hidden="true"
                     />
                     {item.name}
@@ -280,18 +271,15 @@ export default function DashboardSidebar({
                   <Link
                     key={item.name}
                     href={item.locked ? "#" : item.href}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-700 hover:bg-gray-100"
-                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <item.icon
-                      className={`mr-3 h-5 w-5 ${
-                        isActive ? "text-teal-600" : "text-gray-500"
-                      } ${
-                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
-                      }`}
+                      className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                        } ${item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                        }`}
                       aria-hidden="true"
                     />
                     {item.name}
@@ -315,18 +303,15 @@ export default function DashboardSidebar({
                   <Link
                     key={item.name}
                     href={item.locked ? "#" : item.href}
-                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                         ? "bg-teal-50 text-teal-700"
                         : "text-gray-700 hover:bg-gray-100"
-                    } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
+                      } ${item.locked ? "opacity-50 cursor-not-allowed" : ""}`}
                   >
                     <item.icon
-                      className={`mr-3 h-5 w-5 ${
-                        isActive ? "text-teal-600" : "text-gray-500"
-                      } ${
-                        item.locked ? "text-yellow-300 cursor-not-allowed" : ""
-                      }`}
+                      className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                        } ${item.locked ? "text-yellow-300 cursor-not-allowed" : ""
+                        }`}
                       aria-hidden="true"
                     />
                     {item.name}
@@ -349,17 +334,15 @@ export default function DashboardSidebar({
                 Library
               </span>
               <ChevronUp
-                className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${
-                  accordionOpen ? "rotate-0" : "rotate-180"
-                }`}
+                className={`h-5 w-5 text-gray-500 transition-transform duration-200 ${accordionOpen ? "rotate-0" : "rotate-180"
+                  }`}
               />
             </button>
 
             {/* Accordion content - opens upwards */}
             <div
-              className={`overflow-hidden transition-all duration-200 ease-in-out ${
-                accordionOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-200 ease-in-out ${accordionOpen ? "max-h-48 opacity-100" : "max-h-0 opacity-0"
+                }`}
             >
               <div className="flex flex-col-reverse">
                 {accordionItems.map((item) => {
@@ -368,16 +351,14 @@ export default function DashboardSidebar({
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex items-center px-3 py-2 mt-1 rounded-md text-sm font-medium ${
-                        isActive
+                      className={`flex items-center px-3 py-2 mt-1 rounded-md text-sm font-medium ${isActive
                           ? "bg-teal-50 text-teal-700"
                           : "text-gray-700 hover:bg-gray-100"
-                      }`}
+                        }`}
                     >
                       <item.icon
-                        className={`mr-3 h-5 w-5 ${
-                          isActive ? "text-teal-600" : "text-gray-500"
-                        }`}
+                        className={`mr-3 h-5 w-5 ${isActive ? "text-teal-600" : "text-gray-500"
+                          }`}
                         aria-hidden="true"
                       />
                       {item.name}

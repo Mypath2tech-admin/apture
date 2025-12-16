@@ -99,21 +99,13 @@ export default function CreateTimesheet() {
     // Normalize selected date to Monday (start of week)
     const mondayDate = startOfWeek(selectedDate, { weekStartsOn: 1 })
     const normalizedDateString = format(mondayDate, "yyyy-MM-dd")
-    
-    // Reset entries array to clear all daily descriptions and durations
-    const resetEntries = Array(7)
-      .fill(null)
-      .map((_, index) => ({
-        dayIndex: index,
-        duration: "",
-        description: "",
-      }))
-    
+
+    // Only update the week starting date and name.
+    // Do NOT reset daily entries so that any existing values are preserved.
     setFormData((prev) => ({
       ...prev,
       weekStarting: normalizedDateString,
       name: `Week of ${format(mondayDate, "MMM d, yyyy")}`,
-      entries: resetEntries,
     }))
   }
 
@@ -169,18 +161,6 @@ export default function CreateTimesheet() {
     }
 
     setValidationErrors(errors)
-  }
-
-  const handleDayDescriptionChange = (dayIndex: number, value: string) => {
-    const newEntries = [...formData.entries]
-    newEntries[dayIndex] = {
-      ...newEntries[dayIndex],
-      description: value,
-    }
-    setFormData((prev) => ({
-      ...prev,
-      entries: newEntries,
-    }))
   }
 
   const getTotalHours = () => {
@@ -241,7 +221,9 @@ export default function CreateTimesheet() {
         entries: validEntries.map((entry) => {
           const entryDate = addDays(startDate, entry.dayIndex)
           return {
-            description: entry.description,
+            // Daily descriptions are no longer captured on the form.
+            // Preserve the field in the payload but send an empty string.
+            description: "",
             startTime: entryDate.toISOString(),
             endTime: entryDate.toISOString(),
             duration: Number.parseFloat(entry.duration) || 0,
@@ -316,15 +298,22 @@ export default function CreateTimesheet() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="description">Weekly Description (Optional)</Label>
+            <Label htmlFor="description">Weekly Description </Label>
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={handleDescriptionChange}
+              placeholder="General description of work performed this week"
+              rows={3}
+            />
+            <div>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={handleGenerateDescription}
                 disabled={isGenerating}
-                className="flex items-center gap-2"
+                className="mt-1 flex items-center gap-2"
               >
                 {isGenerating ? (
                   <>
@@ -339,13 +328,6 @@ export default function CreateTimesheet() {
                 )}
               </Button>
             </div>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={handleDescriptionChange}
-              placeholder="General description of work performed this week"
-              rows={3}
-            />
           </div>
 
           {/* Organization Tax Rate Display */}
@@ -367,7 +349,7 @@ export default function CreateTimesheet() {
             <h3 className="text-lg font-medium">Daily Hours</h3>
 
             {validationErrors.total && (
-              <Alert >
+              <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{validationErrors.total}</AlertDescription>
               </Alert>
@@ -379,7 +361,6 @@ export default function CreateTimesheet() {
                   <tr>
                     <th className="text-left py-2 px-4 border-b">Day</th>
                     <th className="text-left py-2 px-4 border-b">Hours</th>
-                    <th className="text-left py-2 px-4 border-b">Description</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -413,15 +394,6 @@ export default function CreateTimesheet() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3 px-4">
-                          <Input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => handleDayDescriptionChange(index, e.target.value)}
-                            placeholder="What did you work on?"
-                            className="w-full"
-                          />
-                        </td>
                       </tr>
                     )
                   })}
@@ -429,20 +401,27 @@ export default function CreateTimesheet() {
                 <tfoot>
                   <tr className="bg-gray-50">
                     <td className="py-3 px-4 font-medium">Total</td>
-                    <td className="py-3 px-4 font-medium">{getTotalHours()} hrs</td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Subtotal:</span>
-                          <span>${(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Tax ({organizationTaxRate}%):</span>
-                          <span>${taxAmount.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between font-medium pt-1 border-t border-gray-200">
-                          <span>Total Earnings:</span>
-                          <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                    <td className="py-3 px-4 font-medium">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <span>{getTotalHours()} hrs</span>
+                        <div className="space-y-1 text-right">
+                          <div className="flex justify-between text-sm gap-4">
+                            <span>Subtotal:</span>
+                            <span>
+                              $
+                              {(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(
+                                2,
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm gap-4">
+                            <span>Tax ({organizationTaxRate}%):</span>
+                            <span>${taxAmount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between font-medium pt-1 border-t border-gray-200 gap-4">
+                            <span>Total Earnings:</span>
+                            <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                          </div>
                         </div>
                       </div>
                     </td>
