@@ -12,6 +12,7 @@ import { toast } from "react-toastify"
 import Link from "next/link"
 
 export default function ExportTimesheetsPage() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
