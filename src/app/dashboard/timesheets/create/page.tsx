@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Percent, AlertCircle } from "lucide-react"
+import { Loader2, Percent, AlertCircle, Sparkles } from "lucide-react"
 import type { TimesheetFormData } from "@/types/timesheet"
 import { DatePickerDemo } from "@/components/ui/date-picker"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -27,6 +27,7 @@ export default function CreateTimesheet() {
   const [taxAmount, setTaxAmount] = useState<number>(0)
   const [totalEarnings, setTotalEarnings] = useState<number>(0)
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
+  const [isGenerating, setIsGenerating] = useState(false)
 
 
   // Get the current week's Monday
@@ -94,11 +95,25 @@ export default function CreateTimesheet() {
   }, [formData.entries, formData.hourlyRate, organizationTaxRate])
 
   const handleWeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newWeekStarting = e.target.value
+    const selectedDate = parseISO(e.target.value)
+    // Normalize selected date to Monday (start of week)
+    const mondayDate = startOfWeek(selectedDate, { weekStartsOn: 1 })
+    const normalizedDateString = format(mondayDate, "yyyy-MM-dd")
+    
+    // Reset entries array to clear all daily descriptions and durations
+    const resetEntries = Array(7)
+      .fill(null)
+      .map((_, index) => ({
+        dayIndex: index,
+        duration: "",
+        description: "",
+      }))
+    
     setFormData((prev) => ({
       ...prev,
-      weekStarting: newWeekStarting,
-      name: `Week of ${format(parseISO(newWeekStarting), "MMM d, yyyy")}`,
+      weekStarting: normalizedDateString,
+      name: `Week of ${format(mondayDate, "MMM d, yyyy")}`,
+      entries: resetEntries,
     }))
   }
 
@@ -114,6 +129,16 @@ export default function CreateTimesheet() {
       ...prev,
       description: e.target.value,
     }))
+  }
+
+  const handleGenerateDescription = async () => {
+    // Placeholder implementation - UI hook only
+    setIsGenerating(true)
+    // TODO: Implement description generation logic
+    setTimeout(() => {
+      setIsGenerating(false)
+      toast.info("Description generation will be implemented soon")
+    }, 1000)
   }
 
   const handleDurationChange = (dayIndex: number, value: string) => {
@@ -291,7 +316,29 @@ export default function CreateTimesheet() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Weekly Description (Optional)</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="description">Weekly Description (Optional)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateDescription}
+                disabled={isGenerating}
+                className="flex items-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
             <Textarea
               id="description"
               value={formData.description}
