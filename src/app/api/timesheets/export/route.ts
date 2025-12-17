@@ -143,6 +143,33 @@ export async function GET(req: NextRequest) {
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
     const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
+    const descriptionFontSize = 10
+    const lineHeight = 14
+    const descriptionMaxWidth = 350 - 150 - 20
+
+    const wrapText = (text: string) => {
+      if (!text) return [""]
+
+      const words = text.split(" ")
+      const lines: string[] = []
+      let currentLine = ""
+
+      words.forEach((word) => {
+        const testLine = currentLine ? `${currentLine} ${word}` : word
+        const testWidth = font.widthOfTextAtSize(testLine, descriptionFontSize)
+
+        if (testWidth <= descriptionMaxWidth) {
+          currentLine = testLine
+        } else {
+          if (currentLine) lines.push(currentLine)
+          currentLine = word
+        }
+      })
+
+      if (currentLine) lines.push(currentLine)
+      return lines
+    }
+
     let yPos = height - 50
 
     // Header: "{FirstName} Timesheet - {Month Year}"
@@ -227,10 +254,9 @@ export async function GET(req: NextRequest) {
       const weekEndFormatted = format(entry.weekEnd, "d")
       const weekRange = `${weekStartFormatted}-${weekEndFormatted}`
 
-      // Truncate description if too long
-      const description = entry.description.length > 40
-        ? entry.description.substring(0, 37) + "..."
-        : entry.description
+      // Use full weekly description for export (no manual truncation)
+      const descriptionLines = wrapText(entry.description || "")
+      const rowHeight = Math.max(lineHeight, descriptionLines.length * lineHeight)
 
       page.drawText(weekRange, {
         x: 50,
@@ -239,11 +265,13 @@ export async function GET(req: NextRequest) {
         font,
       })
 
-      page.drawText(description || "-", {
-        x: 150,
-        y: yPos,
-        size: 10,
-        font,
+      descriptionLines.forEach((line, index) => {
+        page.drawText(line || "-", {
+          x: 150,
+          y: yPos - index * lineHeight,
+          size: descriptionFontSize,
+          font,
+        })
       })
 
       page.drawText(entry.hours.toFixed(1), {
@@ -267,7 +295,7 @@ export async function GET(req: NextRequest) {
         font,
       })
 
-      yPos -= 20
+      yPos -= rowHeight
     })
 
     yPos -= 20
@@ -322,7 +350,7 @@ export async function GET(req: NextRequest) {
     // Generate PDF
     const pdfBytes = await pdfDoc.save()
 
-    return new NextResponse(pdfBytes, {
+    return new NextResponse(pdfBytes as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="Timesheet-Export-${monthYear.replace(" ", "-")}.pdf"`,
