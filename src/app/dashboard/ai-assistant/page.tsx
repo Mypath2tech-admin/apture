@@ -37,10 +37,10 @@ export default function AIAssistantPage() {
     "Are we on track to reach our goal?",
   ];
 
-  // Scroll to the bottom when messages change
+  // Scroll to the bottom when messages change or when typing indicator appears
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -180,10 +180,10 @@ export default function AIAssistantPage() {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-full py-2 px-4 ${
+                    className={`max-w-[80%] py-3 px-4 ${
                       message.role === "user"
-                        ? "bg-gray-200 text-black"
-                        : "bg-transparent"
+                        ? "bg-gray-200 text-black rounded-full"
+                        : "bg-gray-100 text-black rounded-2xl"
                     }`}
                   >
                     {message.isMarkdown ? (
@@ -209,6 +209,20 @@ export default function AIAssistantPage() {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-2xl py-3 px-4 bg-gray-100 text-black">
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm">AI is typing</span>
+                      <div className="flex gap-1">
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:150ms]"></span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:300ms]"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}

@@ -4,5 +4,13 @@
       "main": false,
       "sandbox": true
     }
+  },
+  "functions": {
+    "src/app/api/ai-assistant/route.ts": {
+      "maxDuration": 30
+    },
+    "src/app/api/timesheets/generate-description/route.ts": {
+      "maxDuration": 30
+    }
   }
 }

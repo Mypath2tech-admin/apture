@@ -234,55 +234,55 @@ export default function TimesheetDetailPage() {
             </div>
           )}
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">Time Entries</h3>
+            <div>
+              <h3 className="text-lg font-medium mb-4">Time Entries</h3>
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="text-left py-2 px-4 border-b">Day</th>
-                    <th className="text-left py-2 px-4 border-b">Hours</th>
-                    <th className="text-left py-2 px-4 border-b">Description</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {entriesByDay.map((dayData, index) => (
-                    <tr key={index} className="border-b">
-                      <td className="py-3 px-4">
-                        <div className="font-medium">{dayData.day}</div>
-                        <div className="text-sm text-gray-500">{format(dayData.date, "MMM d, yyyy")}</div>
-                      </td>
-                      <td className="py-3 px-4">{dayData.duration}</td>
-                      <td className="py-3 px-4">{dayData.description}</td>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="text-left py-2 px-4 border-b">Day</th>
+                      <th className="text-left py-2 px-4 border-b">Hours</th>
                     </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-50 font-medium">
-                    <td className="py-3 px-4">Total</td>
-                    <td className="py-3 px-4">{totalDuration} hrs</td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Subtotal:</span>
-                          <span>{formatCurrency(timesheet.subtotal)}</span>
+                  </thead>
+                  <tbody>
+                    {entriesByDay.map((dayData, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-3 px-4">
+                          <div className="font-medium">{dayData.day}</div>
+                          <div className="text-sm text-gray-500">{format(dayData.date, "MMM d, yyyy")}</div>
+                        </td>
+                        <td className="py-3 px-4">{dayData.duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-gray-50 font-medium">
+                      <td className="py-3 px-4">Total</td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <span>{totalDuration} hrs</span>
+                          <div className="space-y-1 text-right">
+                            <div className="flex justify-between text-sm gap-4">
+                              <span>Subtotal:</span>
+                              <span>{formatCurrency(timesheet.subtotal)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm gap-4">
+                              <span>Tax ({timesheet.taxRate}%):</span>
+                              <span>{formatCurrency(timesheet.taxAmount)}</span>
+                            </div>
+                            <div className="flex justify-between font-medium pt-1 border-t border-gray-200 gap-4">
+                              <span>Total:</span>
+                              <span className="text-green-600">{formatCurrency(timesheet.totalAmount)}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Tax ({timesheet.taxRate}%):</span>
-                          <span>{formatCurrency(timesheet.taxAmount)}</span>
-                        </div>
-                        <div className="flex justify-between font-medium pt-1 border-t border-gray-200">
-                          <span>Total:</span>
-                          <span className="text-green-600">{formatCurrency(timesheet.totalAmount)}</span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                      </td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
             </div>
-          </div>
         </DashboardCard>
 
         <DashboardCard title={""}>

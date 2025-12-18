@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Percent, AlertCircle } from "lucide-react"
+import { Loader2, Percent, AlertCircle, Sparkles } from "lucide-react"
 import type { TimesheetFormData } from "@/types/timesheet"
 import { DatePickerDemo } from "@/components/ui/date-picker"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -27,6 +27,7 @@ export default function CreateTimesheet() {
   const [taxAmount, setTaxAmount] = useState<number>(0)
   const [totalEarnings, setTotalEarnings] = useState<number>(0)
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
+  const [isGenerating, setIsGenerating] = useState(false)
 
 
   // Get the current week's Monday
@@ -94,11 +95,17 @@ export default function CreateTimesheet() {
   }, [formData.entries, formData.hourlyRate, organizationTaxRate])
 
   const handleWeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newWeekStarting = e.target.value
+    const selectedDate = parseISO(e.target.value)
+    // Normalize selected date to Monday (start of week)
+    const mondayDate = startOfWeek(selectedDate, { weekStartsOn: 1 })
+    const normalizedDateString = format(mondayDate, "yyyy-MM-dd")
+
+    // Only update the week starting date and name.
+    // Do NOT reset daily entries so that any existing values are preserved.
     setFormData((prev) => ({
       ...prev,
-      weekStarting: newWeekStarting,
-      name: `Week of ${format(parseISO(newWeekStarting), "MMM d, yyyy")}`,
+      weekStarting: normalizedDateString,
+      name: `Week of ${format(mondayDate, "MMM d, yyyy")}`,
     }))
   }
 
@@ -114,6 +121,56 @@ export default function CreateTimesheet() {
       ...prev,
       description: e.target.value,
     }))
+  }
+
+  const handleGenerateDescription = async () => {
+    setIsGenerating(true)
+    
+    try {
+      const response = await fetch("/api/timesheets/generate-description", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          weekStarting: formData.weekStarting,
+          existingDescription: formData.description,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to generate description")
+      }
+
+      const data = await response.json()
+      const generatedDescription = data.description
+
+      // If field is empty, fill it; otherwise append
+      if (!formData.description.trim()) {
+        setFormData((prev) => ({
+          ...prev,
+          description: generatedDescription,
+        }))
+        toast.success("Description generated successfully")
+      } else {
+        // Append to existing content
+        setFormData((prev) => ({
+          ...prev,
+          description: `${prev.description}\n\n${generatedDescription}`,
+        }))
+        toast.success("Description enhanced successfully")
+      }
+    } catch (error) {
+      console.error("Error generating description:", error)
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate description. Please ensure you have uploaded a 3-Year Plan document."
+      )
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   const handleDurationChange = (dayIndex: number, value: string) => {
@@ -144,18 +201,6 @@ export default function CreateTimesheet() {
     }
 
     setValidationErrors(errors)
-  }
-
-  const handleDayDescriptionChange = (dayIndex: number, value: string) => {
-    const newEntries = [...formData.entries]
-    newEntries[dayIndex] = {
-      ...newEntries[dayIndex],
-      description: value,
-    }
-    setFormData((prev) => ({
-      ...prev,
-      entries: newEntries,
-    }))
   }
 
   const getTotalHours = () => {
@@ -216,7 +261,9 @@ export default function CreateTimesheet() {
         entries: validEntries.map((entry) => {
           const entryDate = addDays(startDate, entry.dayIndex)
           return {
-            description: entry.description,
+            // Daily descriptions are no longer captured on the form.
+            // Preserve the field in the payload but send an empty string.
+            description: "",
             startTime: entryDate.toISOString(),
             endTime: entryDate.toISOString(),
             duration: Number.parseFloat(entry.duration) || 0,
@@ -291,7 +338,7 @@ export default function CreateTimesheet() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Weekly Description (Optional)</Label>
+            <Label htmlFor="description">Weekly Description </Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -299,6 +346,28 @@ export default function CreateTimesheet() {
               placeholder="General description of work performed this week"
               rows={3}
             />
+            <div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateDescription}
+                disabled={isGenerating}
+                className="mt-1 flex items-center gap-2"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
 
           {/* Organization Tax Rate Display */}
@@ -320,7 +389,7 @@ export default function CreateTimesheet() {
             <h3 className="text-lg font-medium">Daily Hours</h3>
 
             {validationErrors.total && (
-              <Alert >
+              <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>{validationErrors.total}</AlertDescription>
               </Alert>
@@ -332,7 +401,6 @@ export default function CreateTimesheet() {
                   <tr>
                     <th className="text-left py-2 px-4 border-b">Day</th>
                     <th className="text-left py-2 px-4 border-b">Hours</th>
-                    <th className="text-left py-2 px-4 border-b">Description</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -366,15 +434,6 @@ export default function CreateTimesheet() {
                             )}
                           </div>
                         </td>
-                        <td className="py-3 px-4">
-                          <Input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => handleDayDescriptionChange(index, e.target.value)}
-                            placeholder="What did you work on?"
-                            className="w-full"
-                          />
-                        </td>
                       </tr>
                     )
                   })}
@@ -382,20 +441,27 @@ export default function CreateTimesheet() {
                 <tfoot>
                   <tr className="bg-gray-50">
                     <td className="py-3 px-4 font-medium">Total</td>
-                    <td className="py-3 px-4 font-medium">{getTotalHours()} hrs</td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span>Subtotal:</span>
-                          <span>${(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Tax ({organizationTaxRate}%):</span>
-                          <span>${taxAmount.toFixed(2)}</span>
-                        </div>
-                        <div className="flex justify-between font-medium pt-1 border-t border-gray-200">
-                          <span>Total Earnings:</span>
-                          <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                    <td className="py-3 px-4 font-medium">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <span>{getTotalHours()} hrs</span>
+                        <div className="space-y-1 text-right">
+                          <div className="flex justify-between text-sm gap-4">
+                            <span>Subtotal:</span>
+                            <span>
+                              $
+                              {(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(
+                                2,
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-sm gap-4">
+                            <span>Tax ({organizationTaxRate}%):</span>
+                            <span>${taxAmount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between font-medium pt-1 border-t border-gray-200 gap-4">
+                            <span>Total Earnings:</span>
+                            <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
+                          </div>
                         </div>
                       </div>
                     </td>

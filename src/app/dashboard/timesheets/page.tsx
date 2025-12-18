@@ -243,7 +243,7 @@ export default function TimesheetsPage() {
             href="/dashboard/timesheets/export"
             className="text-sm font-medium text-green-600 hover:text-green-500"
           >
-            Export All
+            Export 
           </Link>
         }
       >

@@ -24,6 +24,15 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true, // Allow SVG images
     contentSecurityPolicy: "default-src 'self'; img-src * data: blob:;", // Ensure CSP allows SVGs
   },
+  
+  // Webpack configuration for server-side dependencies
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // For server-side, ignore canvas (not needed for PDF parsing)
+      config.resolve.alias.canvas = false;
+    }
+    return config
+  },
 };
 
 export default nextConfig;

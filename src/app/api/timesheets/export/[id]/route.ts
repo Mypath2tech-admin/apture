@@ -189,7 +189,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       // Create PDF document
       const pdfDoc = await PDFDocument.create()
       const page = pdfDoc.addPage()
-      const {  height } = page.getSize()
+      const { width, height } = page.getSize()
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
 
@@ -238,9 +238,37 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
         font: boldFont,
       })
 
+      const descriptionFontSize = 10
+      const lineHeight = 14
+      const descriptionMaxWidth = width - 250 - 40
+
+      const wrapText = (text: string) => {
+        if (!text) return [""]
+
+        const words = text.split(" ")
+        const lines: string[] = []
+        let currentLine = ""
+
+        words.forEach((word) => {
+          const testLine = currentLine ? `${currentLine} ${word}` : word
+          const testWidth = font.widthOfTextAtSize(testLine, descriptionFontSize)
+
+          if (testWidth <= descriptionMaxWidth) {
+            currentLine = testLine
+          } else {
+            if (currentLine) lines.push(currentLine)
+            currentLine = word
+          }
+        })
+
+        if (currentLine) lines.push(currentLine)
+        return lines
+      }
+
+      let yPos = height - 200
+
       // Add entries
-      entriesByDay.forEach((entry, index) => {
-        const yPos = height - 200 - index * 20
+      entriesByDay.forEach((entry) => {
 
         page.drawText(entry.day, {
           x: 50,
@@ -256,19 +284,24 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
           font,
         })
 
-        // Truncate description if too long
-        const desc = entry.description.length > 50 ? entry.description.substring(0, 47) + "..." : entry.description
+        // Use full description for export (no manual truncation) and wrap to new lines as needed
+        const descriptionLines = wrapText(entry.description || "")
+        const rowHeight = Math.max(lineHeight, descriptionLines.length * lineHeight)
 
-        page.drawText(desc, {
-          x: 250,
-          y: yPos,
-          size: 10,
-          font,
+        descriptionLines.forEach((line, index) => {
+          page.drawText(line, {
+            x: 250,
+            y: yPos - index * lineHeight,
+            size: descriptionFontSize,
+            font,
+          })
         })
+
+        yPos -= rowHeight
       })
 
       // Add totals
-      let totalsY = height - 200 - entriesByDay.length * 20 - 30
+      let totalsY = yPos - 30
 
       page.drawText("Total Hours:", {
         x: 50,
@@ -367,7 +400,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       // Generate PDF
       const pdfBytes = await pdfDoc.save()
 
-      return new NextResponse(pdfBytes, {
+      return new NextResponse(pdfBytes as unknown as BodyInit, {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.pdf"`,

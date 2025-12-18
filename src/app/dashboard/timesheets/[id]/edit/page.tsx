@@ -112,6 +112,7 @@ export default function EditTimesheetPage() {
     }))
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDayDescriptionChange = (dayIndex: number, value: string) => {
     const newEntries = [...formData.entries]
     newEntries[dayIndex] = {
@@ -270,7 +271,7 @@ export default function EditTimesheetPage() {
                   <tr>
                     <th className="text-left py-2 px-4 border-b">Day</th>
                     <th className="text-left py-2 px-4 border-b">Hours</th>
-                    <th className="text-left py-2 px-4 border-b">Description</th>
+                    {/* <th className="text-left py-2 px-4 border-b">Description</th> */}
                   </tr>
                 </thead>
                 <tbody>
@@ -294,15 +295,7 @@ export default function EditTimesheetPage() {
                             placeholder="0"
                           />
                         </td>
-                        <td className="py-3 px-4">
-                          <Input
-                            type="text"
-                            value={entry.description}
-                            onChange={(e) => handleDayDescriptionChange(index, e.target.value)}
-                            placeholder="What did you work on?"
-                            className="w-full"
-                          />
-                        </td>
+                       
                       </tr>
                     )
                   })}
