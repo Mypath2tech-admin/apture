@@ -180,10 +180,10 @@ export default function AIAssistantPage() {
                   }`}
                 >
                   <div
-                    className={`max-w-[80%] rounded-full py-2 px-4 ${
+                    className={`max-w-[80%] py-3 px-4 ${
                       message.role === "user"
-                        ? "bg-gray-200 text-black"
-                        : "bg-transparent"
+                        ? "bg-gray-200 text-black rounded-full"
+                        : "bg-gray-100 text-black rounded-2xl"
                     }`}
                   >
                     {message.isMarkdown ? (
@@ -211,13 +211,13 @@ export default function AIAssistantPage() {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-full py-2 px-4 bg-transparent">
+                  <div className="max-w-[80%] rounded-2xl py-3 px-4 bg-gray-100 text-black">
                     <div className="flex items-center gap-1">
-                      <span className="text-muted-foreground text-sm">AI is typing</span>
+                      <span className="text-sm">AI is typing</span>
                       <div className="flex gap-1">
-                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:0ms]"></span>
-                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:150ms]"></span>
-                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:300ms]"></span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:0ms]"></span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:150ms]"></span>
+                        <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce [animation-delay:300ms]"></span>
                       </div>
                     </div>
                   </div>
