@@ -115,8 +115,8 @@ export async function POST(request: Request) {
 
 Your capabilities:
 - Answer questions about budgets, expenses, and financial planning
-- Provide insights about timesheet data and work performance
-- Reference and explain content from the user's 3-Year Plan document
+- Provide insights about timesheet data and yearly spending
+- Reference and explain content from the user's yearly Plan document
 - Compare actual performance against planned goals
 - Suggest activities and strategies based on the plan
 
