@@ -1,4 +1,4 @@
-import { format, getWeek, startOfMonth, startOfYear } from 'date-fns'
+import { getWeek, startOfMonth } from 'date-fns'
 
 /**
  * Extract year, month, and week number from a date

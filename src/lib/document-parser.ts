@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PDFParse } from 'pdf-parse'
+import PDFParser from 'pdf2json'
+import { promises as fs } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
+import { randomUUID } from 'crypto'
 import mammoth from 'mammoth'
 
 export interface ParsedChunk {
@@ -17,13 +21,12 @@ export interface ParsedDocument {
 }
 
 /**
- * Extract text from PDF file
+ * Extract text from PDF file using pdf2json
  * Enhanced error handling and support for various PDF formats
- * Configured for Next.js server-side usage
+ * Configured for Next.js server-side usage (cross-platform)
  */
 export async function extractTextFromPDF(fileBuffer: Buffer): Promise<string> {
-  let parser: PDFParse | null = null
-  
+  let tempFilePath: string | null = null
   try {
     // Validate buffer
     if (!fileBuffer || fileBuffer.length === 0) {
@@ -36,45 +39,42 @@ export async function extractTextFromPDF(fileBuffer: Buffer): Promise<string> {
       throw new Error('Invalid PDF file format: missing PDF header')
     }
 
-    // Configure worker for Next.js server environment
-    // pdf-parse v2 requires worker configuration in some environments
-    try {
-      // Try to configure worker path before creating parser
-      // This prevents the "Cannot find module" error
-      if (typeof (PDFParse as any).setWorker === 'function') {
-        // Set worker to null to use Node.js implementation
-        (PDFParse as any).setWorker(null)
-      }
-    } catch (workerConfigError) {
-      // Ignore worker configuration errors - will try without it
-      console.warn('Could not configure PDF worker, continuing with default:', workerConfigError)
-    }
+    // Create temporary file (cross-platform using os.tmpdir())
+    const tempDir = tmpdir()
+    const tempFileName = `pdf-${randomUUID()}.pdf`
+    tempFilePath = join(tempDir, tempFileName)
 
-    // Create parser with error handling
-    parser = new PDFParse({ 
-      data: fileBuffer,
+    // Write buffer to temporary file
+    await fs.writeFile(tempFilePath, fileBuffer)
+
+    // Parse PDF using pdf2json (no worker required)
+    const pdfParser = new (PDFParser as any)(null, 1)
+    
+    // Wrap the event-based API in a Promise
+    const parsedText = await new Promise<string>((resolve, reject) => {
+      pdfParser.on('pdfParser_dataError', (errData: any) => {
+        const errorMsg = errData?.parserError || 'Unknown PDF parsing error'
+        reject(new Error(errorMsg))
+      })
+
+      pdfParser.on('pdfParser_dataReady', () => {
+        try {
+          const text = (pdfParser as any).getRawTextContent()
+          if (!text || text.trim().length === 0) {
+            reject(new Error('PDF file appears to be empty or contains no extractable text (may be image-based PDF)'))
+          } else {
+            resolve(text.trim())
+          }
+        } catch (error) {
+          reject(error instanceof Error ? error : new Error('Failed to extract text from PDF'))
+        }
+      })
+
+      // Load and parse the PDF
+      pdfParser.loadPDF(tempFilePath)
     })
-    
-    // Extract text with timeout protection
-    const result = await Promise.race([
-      parser.getText(),
-      new Promise<never>((_, reject) => 
-        setTimeout(() => reject(new Error('PDF parsing timeout after 30 seconds')), 30000)
-      )
-    ])
 
-    // Validate result
-    if (!result || typeof result.text !== 'string') {
-      throw new Error('PDF parsing returned invalid result')
-    }
-
-    const extractedText = result.text.trim()
-    
-    if (extractedText.length === 0) {
-      throw new Error('PDF file appears to be empty or contains no extractable text (may be image-based PDF)')
-    }
-
-    return extractedText
+    return parsedText
   } catch (error) {
     // Provide more specific error messages
     if (error instanceof Error) {
@@ -91,12 +91,12 @@ export async function extractTextFromPDF(fileBuffer: Buffer): Promise<string> {
     }
     throw new Error(`Failed to extract text from PDF: Unknown error occurred`)
   } finally {
-    // Clean up parser
-    if (parser) {
+    // Clean up temporary file
+    if (tempFilePath) {
       try {
-        await parser.destroy()
+        await fs.unlink(tempFilePath)
       } catch (cleanupError) {
-        console.warn('Error cleaning up PDF parser:', cleanupError)
+        console.warn('Failed to clean up temporary PDF file:', cleanupError)
       }
     }
   }

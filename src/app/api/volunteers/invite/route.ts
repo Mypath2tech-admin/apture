@@ -10,7 +10,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
  * Generate or retrieve organization-scoped volunteer invite link
  * GET /api/volunteers/invite
  */
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('auth-token')?.value
@@ -87,7 +88,8 @@ export async function GET(request: NextRequest) {
  * Regenerate invite link (deactivate old, create new)
  * POST /api/volunteers/invite
  */
-export async function POST(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function POST(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('auth-token')?.value

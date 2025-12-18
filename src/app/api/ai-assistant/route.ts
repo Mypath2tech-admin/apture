@@ -54,6 +54,7 @@ export async function POST(request: Request) {
         organizationId = user.organizationId;
       }
     } catch (authError) {
+      console.error("Authentication error:", authError);
       return NextResponse.json(
         { error: "Invalid authentication token" },
         { status: 401 }

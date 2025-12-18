@@ -35,7 +35,7 @@ export async function searchSimilarChunks(
 
     // Build filter conditions
     const filterConditions: string[] = []
-    const params: any[] = [embeddingStr, documentId]
+    const params: (string | number)[] = [embeddingStr, documentId]
     let paramIndex = 3
 
     if (filters?.year !== undefined) {

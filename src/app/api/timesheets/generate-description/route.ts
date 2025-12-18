@@ -104,17 +104,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Combine plan chunks into context, prioritizing exact matches
-    const planContent = searchResults.allRelevant
+    // Type assertion: allRelevant includes matchType from hybridSearch
+    type SearchResultWithMatchType = typeof searchResults.allRelevant[0]
+    
+    const planContent = (searchResults.allRelevant as SearchResultWithMatchType[])
       .sort((a, b) => {
         // Sort: exact matches first, then by similarity
-        const aType = (a as any).matchType || 'similar'
-        const bType = (b as any).matchType || 'similar'
+        const aType = a.matchType || 'similar'
+        const bType = b.matchType || 'similar'
         if (aType === 'exact' && bType !== 'exact') return -1
         if (aType !== 'exact' && bType === 'exact') return 1
         return b.similarity - a.similarity
       })
       .map(chunk => {
-        const matchType = (chunk as any).matchType || 'similar'
+        const matchType = chunk.matchType || 'similar'
         const prefix = matchType === 'exact' ? '[EXACT MATCH]' : `[SIMILAR: ${(chunk.similarity * 100).toFixed(0)}%]`
         return `${prefix}\n${chunk.chunkText}`
       })
@@ -161,7 +164,7 @@ ${existingDescription && existingDescription.trim()
       ],
     })
 
-    const generatedDescription = response.text.trim()
+    const generatedDescription = response.text?.trim() || ''
 
     return NextResponse.json({
       description: generatedDescription,

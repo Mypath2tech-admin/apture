@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 /**
  * GET /api/documents - List documents for the authenticated user/organization
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function GET(request: NextRequest) {
   try {
     // Verify authentication

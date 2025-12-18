@@ -27,14 +27,21 @@ export async function GET() {
       );
     }
 
-    const data = await response.json();
+    const data = await response.json() as {
+      models?: Array<{
+        name: string
+        displayName?: string
+        description?: string
+        supportedGenerationMethods?: string[]
+      }>
+    }
     
     // Filter models that support generateContent
     const availableModels = data.models
-      ?.filter((model: any) => 
+      ?.filter((model) => 
         model.supportedGenerationMethods?.includes("generateContent")
       )
-      .map((model: any) => ({
+      .map((model) => ({
         name: model.name,
         displayName: model.displayName,
         description: model.description,

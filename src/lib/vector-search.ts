@@ -1,6 +1,4 @@
 import { prisma } from './prisma'
-import { embeddingFromJson, cosineSimilarity } from './embeddings'
-import type { generateEmbedding } from './embeddings'
 
 export interface ChunkSearchResult {
   id: string
@@ -66,9 +64,8 @@ export async function semanticSearch(
     limit?: number
   }
 ): Promise<ChunkSearchResult[]> {
-  // Generate embedding for query
-  const { generateEmbedding } = await import('./embeddings')
-  const queryEmbedding = await generateEmbedding(queryText)
+  // Note: This function cannot access embedding field via Prisma
+  // For semantic search with embeddings, use vector-search-service.ts instead
   
   // Build where clause
   const where: {
@@ -93,37 +90,34 @@ export async function semanticSearch(
   }
   where.embedding = { not: null }
   
-  // Get all relevant chunks
+  // Note: Prisma doesn't expose the embedding field directly (it's Unsupported("vector(768)"))
+  // For semantic search, use vector-search-service.ts which uses raw SQL queries
+  // This function is kept for compatibility but should use raw SQL for embedding access
+  console.warn('semanticSearch in vector-search.ts: Embedding field not accessible via Prisma. Use vector-search-service.ts instead.')
+  
+  // Get all relevant chunks (without embedding field)
   const chunks = await prisma.documentEmbedding.findMany({
-    where,
+    where: {
+      documentId: where.documentId,
+      year: where.year,
+      month: where.month,
+      week: where.week,
+    },
     take: filters?.limit || 10,
   })
   
-  // Calculate similarity for each chunk
-  const results: ChunkSearchResult[] = chunks
-    .map(chunk => {
-      if (!chunk.embedding) {
-        return null
-      }
-      
-      const chunkEmbedding = embeddingFromJson(chunk.embedding)
-      const similarity = cosineSimilarity(queryEmbedding.embedding, chunkEmbedding)
-      
-      return {
-        id: chunk.id,
-        chunkText: chunk.chunkText,
-        chunkIndex: chunk.chunkIndex,
-        year: chunk.year ?? undefined,
-        month: chunk.month ?? undefined,
-        week: chunk.week ?? undefined,
-        metadata: chunk.metadata as Record<string, unknown> | undefined,
-        similarity,
-      }
-    })
-    .filter((result): result is ChunkSearchResult => result !== null)
-    .sort((a, b) => (b.similarity || 0) - (a.similarity || 0))
-  
-  return results
+  // Return chunks without similarity scores (embedding not accessible)
+  // For actual semantic search, use vector-search-service.ts
+  return chunks.map(chunk => ({
+    id: chunk.id,
+    chunkText: chunk.chunkText,
+    chunkIndex: chunk.chunkIndex,
+    year: chunk.year ?? undefined,
+    month: chunk.month ?? undefined,
+    week: chunk.week ?? undefined,
+    metadata: chunk.metadata as Record<string, unknown> | undefined,
+    similarity: 0, // Cannot calculate without embedding
+  }))
 }
 
 /**

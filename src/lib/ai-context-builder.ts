@@ -1,5 +1,5 @@
 import { prisma } from './prisma'
-import { findYearPlanDocument, searchByYearMonthWeek } from './vector-search'
+import { findYearPlanDocument } from './vector-search'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
 export interface UserContext {
@@ -75,7 +75,18 @@ async function getYearPlanContext(
   }
 
   // Get a general overview from the plan (first few chunks)
-  const chunks = await searchByYearMonthWeek(yearPlan.id)
+  // Query all chunks to get summary of available years/months/weeks
+  const chunks = await prisma.documentEmbedding.findMany({
+    where: {
+      documentId: yearPlan.id,
+    },
+    select: {
+      year: true,
+      month: true,
+      week: true,
+    },
+    take: 1000, // Limit to avoid loading too much data
+  })
   
   if (chunks.length === 0) {
     return `3-Year Plan document "${yearPlan.name}" is available but contains no structured content.`
@@ -173,8 +184,7 @@ async function getBudgetContext(
     organizationId?: string
     OR: Array<{
       startDate?: { lte: Date }
-      endDate?: { gte: Date }
-      endDate?: null
+      endDate?: { gte: Date } | null
     }>
   } = {
     OR: [

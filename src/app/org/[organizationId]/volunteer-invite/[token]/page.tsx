@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -118,9 +119,11 @@ export default function VolunteerInvitePage() {
         <CardHeader className="text-center">
           {organization.logo && (
             <div className="flex justify-center mb-4">
-              <img
+              <Image
                 src={organization.logo}
                 alt={organization.name}
+                width={64}
+                height={64}
                 className="h-16 w-16 rounded-full object-cover"
               />
             </div>
@@ -174,7 +177,7 @@ export default function VolunteerInvitePage() {
           </form>
 
           <p className="mt-4 text-sm text-gray-500 text-center">
-            Your application will be reviewed by the organization. You'll receive an email once a decision is made.
+            Your application will be reviewed by the organization. You&apos;ll receive an email once a decision is made.
           </p>
         </CardContent>
       </Card>

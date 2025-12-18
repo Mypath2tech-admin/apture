@@ -37,10 +37,10 @@ export default function AIAssistantPage() {
     "Are we on track to reach our goal?",
   ];
 
-  // Scroll to the bottom when messages change
+  // Scroll to the bottom when messages change or when typing indicator appears
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, isLoading]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -209,6 +209,20 @@ export default function AIAssistantPage() {
                   </div>
                 </div>
               ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[80%] rounded-full py-2 px-4 bg-transparent">
+                    <div className="flex items-center gap-1">
+                      <span className="text-muted-foreground text-sm">AI is typing</span>
+                      <div className="flex gap-1">
+                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:0ms]"></span>
+                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:150ms]"></span>
+                        <span className="w-1 h-1 bg-muted-foreground rounded-full animate-bounce [animation-delay:300ms]"></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div ref={messagesEndRef} />
             </div>
           )}

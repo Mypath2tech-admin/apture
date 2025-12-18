@@ -9,7 +9,8 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
  * Get all volunteers for the current user's organization
  * GET /api/volunteers
  */
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function GET(_request: NextRequest) {
   try {
     const cookieStore = await cookies()
     const token = cookieStore.get('auth-token')?.value
