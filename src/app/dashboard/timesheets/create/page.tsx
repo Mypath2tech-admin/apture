@@ -124,13 +124,53 @@ export default function CreateTimesheet() {
   }
 
   const handleGenerateDescription = async () => {
-    // Placeholder implementation - UI hook only
     setIsGenerating(true)
-    // TODO: Implement description generation logic
-    setTimeout(() => {
+    
+    try {
+      const response = await fetch("/api/timesheets/generate-description", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          weekStarting: formData.weekStarting,
+          existingDescription: formData.description,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || "Failed to generate description")
+      }
+
+      const data = await response.json()
+      const generatedDescription = data.description
+
+      // If field is empty, fill it; otherwise append
+      if (!formData.description.trim()) {
+        setFormData((prev) => ({
+          ...prev,
+          description: generatedDescription,
+        }))
+        toast.success("Description generated successfully")
+      } else {
+        // Append to existing content
+        setFormData((prev) => ({
+          ...prev,
+          description: `${prev.description}\n\n${generatedDescription}`,
+        }))
+        toast.success("Description enhanced successfully")
+      }
+    } catch (error) {
+      console.error("Error generating description:", error)
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to generate description. Please ensure you have uploaded a 3-Year Plan document."
+      )
+    } finally {
       setIsGenerating(false)
-      toast.info("Description generation will be implemented soon")
-    }, 1000)
+    }
   }
 
   const handleDurationChange = (dayIndex: number, value: string) => {

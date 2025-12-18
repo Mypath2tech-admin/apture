@@ -1,5 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/prisma";
+import { buildUserContext, formatContextForPrompt } from "@/lib/ai-context-builder";
 
 interface AppError extends Error {
   code?: string;
@@ -12,6 +16,8 @@ interface UploadedFile {
   content: string; // Assuming the file content is plain text or base64
 }
 
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
 // Initialize the Gemini API client
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY || "",
@@ -19,6 +25,41 @@ const ai = new GoogleGenAI({
 
 export async function POST(request: Request) {
   try {
+    // Verify authentication
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth-token")?.value;
+
+    if (!token) {
+      return NextResponse.json(
+        { error: "Not authenticated" },
+        { status: 401 }
+      );
+    }
+
+    // Verify token and get user info
+    let userId: string;
+    let organizationId: string | null = null;
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+      userId = decoded.userId;
+
+      // Get user's organization
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, organizationId: true },
+      });
+
+      if (user) {
+        organizationId = user.organizationId;
+      }
+    } catch (authError) {
+      return NextResponse.json(
+        { error: "Invalid authentication token" },
+        { status: 401 }
+      );
+    }
+
     // Parse the request body
     const { messages, fileData } = await request.json();
 
@@ -29,6 +70,10 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    // Build user context (Year Plan, Timesheets, Budgets, Performance)
+    const userContext = await buildUserContext(userId, organizationId);
+    const contextText = formatContextForPrompt(userContext);
 
     // Prepare the chat history for Gemini
     const chatHistory = [];
@@ -61,19 +106,32 @@ export async function POST(request: Request) {
       }
     }
 
-    // Add instruction to format response as markdown
+    // Build enhanced system instruction with context
+    const systemInstructionText = `You are an AI assistant helping with budget management, timesheet tracking, and planning.
+
+Your capabilities:
+- Answer questions about budgets, expenses, and financial planning
+- Provide insights about timesheet data and work performance
+- Reference and explain content from the user's 3-Year Plan document
+- Compare actual performance against planned goals
+- Suggest activities and strategies based on the plan
+
+Please format your responses using markdown for better readability. Use headers, lists, code blocks, bold, and italic text where appropriate.
+
+${contextText ? `You have access to the following user context:${contextText}` : "No additional context is available at this time."}`;
+
     const systemInstruction = {
       role: "model",
       parts: [
         {
-          text: "Please format your responses using markdown for better readability. Use headers, lists, code blocks, bold, and italic text where appropriate.",
+          text: systemInstructionText,
         },
       ],
     };
 
     // Generate content
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash-001",
+      model: "gemini-2.5-pro",
       contents: [
         systemInstruction,
         ...chatHistory,

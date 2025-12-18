@@ -1,12 +1,14 @@
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider        = "prisma-client-js"
+  output          = "../generated/prisma"
+  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+  extensions = [uuid_ossp(map: "uuid-ossp", schema: "extensions"), vector]
 }
 
 model User {
@@ -31,6 +33,7 @@ model User {
   canViewOrgDashboard     Boolean?         @default(false)
   auditLogs               AuditLog[]
   budgets                 Budget[]
+  documents               Document[]
   expenses                Expense[]
   notifications           Notification[]
   ownedOrganization       Organization?    @relation("OrganizationOwner")
@@ -52,12 +55,15 @@ model Organization {
   ownerId      String?          @unique
   tax_rate     Decimal?         @default(0.00) @db.Decimal(5, 2)
   budgets      Budget[]
+  documents    Document[]
   expenses     Expense[]
   owner        User?            @relation("OrganizationOwner", fields: [ownerId], references: [id])
   subscription Subscription?
   timesheets   Timesheet[]
   members      User[]
   invitations  UserInvitation[]
+  volunteers   Volunteer[]
+  volunteerInvites VolunteerInvite[]
 }
 
 model UserInvitation {
@@ -246,6 +252,51 @@ model playing_with_neon {
   value Float? @db.Real
 }
 
+model Document {
+  id             String              @id @default(cuid())
+  name           String
+  fileName       String
+  filePath       String
+  fileSize       Int
+  mimeType       String
+  organizationId String?
+  userId         String?
+  isAiReadable   Boolean             @default(false)
+  isYearPlan     Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  planStartDate  DateTime?
+  planYears      Int?                @default(3)
+  organization   Organization?       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User?               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  embeddings     DocumentEmbedding[]
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([isYearPlan, organizationId])
+  @@index([isYearPlan, userId])
+}
+
+model DocumentEmbedding {
+  id         String                 @id @default(cuid())
+  documentId String                 @map("document_id")
+  chunkText  String                 @map("chunk_text")
+  chunkIndex Int                    @map("chunk_index")
+  year       Int?
+  month      Int?
+  week       Int?
+  embedding  Unsupported("vector")?
+  metadata   Json?
+  createdAt  DateTime               @default(now()) @map("created_at")
+  document   Document               @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, year, month, week])
+  @@index([documentId])
+  @@index([documentId, year, month, week], map: "document_embeddings_document_year_month_week_idx")
+  @@index([embedding])
+  @@map("document_embeddings")
+}
+
 enum UserRole {
   ADMIN
   USER
@@ -257,4 +308,41 @@ enum InvitationStatus {
   PENDING
   ACCEPTED
   EXPIRED
+}
+
+enum VolunteerStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Volunteer {
+  id             String          @id @default(cuid())
+  name           String
+  email          String
+  role           String
+  status         VolunteerStatus @default(PENDING)
+  volunteerDate  DateTime        @default(now()) // Date volunteer submitted form
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organizationId String
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([organizationId, status])
+}
+
+model VolunteerInvite {
+  id             String          @id @default(cuid())
+  token          String          @unique
+  organizationId String
+  expiresAt      DateTime?
+  isActive       Boolean         @default(true)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, token])
+  @@index([organizationId])
+  @@index([token])
 }

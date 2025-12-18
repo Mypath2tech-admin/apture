@@ -24,6 +24,18 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true, // Allow SVG images
     contentSecurityPolicy: "default-src 'self'; img-src * data: blob:;", // Ensure CSP allows SVGs
   },
+  
+  // Webpack configuration to handle pdf-parse worker files
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // For server-side, ignore worker files
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'pdfjs-dist/build/pdf.worker.mjs': false,
+      }
+    }
+    return config
+  },
 };
 
 export default nextConfig;
