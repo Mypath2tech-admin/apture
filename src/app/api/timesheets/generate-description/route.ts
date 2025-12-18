@@ -7,6 +7,9 @@ import { findYearPlanDocument } from '@/lib/vector-search'
 import { mapCalendarToPlanYear, getMonthName } from '@/lib/year-plan-service'
 import { hybridSearch } from '@/lib/vector-search-service'
 
+// Increase timeout for Vercel (max 60s on Pro plan, 10s on Hobby)
+export const maxDuration = 30;
+
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
 // Initialize Gemini AI client

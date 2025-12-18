@@ -10,52 +10,81 @@ export interface UserContext {
 }
 
 /**
+ * Helper function to add timeout to promises
+ */
+async function withTimeout<T>(
+  promise: Promise<T>,
+  timeoutMs: number,
+  errorMessage: string
+): Promise<T> {
+  const timeout = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error(errorMessage)), timeoutMs)
+  )
+  return Promise.race([promise, timeout])
+}
+
+/**
  * Build comprehensive context for AI assistant
+ * Optimized to run queries in parallel with timeouts to prevent blocking
  */
 export async function buildUserContext(
   userId: string,
   organizationId?: string | null
 ): Promise<UserContext> {
   const context: UserContext = {}
+  const timeoutMs = 5000 // 5 second timeout per query
 
-  // Get Year Plan context
-  try {
-    const yearPlanContext = await getYearPlanContext(userId, organizationId || undefined)
-    if (yearPlanContext) {
-      context.yearPlan = yearPlanContext
-    }
-  } catch (error) {
-    console.error('Error fetching year plan context:', error)
+  // Run all context queries in parallel for better performance
+  // Each query has a 5s timeout to prevent blocking
+  const [yearPlanContext, timesheetContext, budgetContext, performanceContext] = await Promise.allSettled([
+    withTimeout(
+      getYearPlanContext(userId, organizationId || undefined),
+      timeoutMs,
+      'Year plan context timeout'
+    ),
+    withTimeout(
+      getTimesheetContext(userId, organizationId || undefined),
+      timeoutMs,
+      'Timesheet context timeout'
+    ),
+    withTimeout(
+      getBudgetContext(userId, organizationId || undefined),
+      timeoutMs,
+      'Budget context timeout'
+    ),
+    withTimeout(
+      getPerformanceContext(userId, organizationId || undefined),
+      timeoutMs,
+      'Performance context timeout'
+    ),
+  ])
+
+  // Handle Year Plan context
+  if (yearPlanContext.status === 'fulfilled' && yearPlanContext.value) {
+    context.yearPlan = yearPlanContext.value
+  } else if (yearPlanContext.status === 'rejected') {
+    console.error('Error fetching year plan context:', yearPlanContext.reason)
   }
 
-  // Get timesheet context (current month)
-  try {
-    const timesheetContext = await getTimesheetContext(userId, organizationId || undefined)
-    if (timesheetContext) {
-      context.timesheets = timesheetContext
-    }
-  } catch (error) {
-    console.error('Error fetching timesheet context:', error)
+  // Handle Timesheet context
+  if (timesheetContext.status === 'fulfilled' && timesheetContext.value) {
+    context.timesheets = timesheetContext.value
+  } else if (timesheetContext.status === 'rejected') {
+    console.error('Error fetching timesheet context:', timesheetContext.reason)
   }
 
-  // Get budget context (current month)
-  try {
-    const budgetContext = await getBudgetContext(userId, organizationId || undefined)
-    if (budgetContext) {
-      context.budgets = budgetContext
-    }
-  } catch (error) {
-    console.error('Error fetching budget context:', error)
+  // Handle Budget context
+  if (budgetContext.status === 'fulfilled' && budgetContext.value) {
+    context.budgets = budgetContext.value
+  } else if (budgetContext.status === 'rejected') {
+    console.error('Error fetching budget context:', budgetContext.reason)
   }
 
-  // Get performance context
-  try {
-    const performanceContext = await getPerformanceContext(userId, organizationId || undefined)
-    if (performanceContext) {
-      context.performance = performanceContext
-    }
-  } catch (error) {
-    console.error('Error fetching performance context:', error)
+  // Handle Performance context
+  if (performanceContext.status === 'fulfilled' && performanceContext.value) {
+    context.performance = performanceContext.value
+  } else if (performanceContext.status === 'rejected') {
+    console.error('Error fetching performance context:', performanceContext.reason)
   }
 
   return context
@@ -74,18 +103,22 @@ async function getYearPlanContext(
     return null
   }
 
-  // Get a general overview from the plan (first few chunks)
-  // Query all chunks to get summary of available years/months/weeks
+  // Get a general overview from the plan
+  // Query chunks to get summary of available years/months/weeks
+  // Use a more efficient query with limits
   const chunks = await prisma.documentEmbedding.findMany({
     where: {
       documentId: yearPlan.id,
+      year: { not: null },
+      month: { not: null },
+      week: { not: null },
     },
     select: {
       year: true,
       month: true,
       week: true,
     },
-    take: 1000, // Limit to avoid loading too much data
+    take: 200, // Reduced limit for faster queries - enough to get unique combinations
   })
   
   if (chunks.length === 0) {

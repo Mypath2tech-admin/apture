@@ -5,6 +5,9 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import { buildUserContext, formatContextForPrompt } from "@/lib/ai-context-builder";
 
+// Increase timeout for Vercel (max 60s on Pro plan, 10s on Hobby)
+export const maxDuration = 30;
+
 interface AppError extends Error {
   code?: string;
   stack?: string;
