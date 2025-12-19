@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import { buildUserContext, formatContextForPrompt } from "@/lib/ai-context-builder";
+import { searchSimilarChunks } from "@/lib/vector-search-service";
 
 // Increase timeout for Vercel (max 60s on Pro plan, 10s on Hobby)
 export const maxDuration = 30;
@@ -79,6 +80,40 @@ export async function POST(request: Request) {
     const userContext = await buildUserContext(userId, organizationId);
     const contextText = formatContextForPrompt(userContext);
 
+    // Get all AI-readable documents for semantic search
+    const whereClause: {
+      isAiReadable: boolean
+      OR: Array<{
+        userId?: string | null
+        organizationId?: string | null
+      }>
+    } = {
+      isAiReadable: true,
+      OR: [],
+    }
+
+    if (userId) {
+      whereClause.OR.push({
+        userId: userId,
+        organizationId: null,
+      })
+    }
+
+    if (organizationId) {
+      whereClause.OR.push({
+        organizationId: organizationId,
+        userId: null,
+      })
+    }
+
+    const aiReadableDocs = await prisma.document.findMany({
+      where: whereClause,
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+
     // Prepare the chat history for Gemini
     const chatHistory = [];
     let userPrompt = "";
@@ -93,10 +128,61 @@ export async function POST(request: Request) {
     }
 
     // Get the latest user message
+    let relevantDocumentContent = ""
     if (messages.length > 0) {
       const lastMsg = messages[messages.length - 1];
       if (lastMsg.role === "user") {
         userPrompt = lastMsg.content;
+
+        // Perform semantic search across all AI-readable documents
+        if (aiReadableDocs.length > 0 && userPrompt.trim().length > 10) {
+          // Search each document for relevant content
+          const searchPromises = aiReadableDocs.map(async (doc) => {
+            try {
+              const results = await searchSimilarChunks(
+                userPrompt,
+                doc.id,
+                undefined, // No filters
+                3 // Top 3 most relevant chunks per document
+              )
+              return {
+                documentName: doc.name,
+                chunks: results,
+              }
+            } catch (error) {
+              console.error(`Error searching document ${doc.id}:`, error)
+              return null
+            }
+          })
+
+          const searchResults = await Promise.allSettled(searchPromises)
+          const relevantChunks: Array<{ documentName: string; chunkText: string; similarity: number }> = []
+
+          searchResults.forEach((result, index) => {
+            if (result.status === 'fulfilled' && result.value) {
+              result.value.chunks.forEach(chunk => {
+                if (chunk.similarity > 0.7) { // Only include chunks with >70% similarity
+                  relevantChunks.push({
+                    documentName: result.value!.documentName,
+                    chunkText: chunk.chunkText,
+                    similarity: chunk.similarity,
+                  })
+                }
+              })
+            }
+          })
+
+          // Sort by similarity and take top 5 chunks
+          relevantChunks.sort((a, b) => b.similarity - a.similarity)
+          const topChunks = relevantChunks.slice(0, 5)
+
+          if (topChunks.length > 0) {
+            relevantDocumentContent = "\n\n**Relevant content from your documents:**\n\n"
+            topChunks.forEach((chunk, idx) => {
+              relevantDocumentContent += `[From "${chunk.documentName}" - ${(chunk.similarity * 100).toFixed(0)}% match]\n${chunk.chunkText}\n\n`
+            })
+          }
+        }
 
         // Add file content if there are attachments
         if (fileData && fileData.length > 0) {
@@ -116,9 +202,9 @@ export async function POST(request: Request) {
 Your capabilities:
 - Answer questions about budgets, expenses, and financial planning
 - Provide insights about timesheet data and work performance
-- Reference and explain content from the user's 3-Year Plan document
+- Reference and explain content from the user's AI-readable documents (including plan documents)
 - Compare actual performance against planned goals
-- Suggest activities and strategies based on the plan
+- Suggest activities and strategies based on available documents
 
 Please format your responses using markdown for better readability. Use headers, lists, code blocks, bold, and italic text where appropriate.
 
@@ -133,13 +219,16 @@ ${contextText ? `You have access to the following user context:${contextText}` :
       ],
     };
 
+    // Combine user prompt with relevant document content
+    const enhancedUserPrompt = userPrompt + relevantDocumentContent
+
     // Generate content
     const response = await ai.models.generateContent({
       model: "gemini-2.5-pro",
       contents: [
         systemInstruction,
         ...chatHistory,
-        { role: "user", parts: [{ text: userPrompt }] },
+        { role: "user", parts: [{ text: enhancedUserPrompt }] },
       ],
     });
 

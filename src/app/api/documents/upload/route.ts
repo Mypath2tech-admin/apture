@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
 import { supabase, supabaseStorage } from '@/lib/supabase'
 import { extractAndParseDocument } from '@/lib/document-parser'
-import { generateEmbedding } from '@/lib/embeddings'
 import { v4 as uuidv4 } from 'uuid'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
@@ -69,13 +68,11 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const fileBuffer = Buffer.from(arrayBuffer)
 
-    // Check if this is a "3-Year Plan" document - flexible detection
+    // Check if this is a "Plan" document - flexible detection
+    // Document is marked as plan if filename contains "plan" or related terms
     const fileNameLower = file.name.toLowerCase()
-    // Check for common patterns: "3-year", "3 year", "year plan" with "3" or "three"
-    const hasYear = fileNameLower.includes('year')
-    const hasPlan = fileNameLower.includes('plan')
-    const hasThree = fileNameLower.includes('3') || fileNameLower.includes('three')
-    const isYearPlan = hasYear && hasPlan && hasThree
+    const planKeywords = ['plan', 'planning', 'strategy', 'roadmap', 'blueprint']
+    const isYearPlan = planKeywords.some(keyword => fileNameLower.includes(keyword))
     
     // #region agent log
     fetch('http://127.0.0.1:7243/ingest/209a747d-6f6d-4b09-9475-b6d4294efafd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'upload/route.ts:76',message:'Document upload - isYearPlan detection',data:{fileName:file.name,isYearPlan,userId,organizationId:user.organizationId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
@@ -162,6 +159,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create document record
+    // Note: isAiReadable is false by default - user must enable it manually
     const documentData = {
       name: file.name,
       fileName: file.name,
@@ -171,7 +169,7 @@ export async function POST(request: NextRequest) {
       userId: user.organizationId ? null : userId, // Per-user if no org, otherwise null
       organizationId: user.organizationId || null,
       isYearPlan,
-      isAiReadable: isYearPlan, // Auto-enable AI readability for year plans
+      isAiReadable: false, // User must enable AI readability manually
     }
     
     // #region agent log
@@ -186,7 +184,7 @@ export async function POST(request: NextRequest) {
     fetch('http://127.0.0.1:7243/ingest/209a747d-6f6d-4b09-9475-b6d4294efafd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'upload/route.ts:172',message:'Document creation - after create',data:{id:document.id,name:document.name,isYearPlan:document.isYearPlan,userId:document.userId,organizationId:document.organizationId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
     // #endregion
 
-    // If this is a year plan, set the plan start date
+    // If this is a plan document, set the plan start date
     if (isYearPlan) {
       // Default to January 1st of the current year
       // In the future, you could let users specify this during upload
@@ -204,106 +202,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Generate embeddings for all chunks first
-    const embeddingData = await Promise.all(
-      parsedDocument.chunks.map(async (chunk, index) => {
-        try {
-          // Generate embedding using Gemini
-          const embeddingResult = await generateEmbedding(chunk.text)
-          const embeddingArray = embeddingResult.embedding
-
-          // Convert to pgvector format: [1,2,3,...] as string
-          const embeddingVector = `[${embeddingArray.join(',')}]`
-
-          return {
-            id: crypto.randomUUID(),
-            documentId: document.id,
-            chunkText: chunk.text,
-            chunkIndex: index,
-            year: chunk.year ?? null,
-            month: chunk.month ?? null,
-            week: chunk.week ?? null,
-            embedding: embeddingVector, // pgvector format
-            metadata: JSON.parse(JSON.stringify(chunk.metadata || {})),
-            createdAt: new Date(),
-          }
-        } catch (error) {
-          console.error(`Failed to generate embedding for chunk ${index}:`, error)
-          // Store chunk without embedding if embedding generation fails
-          return {
-            id: crypto.randomUUID(),
-            documentId: document.id,
-            chunkText: chunk.text,
-            chunkIndex: index,
-            year: chunk.year ?? null,
-            month: chunk.month ?? null,
-            week: chunk.week ?? null,
-            embedding: null,
-            metadata: JSON.parse(JSON.stringify(chunk.metadata || {})),
-            createdAt: new Date(),
-          }
-        }
-      })
-    )
-
-    // Batch insert using raw SQL since Prisma doesn't fully support vector type
-    if (embeddingData.length > 0) {
-      try {
-        // Insert in batches to avoid SQL parameter limits
-        const batchSize = 50
-        for (let i = 0; i < embeddingData.length; i += batchSize) {
-          const batch = embeddingData.slice(i, i + batchSize)
-          
-          // Build parameterized query for batch insert
-          const values = batch.map((_, idx) => {
-            const baseIdx = idx * 10
-            return `($${baseIdx + 1}, $${baseIdx + 2}, $${baseIdx + 3}, $${baseIdx + 4}, $${baseIdx + 5}, $${baseIdx + 6}, $${baseIdx + 7}, $${baseIdx + 8}::vector, $${baseIdx + 9}::jsonb, $${baseIdx + 10})`
-          }).join(', ')
-
-          const params = batch.flatMap(d => [
-            d.id,
-            d.documentId,
-            d.chunkText,
-            d.chunkIndex,
-            d.year,
-            d.month,
-            d.week,
-            d.embedding || null, // Will be cast to vector in SQL
-            JSON.stringify(d.metadata), // Will be cast to jsonb in SQL
-            d.createdAt,
-          ])
-
-          const query = `
-            INSERT INTO document_embeddings 
-            (id, document_id, chunk_text, chunk_index, year, month, week, embedding, metadata, created_at)
-            VALUES ${values}
-            ON CONFLICT (id) DO NOTHING
-          `
-
-          await prisma.$executeRawUnsafe(query, ...params)
-        }
-      } catch (dbError) {
-        console.error('Error inserting embeddings:', dbError)
-        // Fallback: Try using Prisma createMany without vector (for migration period)
-        // This allows the system to work even if pgvector isn't set up yet
-        const fallbackData = embeddingData.map(d => ({
-          documentId: d.documentId,
-          chunkText: d.chunkText,
-          chunkIndex: d.chunkIndex,
-          year: d.year,
-          month: d.month,
-          week: d.week,
-          metadata: d.metadata,
-        }))
-
-        await prisma.documentEmbedding.createMany({
-          data: fallbackData,
-          skipDuplicates: true,
-        })
-
-        console.warn('Stored embeddings without vector (migration mode). Run supabase-migration.sql to enable vector search.')
-      }
-    }
+    // Note: Embeddings are NOT generated during upload
+    // User must enable AI readability manually, which will trigger embedding generation
 
     return NextResponse.json({
       id: document.id,
@@ -314,7 +214,7 @@ export async function POST(request: NextRequest) {
       isAiReadable: document.isAiReadable,
       isYearPlan: document.isYearPlan,
       createdAt: document.createdAt,
-      chunksProcessed: parsedDocument.chunks.length,
+      // Note: chunksProcessed removed - embeddings not generated during upload
     })
   } catch (error) {
     console.error('Document upload error:', error)

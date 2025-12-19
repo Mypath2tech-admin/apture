@@ -3,6 +3,9 @@ import { cookies } from 'next/headers'
 import jwt from 'jsonwebtoken'
 import { prisma } from '@/lib/prisma'
 import { supabaseStorage } from '@/lib/supabase'
+import { extractAndParseDocument } from '@/lib/document-parser'
+import { generateEmbedding } from '@/lib/embeddings'
+import { cleanTextForEmbedding, cleanChunkText } from '@/lib/text-cleaner'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -56,6 +59,23 @@ export async function GET(request: NextRequest) {
       },
     })
 
+    // Get embedding counts for each document
+    const documentIds = documents.map(doc => doc.id)
+    const embeddingCounts = await prisma.documentEmbedding.groupBy({
+      by: ['documentId'],
+      where: {
+        documentId: { in: documentIds },
+        embedding: { not: null },
+      },
+      _count: {
+        id: true,
+      },
+    })
+
+    const embeddingCountMap = new Map(
+      embeddingCounts.map(item => [item.documentId, item._count.id])
+    )
+
     // Format response
     const formattedDocuments = documents.map(doc => ({
       id: doc.id,
@@ -66,6 +86,8 @@ export async function GET(request: NextRequest) {
       mimeType: doc.mimeType,
       isAiReadable: doc.isAiReadable,
       isYearPlan: doc.isYearPlan,
+      embeddingCount: embeddingCountMap.get(doc.id) || 0,
+      hasEmbeddings: (embeddingCountMap.get(doc.id) || 0) > 0,
     }))
 
     return NextResponse.json({ documents: formattedDocuments })
@@ -122,11 +144,168 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Document not found or access denied' }, { status: 404 })
     }
 
-    // Update document
+    const currentIsAiReadable = document.isAiReadable
+    const newIsAiReadable = isAiReadable !== undefined ? isAiReadable : currentIsAiReadable
+
+    // If enabling AI readability, generate embeddings
+    if (newIsAiReadable && !currentIsAiReadable) {
+      try {
+        // Check if embeddings already exist
+        const existingEmbeddings = await prisma.documentEmbedding.count({
+          where: {
+            documentId: document.id,
+            embedding: { not: null },
+          },
+        })
+
+        // Only generate if embeddings don't exist
+        if (existingEmbeddings === 0) {
+          // Fetch file from Supabase Storage
+          const { data: fileData, error: downloadError } = await supabaseStorage.download(document.filePath)
+
+          if (downloadError || !fileData) {
+            return NextResponse.json(
+              { error: `Failed to fetch document file: ${downloadError?.message || 'File not found'}` },
+              { status: 500 }
+            )
+          }
+
+          // Convert blob to buffer
+          const arrayBuffer = await fileData.arrayBuffer()
+          const fileBuffer = Buffer.from(arrayBuffer)
+
+          // Parse document
+          let parsedDocument
+          try {
+            parsedDocument = await extractAndParseDocument(fileBuffer, document.mimeType)
+          } catch (parseError) {
+            return NextResponse.json(
+              { error: `Failed to parse document: ${parseError instanceof Error ? parseError.message : 'Unknown error'}` },
+              { status: 400 }
+            )
+          }
+
+          // Clean and generate embeddings for all chunks
+          const embeddingData = await Promise.all(
+            parsedDocument.chunks.map(async (chunk, index) => {
+              try {
+                // Clean the chunk text before embedding
+                const cleanedText = cleanChunkText(chunk.text)
+
+                // Skip empty chunks after cleaning
+                if (!cleanedText || cleanedText.trim().length === 0) {
+                  return null
+                }
+
+                // Generate embedding using Gemini
+                const embeddingResult = await generateEmbedding(cleanedText)
+                const embeddingArray = embeddingResult.embedding
+
+                // Convert to pgvector format: [1,2,3,...] as string
+                const embeddingVector = `[${embeddingArray.join(',')}]`
+
+                return {
+                  id: crypto.randomUUID(),
+                  documentId: document.id,
+                  chunkText: chunk.text, // Store original text (not cleaned) for display
+                  chunkIndex: index,
+                  year: chunk.year ?? null,
+                  month: chunk.month ?? null,
+                  week: chunk.week ?? null,
+                  embedding: embeddingVector, // pgvector format
+                  metadata: JSON.parse(JSON.stringify(chunk.metadata || {})),
+                  createdAt: new Date(),
+                }
+              } catch (error) {
+                console.error(`Failed to generate embedding for chunk ${index}:`, error)
+                // Store chunk without embedding if embedding generation fails
+                return {
+                  id: crypto.randomUUID(),
+                  documentId: document.id,
+                  chunkText: chunk.text,
+                  chunkIndex: index,
+                  year: chunk.year ?? null,
+                  month: chunk.month ?? null,
+                  week: chunk.week ?? null,
+                  embedding: null,
+                  metadata: JSON.parse(JSON.stringify(chunk.metadata || {})),
+                  createdAt: new Date(),
+                }
+              }
+            })
+          )
+
+          // Filter out null entries (empty chunks)
+          const validEmbeddingData = embeddingData.filter(item => item !== null)
+
+          // Batch insert using raw SQL since Prisma doesn't fully support vector type
+          if (validEmbeddingData.length > 0) {
+            try {
+              // Insert in batches to avoid SQL parameter limits
+              const batchSize = 50
+              for (let i = 0; i < validEmbeddingData.length; i += batchSize) {
+                const batch = validEmbeddingData.slice(i, i + batchSize)
+
+                // Build parameterized query for batch insert
+                const values = batch.map((_, idx) => {
+                  const baseIdx = idx * 10
+                  return `($${baseIdx + 1}, $${baseIdx + 2}, $${baseIdx + 3}, $${baseIdx + 4}, $${baseIdx + 5}, $${baseIdx + 6}, $${baseIdx + 7}, $${baseIdx + 8}::vector, $${baseIdx + 9}::jsonb, $${baseIdx + 10})`
+                }).join(', ')
+
+                const params = batch.flatMap(d => [
+                  d.id,
+                  d.documentId,
+                  d.chunkText,
+                  d.chunkIndex,
+                  d.year,
+                  d.month,
+                  d.week,
+                  d.embedding || null, // Will be cast to vector in SQL
+                  JSON.stringify(d.metadata), // Will be cast to jsonb in SQL
+                  d.createdAt,
+                ])
+
+                const query = `
+                  INSERT INTO document_embeddings 
+                  (id, document_id, chunk_text, chunk_index, year, month, week, embedding, metadata, created_at)
+                  VALUES ${values}
+                  ON CONFLICT (id) DO NOTHING
+                `
+
+                await prisma.$executeRawUnsafe(query, ...params)
+              }
+            } catch (dbError) {
+              console.error('Error inserting embeddings:', dbError)
+              // If embedding insertion fails, don't enable AI readability
+              return NextResponse.json(
+                { error: 'Failed to generate embeddings. Please try again.' },
+                { status: 500 }
+              )
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error generating embeddings:', error)
+        return NextResponse.json(
+          { error: `Failed to enable AI readability: ${error instanceof Error ? error.message : 'Unknown error'}` },
+          { status: 500 }
+        )
+      }
+    }
+
+    // Update document flag (whether enabling or disabling)
     const updated = await prisma.document.update({
       where: { id: documentId },
       data: {
-        isAiReadable: isAiReadable !== undefined ? isAiReadable : document.isAiReadable,
+        isAiReadable: newIsAiReadable,
+      },
+    })
+
+    // Get embedding count for response
+    const embeddingCount = await prisma.documentEmbedding.count({
+      where: {
+        documentId: document.id,
+        embedding: { not: null },
       },
     })
 
@@ -134,6 +313,8 @@ export async function PATCH(request: NextRequest) {
       id: updated.id,
       name: updated.name,
       isAiReadable: updated.isAiReadable,
+      embeddingCount,
+      hasEmbeddings: embeddingCount > 0,
     })
   } catch (error) {
     console.error('Error updating document:', error)
