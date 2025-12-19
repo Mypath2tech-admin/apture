@@ -277,7 +277,7 @@ ${contextText ? `You have access to the following user context:${contextText}` :
 
     // Generate content
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-pro",
+      model: "gemini-3-pro-preview",
       contents: [
         systemInstruction,
         ...chatHistory,
