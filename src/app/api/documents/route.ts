@@ -59,22 +59,30 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Get embedding counts for each document
+    // Get embedding counts for each document using raw SQL
+    // (Prisma can't filter by embedding field since it's Unsupported("vector"))
     const documentIds = documents.map(doc => doc.id)
-    const embeddingCounts = await prisma.documentEmbedding.groupBy({
-      by: ['documentId'],
-      where: {
-        documentId: { in: documentIds },
-        embedding: { not: null },
-      },
-      _count: {
-        id: true,
-      },
-    })
+    let embeddingCountMap = new Map<string, number>()
 
-    const embeddingCountMap = new Map(
-      embeddingCounts.map(item => [item.documentId, item._count.id])
-    )
+    if (documentIds.length > 0) {
+      try {
+        // Use raw SQL to count embeddings where embedding IS NOT NULL
+        const embeddingCounts = await prisma.$queryRaw<Array<{ document_id: string; count: bigint }>>`
+          SELECT document_id, COUNT(*)::int as count
+          FROM document_embeddings
+          WHERE document_id = ANY(${documentIds}::text[])
+            AND embedding IS NOT NULL
+          GROUP BY document_id
+        `
+
+        embeddingCountMap = new Map(
+          embeddingCounts.map(item => [item.document_id, Number(item.count)])
+        )
+      } catch (error) {
+        console.error('Error fetching embedding counts:', error)
+        // If query fails, just use empty map (all counts will be 0)
+      }
+    }
 
     // Format response
     const formattedDocuments = documents.map(doc => ({
@@ -301,13 +309,21 @@ export async function PATCH(request: NextRequest) {
       },
     })
 
-    // Get embedding count for response
-    const embeddingCount = await prisma.documentEmbedding.count({
-      where: {
-        documentId: document.id,
-        embedding: { not: null },
-      },
-    })
+    // Get embedding count for response using raw SQL
+    // (Prisma can't filter by embedding field since it's Unsupported("vector"))
+    let embeddingCount = 0
+    try {
+      const result = await prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::int as count
+        FROM document_embeddings
+        WHERE document_id = ${document.id}
+          AND embedding IS NOT NULL
+      `
+      embeddingCount = result.length > 0 ? Number(result[0].count) : 0
+    } catch (error) {
+      console.error('Error fetching embedding count:', error)
+      // If query fails, count will be 0
+    }
 
     return NextResponse.json({
       id: updated.id,

@@ -208,22 +208,30 @@ async function getAiReadableDocumentsContext(
     return null
   }
 
-  // Get embedding counts for each document
+  // Get embedding counts for each document using raw SQL
+  // (Prisma can't filter by embedding field since it's Unsupported("vector"))
   const docIds = aiReadableDocs.map(doc => doc.id)
-  const embeddingCounts = await prisma.documentEmbedding.groupBy({
-    by: ['documentId'],
-    where: {
-      documentId: { in: docIds },
-      embedding: { not: null },
-    },
-    _count: {
-      id: true,
-    },
-  })
+  let embeddingCountMap = new Map<string, number>()
 
-  const embeddingCountMap = new Map(
-    embeddingCounts.map(item => [item.documentId, item._count.id])
-  )
+  if (docIds.length > 0) {
+    try {
+      // Use raw SQL to count embeddings where embedding IS NOT NULL
+      const embeddingCounts = await prisma.$queryRaw<Array<{ document_id: string; count: bigint }>>`
+        SELECT document_id, COUNT(*)::int as count
+        FROM document_embeddings
+        WHERE document_id = ANY(${docIds}::text[])
+          AND embedding IS NOT NULL
+          GROUP BY document_id
+      `
+
+      embeddingCountMap = new Map(
+        embeddingCounts.map(item => [item.document_id, Number(item.count)])
+      )
+    } catch (error) {
+      console.error('Error fetching embedding counts:', error)
+      // If query fails, just use empty map (all counts will be 0)
+    }
+  }
 
   const docSummaries = aiReadableDocs.map(doc => {
     const embeddingCount = embeddingCountMap.get(doc.id) || 0
