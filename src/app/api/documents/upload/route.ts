@@ -148,6 +148,7 @@ export async function POST(request: NextRequest) {
     // Extract and parse document
     let parsedDocument
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       parsedDocument = await extractAndParseDocument(fileBuffer, file.type)
     } catch (parseError) {
       // If parsing fails, delete uploaded file

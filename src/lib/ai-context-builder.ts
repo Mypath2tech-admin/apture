@@ -1,6 +1,5 @@
 import { prisma } from './prisma'
 import { findYearPlanDocument } from './vector-search'
-import { searchSimilarChunks } from './vector-search-service'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
 export interface UserContext {

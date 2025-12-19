@@ -158,6 +158,7 @@ export async function POST(request: Request) {
           const searchResults = await Promise.allSettled(searchPromises)
           const relevantChunks: Array<{ documentName: string; chunkText: string; similarity: number }> = []
 
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           searchResults.forEach((result, index) => {
             if (result.status === 'fulfilled' && result.value) {
               result.value.chunks.forEach(chunk => {
