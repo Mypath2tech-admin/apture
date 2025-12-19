@@ -158,13 +158,21 @@ export async function PATCH(request: NextRequest) {
     // If enabling AI readability, generate embeddings
     if (newIsAiReadable && !currentIsAiReadable) {
       try {
-        // Check if embeddings already exist
-        const existingEmbeddings = await prisma.documentEmbedding.count({
-          where: {
-            documentId: document.id,
-            embedding: { not: null },
-          },
-        })
+        // Check if embeddings already exist using raw SQL
+        // (Prisma can't filter by embedding field since it's Unsupported("vector"))
+        let existingEmbeddings = 0
+        try {
+          const result = await prisma.$queryRaw<Array<{ count: bigint }>>`
+            SELECT COUNT(*)::int as count
+            FROM document_embeddings
+            WHERE document_id = ${document.id}
+              AND embedding IS NOT NULL
+          `
+          existingEmbeddings = result.length > 0 ? Number(result[0].count) : 0
+        } catch (error) {
+          console.error('Error checking existing embeddings:', error)
+          // If query fails, assume no embeddings exist and proceed
+        }
 
         // Only generate if embeddings don't exist
         if (existingEmbeddings === 0) {
