@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 // import { useRouter } from "next/navigation"
 // import { useAuthStore } from "@/lib/store/authStore"
 import PageHeader  from "@/components/dashboard/PageHeader"
@@ -29,9 +29,12 @@ export default function ExportExpensesPage() {
   const [includeReceipts, setIncludeReceipts] = useState(false)
 
   // Fetch available categories and budgets for filtering
-  useState(() => {
+  useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
+        // Only fetch in browser (client-side)
+        if (typeof window === 'undefined') return
+
         // Fetch categories
         const categoriesResponse = await fetch("/api/categories")
         if (categoriesResponse.ok) {
@@ -51,7 +54,7 @@ export default function ExportExpensesPage() {
     }
 
     fetchFilterOptions()
-  }, )
+  }, [])
 
   const handleCategoryToggle = (categoryId: string) => {
     setFilters((prev) => {

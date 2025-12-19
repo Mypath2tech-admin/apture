@@ -5,7 +5,8 @@ import { prisma } from '@/lib/prisma'
 import { supabaseStorage } from '@/lib/supabase'
 import { extractAndParseDocument } from '@/lib/document-parser'
 import { generateEmbedding } from '@/lib/embeddings'
-import {  cleanChunkText } from '@/lib/text-cleaner'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { cleanTextForEmbedding, cleanChunkText } from '@/lib/text-cleaner'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 

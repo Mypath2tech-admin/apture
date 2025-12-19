@@ -29,7 +29,8 @@ export default function DocumentsLibraryPage() {
   // Fetch documents on mount
   useEffect(() => {
     fetchDocuments();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchDocuments = async () => {
     try {

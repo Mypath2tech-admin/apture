@@ -1,5 +1,7 @@
 import { prisma } from './prisma'
 import { findYearPlanDocument } from './vector-search'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { searchSimilarChunks } from './vector-search-service'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
 export interface UserContext {
