@@ -13,6 +13,8 @@ interface Document {
   mimeType: string;
   isAiReadable: boolean;
   isYearPlan: boolean;
+  embeddingCount?: number;
+  hasEmbeddings?: boolean;
 }
 
 export default function DocumentsLibraryPage() {
@@ -27,6 +29,7 @@ export default function DocumentsLibraryPage() {
   // Fetch documents on mount
   useEffect(() => {
     fetchDocuments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchDocuments = async () => {
@@ -40,6 +43,14 @@ export default function DocumentsLibraryPage() {
 
       const data = await response.json();
       setDocuments(data.documents || []);
+      
+      // Update selected document if it exists in the new list
+      if (selectedDocument) {
+        const updatedDoc = data.documents?.find((d: Document) => d.id === selectedDocument.id);
+        if (updatedDoc) {
+          setSelectedDocument(updatedDoc);
+        }
+      }
     } catch (error) {
       console.error("Error fetching documents:", error);
       toast.error("Failed to load documents");
@@ -131,18 +142,43 @@ export default function DocumentsLibraryPage() {
         throw new Error(errorData.error || "Failed to update document");
       }
 
-      toast.success(`Document ${!currentValue ? "enabled" : "disabled"} for AI reading`);
+      const responseData = await response.json();
       
-      // Update local state
+      if (!currentValue) {
+        // Enabling AI readability
+        if (responseData.hasEmbeddings && responseData.embeddingCount > 0) {
+          toast.success(`Document enabled for AI reading. ${responseData.embeddingCount} chunks embedded.`);
+        } else {
+          toast.warning("Document enabled for AI reading, but embeddings may still be processing.");
+        }
+      } else {
+        toast.success("Document disabled for AI reading");
+      }
+      
+      // Update local state with embedding info
       setDocuments((prev) =>
         prev.map((doc) =>
-          doc.id === docId ? { ...doc, isAiReadable: !currentValue } : doc
+          doc.id === docId
+            ? {
+                ...doc,
+                isAiReadable: responseData.isAiReadable,
+                embeddingCount: responseData.embeddingCount || 0,
+                hasEmbeddings: responseData.hasEmbeddings || false,
+              }
+            : doc
         )
       );
       
       if (selectedDocument?.id === docId) {
         setSelectedDocument((prev) =>
-          prev ? { ...prev, isAiReadable: !currentValue } : null
+          prev
+            ? {
+                ...prev,
+                isAiReadable: responseData.isAiReadable,
+                embeddingCount: responseData.embeddingCount || 0,
+                hasEmbeddings: responseData.hasEmbeddings || false,
+              }
+            : null
         );
       }
     } catch (error) {
@@ -313,14 +349,22 @@ export default function DocumentsLibraryPage() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <button
-                        className={`text-teal-600 hover:text-teal-900 mr-3 ${
-                          doc.isAiReadable
-                            ? "bg-teal-50 p-1 rounded"
-                            : ""
-                        } ${isToggling === doc.id ? "opacity-50" : ""}`}
+                        className={`mr-3 p-1 rounded transition-colors ${
+                          isToggling === doc.id
+                            ? "opacity-50 cursor-not-allowed"
+                            : "hover:bg-gray-100"
+                        } ${
+                          doc.isAiReadable && doc.hasEmbeddings
+                            ? "text-teal-600 bg-teal-50"
+                            : doc.isAiReadable && !doc.hasEmbeddings
+                            ? "text-orange-500 bg-orange-50"
+                            : "text-gray-400"
+                        }`}
                         title={
-                          doc.isAiReadable
-                            ? "AI can read this document"
+                          doc.isAiReadable && doc.hasEmbeddings
+                            ? `AI can read this document (${doc.embeddingCount || 0} chunks)`
+                            : doc.isAiReadable && !doc.hasEmbeddings
+                            ? "AI readability enabled but embeddings missing"
                             : "Make readable to AI"
                         }
                         onClick={() => toggleAiReadable(doc.id, doc.isAiReadable)}
@@ -392,17 +436,26 @@ export default function DocumentsLibraryPage() {
             </div>
             <div>
               <button
-                className={`text-xs px-2 py-1 rounded-full mr-2 ${
-                  selectedDocument.isAiReadable
+                className={`text-xs px-2 py-1 rounded-full mr-2 transition-colors ${
+                  selectedDocument.isAiReadable && selectedDocument.hasEmbeddings
                     ? "bg-teal-100 text-teal-800"
+                    : selectedDocument.isAiReadable && !selectedDocument.hasEmbeddings
+                    ? "bg-orange-100 text-orange-800"
                     : "bg-gray-100 text-gray-800"
                 }`}
                 onClick={() => toggleAiReadable(selectedDocument.id, selectedDocument.isAiReadable)}
+                disabled={isToggling === selectedDocument.id}
               >
                 <span className="flex items-center">
-                  <Brain className="h-3 w-3 mr-1" />
-                  {selectedDocument.isAiReadable
-                    ? "AI Readable"
+                  {isToggling === selectedDocument.id ? (
+                    <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                  ) : (
+                    <Brain className="h-3 w-3 mr-1" />
+                  )}
+                  {selectedDocument.isAiReadable && selectedDocument.hasEmbeddings
+                    ? `AI Readable (${selectedDocument.embeddingCount || 0} chunks)`
+                    : selectedDocument.isAiReadable && !selectedDocument.hasEmbeddings
+                    ? "AI Readable (processing...)"
                     : "Not AI Readable"}
                 </span>
               </button>
@@ -411,7 +464,7 @@ export default function DocumentsLibraryPage() {
           {selectedDocument.isYearPlan && (
             <div className="mb-4 p-3 bg-teal-50 border border-teal-200 rounded-md">
               <p className="text-sm text-teal-800">
-                <strong>3-Year Plan Document:</strong> This document is automatically enabled for AI reading and can be used to generate timesheet descriptions.
+                <strong>Plan Document:</strong> This document has been detected as a plan document. Enable AI readability to use it for generating timesheet descriptions and AI chat.
               </p>
             </div>
           )}

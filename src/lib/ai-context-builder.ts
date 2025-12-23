@@ -1,5 +1,7 @@
 import { prisma } from './prisma'
 import { findYearPlanDocument } from './vector-search'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { searchSimilarChunks } from './vector-search-service'
 import { format, startOfMonth, endOfMonth } from 'date-fns'
 
 export interface UserContext {
@@ -36,11 +38,16 @@ export async function buildUserContext(
 
   // Run all context queries in parallel for better performance
   // Each query has a 5s timeout to prevent blocking
-  const [yearPlanContext, timesheetContext, budgetContext, performanceContext] = await Promise.allSettled([
+  const [yearPlanContext, aiReadableDocsContext, timesheetContext, budgetContext, performanceContext] = await Promise.allSettled([
     withTimeout(
       getYearPlanContext(userId, organizationId || undefined),
       timeoutMs,
       'Year plan context timeout'
+    ),
+    withTimeout(
+      getAiReadableDocumentsContext(userId, organizationId || undefined),
+      timeoutMs,
+      'AI readable documents context timeout'
     ),
     withTimeout(
       getTimesheetContext(userId, organizationId || undefined),
@@ -64,6 +71,18 @@ export async function buildUserContext(
     context.yearPlan = yearPlanContext.value
   } else if (yearPlanContext.status === 'rejected') {
     console.error('Error fetching year plan context:', yearPlanContext.reason)
+  }
+
+  // Handle AI Readable Documents context (includes year plan and other documents)
+  if (aiReadableDocsContext.status === 'fulfilled' && aiReadableDocsContext.value) {
+    // Merge with year plan context if both exist
+    if (context.yearPlan) {
+      context.yearPlan = `${context.yearPlan}\n\n${aiReadableDocsContext.value}`
+    } else {
+      context.yearPlan = aiReadableDocsContext.value
+    }
+  } else if (aiReadableDocsContext.status === 'rejected') {
+    console.error('Error fetching AI readable documents context:', aiReadableDocsContext.reason)
   }
 
   // Handle Timesheet context
@@ -141,6 +160,89 @@ async function getYearPlanContext(
 - Months covered: ${months.size}
 - Weeks covered: ${weeks.size}
 The plan can be used to answer questions about planned activities, goals, and timelines.`
+}
+
+/**
+ * Get context from all AI-readable documents (not just year plan)
+ * This provides a summary of all documents that are enabled for AI reading
+ */
+async function getAiReadableDocumentsContext(
+  userId?: string,
+  organizationId?: string
+): Promise<string | null> {
+  // Find all documents with isAiReadable = true
+  const whereClause: {
+    isAiReadable: boolean
+    OR: Array<{
+      userId?: string | null
+      organizationId?: string | null
+    }>
+  } = {
+    isAiReadable: true,
+    OR: [],
+  }
+
+  if (userId) {
+    whereClause.OR.push({
+      userId: userId,
+      organizationId: null,
+    })
+  }
+
+  if (organizationId) {
+    whereClause.OR.push({
+      organizationId: organizationId,
+      userId: null,
+    })
+  }
+
+  const aiReadableDocs = await prisma.document.findMany({
+    where: whereClause,
+    select: {
+      id: true,
+      name: true,
+      isYearPlan: true,
+    },
+  })
+
+  if (aiReadableDocs.length === 0) {
+    return null
+  }
+
+  // Get embedding counts for each document using raw SQL
+  // (Prisma can't filter by embedding field since it's Unsupported("vector"))
+  const docIds = aiReadableDocs.map(doc => doc.id)
+  let embeddingCountMap = new Map<string, number>()
+
+  if (docIds.length > 0) {
+    try {
+      // Use raw SQL to count embeddings where embedding IS NOT NULL
+      const embeddingCounts = await prisma.$queryRaw<Array<{ document_id: string; count: bigint }>>`
+        SELECT document_id, COUNT(*)::int as count
+        FROM document_embeddings
+        WHERE document_id = ANY(${docIds}::text[])
+          AND embedding IS NOT NULL
+          GROUP BY document_id
+      `
+
+      embeddingCountMap = new Map(
+        embeddingCounts.map(item => [item.document_id, Number(item.count)])
+      )
+    } catch (error) {
+      console.error('Error fetching embedding counts:', error)
+      // If query fails, just use empty map (all counts will be 0)
+    }
+  }
+
+  const docSummaries = aiReadableDocs.map(doc => {
+    const embeddingCount = embeddingCountMap.get(doc.id) || 0
+    const docType = doc.isYearPlan ? 'Plan Document' : 'Document'
+    return `- "${doc.name}" (${docType}, ${embeddingCount} chunks)`
+  })
+
+  return `AI-Readable Documents (${aiReadableDocs.length}):
+${docSummaries.join('\n')}
+These documents are available for answering questions and generating content.`
 }
 
 /**
