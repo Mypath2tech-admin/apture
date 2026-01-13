@@ -7,6 +7,13 @@ export interface TimesheetEntry {
     timesheetId?: string
 }
 
+export interface WeeklyDescriptions {
+    week1: string
+    week2: string
+    week3: string
+    week4: string
+}
+
 export interface Timesheet {
     hourlyRate: number
     id?: string
@@ -18,8 +25,25 @@ export interface Timesheet {
     userId?: string
     organizationId?: string
     entries: TimesheetEntry[]
+    weeklyDescriptions?: WeeklyDescriptions
 }
 
+export interface MonthlyDayEntry {
+    dayOfMonth: number  // 1-31
+    duration: string
+}
+
+export interface MonthlyTimesheetFormData {
+    name: string
+    year: number
+    month: number  // 1-12
+    hourlyRate: string
+    weeklyDescriptions: WeeklyDescriptions
+    // Days 1-28 are in weeks, days 29-31 are extra days
+    entries: MonthlyDayEntry[]
+}
+
+// Keep legacy form data for backwards compatibility
 export interface TimesheetFormData {
     name: string
     description: string
@@ -50,6 +74,7 @@ export interface TimesheetResponse {
     taxRate?: number
     taxAmount?: number
     entries: TimesheetEntry[]
+    weeklyDescriptions?: WeeklyDescriptions | null
     user?: {
         id: string
         email: string
