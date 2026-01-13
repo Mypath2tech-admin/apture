@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import type { TimesheetEntry, WeeklyDescriptions } from "@/types/timesheet"
+import type { Prisma } from "../../../../../generated/prisma"
 
 interface TimesheetUpdateData {
   name?: string
@@ -156,7 +157,9 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
         description: data.description,
         hourlyRate,
         // Only update weeklyDescriptions if provided in the request
-        ...(data.weeklyDescriptions !== undefined && { weeklyDescriptions: data.weeklyDescriptions }),
+        ...(data.weeklyDescriptions !== undefined && { 
+          weeklyDescriptions: data.weeklyDescriptions as unknown as Prisma.InputJsonValue 
+        }),
       },
     })
 

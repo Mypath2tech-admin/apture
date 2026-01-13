@@ -12,9 +12,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Percent, AlertCircle, Sparkles, Calendar } from "lucide-react"
+import { Loader2, Percent, AlertCircle, Sparkles, Calendar, AlertTriangle } from "lucide-react"
 import type { WeeklyDescriptions, MonthlyDayEntry } from "@/types/timesheet"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   Select,
   SelectContent,
@@ -30,6 +30,13 @@ import {
   getDaysInMonth,
 } from "@/lib/timesheet-utils"
 
+interface ExistingTimesheetInfo {
+  id: string
+  name: string
+  startDate: string
+  endDate: string | null
+}
+
 export default function CreateTimesheet() {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -40,6 +47,10 @@ export default function CreateTimesheet() {
   const [totalEarnings, setTotalEarnings] = useState<number>(0)
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
   const [generatingWeek, setGeneratingWeek] = useState<number | null>(null)
+
+  // Existing timesheet check
+  const [existingTimesheet, setExistingTimesheet] = useState<ExistingTimesheetInfo | null>(null)
+  const [isCheckingExisting, setIsCheckingExisting] = useState(false)
 
   // Initialize with current year and month
   const currentDate = new Date()
@@ -72,6 +83,33 @@ export default function CreateTimesheet() {
         duration: "",
       }))
     )
+  }, [selectedYear, selectedMonth])
+
+  // Check for existing timesheet when month/year changes
+  useEffect(() => {
+    const checkExistingTimesheet = async () => {
+      setIsCheckingExisting(true)
+      setExistingTimesheet(null)
+
+      try {
+        const response = await fetch(
+          `/api/timesheets/check?year=${selectedYear}&month=${selectedMonth}`
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.exists && data.timesheet) {
+            setExistingTimesheet(data.timesheet)
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for existing timesheet:", error)
+      } finally {
+        setIsCheckingExisting(false)
+      }
+    }
+
+    checkExistingTimesheet()
   }, [selectedYear, selectedMonth])
 
   // Fetch user's hourly rate and organization tax rate
@@ -428,6 +466,38 @@ export default function CreateTimesheet() {
             </div>
           </div>
 
+          {/* Existing Timesheet Warning */}
+          {isCheckingExisting && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking for existing timesheet...
+            </div>
+          )}
+
+          {existingTimesheet && (
+            <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/30">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="text-amber-800 dark:text-amber-200">
+                Timesheet Already Exists
+              </AlertTitle>
+              <AlertDescription className="text-amber-700 dark:text-amber-300">
+                <p className="mb-3">
+                  A timesheet already exists for {getMonthNameFromNumber(selectedMonth)} {selectedYear}:
+                  <br />
+                  <strong>{existingTimesheet.name}</strong>
+                </p>
+                <p className="mb-4">
+                  To add more hours to this month, please edit the existing timesheet instead of creating a new one.
+                </p>
+                <Link href={`/dashboard/timesheets/${existingTimesheet.id}/edit`}>
+                  <Button type="button" className="bg-amber-600 hover:bg-amber-700 text-white">
+                    Edit Existing Timesheet
+                  </Button>
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
+
           {/* Organization Tax Rate Display */}
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
             <div className="flex items-center mb-2">
@@ -678,12 +748,14 @@ export default function CreateTimesheet() {
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !!existingTimesheet}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
+              ) : existingTimesheet ? (
+                "Cannot Create - Timesheet Exists"
               ) : (
                 "Save Timesheet"
               )}
