@@ -72,9 +72,7 @@ export default function EditTimesheetPage() {
         setName(data.name)
 
         // Detect if this is a monthly format timesheet
-        const hasWeeklyDescriptions = data.weeklyDescriptions && 
-          typeof data.weeklyDescriptions === 'object' &&
-          ('week1' in data.weeklyDescriptions || 'week2' in data.weeklyDescriptions)
+       
         
         // Also check by date range - monthly timesheets span more than 7 days
         const startDate = new Date(data.startDate)
