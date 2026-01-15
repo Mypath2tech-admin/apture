@@ -69,6 +69,13 @@ export default function EditTimesheetPage() {
           typeof data.weeklyDescriptions === 'object' &&
           ('week1' in data.weeklyDescriptions || 'week2' in data.weeklyDescriptions)
 
+        setName(data.name)
+
+        // Detect if this is a monthly format timesheet
+        const hasWeeklyDescriptions = data.weeklyDescriptions && 
+          typeof data.weeklyDescriptions === 'object' &&
+          ('week1' in data.weeklyDescriptions || 'week2' in data.weeklyDescriptions)
+        
         // Also check by date range - monthly timesheets span more than 7 days
         const startDate = new Date(data.startDate)
         const endDate = data.endDate ? new Date(data.endDate) : startDate
@@ -426,6 +433,7 @@ export default function EditTimesheetPage() {
 
               />
             </div>
+
             {validationErrors.total && (
               <Alert>
                 <AlertCircle className="h-4 w-4" />
