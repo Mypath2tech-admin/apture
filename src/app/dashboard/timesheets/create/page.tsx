@@ -2,9 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { format, startOfWeek, addDays, parseISO } from "date-fns"
 import { toast } from "react-toastify"
 import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
@@ -13,10 +12,30 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Loader2, Percent, AlertCircle, Sparkles } from "lucide-react"
-import type { TimesheetFormData } from "@/types/timesheet"
-import { DatePickerDemo } from "@/components/ui/date-picker"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2, Percent, AlertCircle, Sparkles, Calendar, AlertTriangle } from "lucide-react"
+import type { WeeklyDescriptions, MonthlyDayEntry } from "@/types/timesheet"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  getMonthStructure,
+  getYearOptions,
+  getMonthOptions,
+  getMonthNameFromNumber,
+  getDaysInMonth,
+} from "@/lib/timesheet-utils"
+
+interface ExistingTimesheetInfo {
+  id: string
+  name: string
+  startDate: string
+  endDate: string | null
+}
 
 export default function CreateTimesheet() {
   const router = useRouter()
@@ -27,26 +46,71 @@ export default function CreateTimesheet() {
   const [taxAmount, setTaxAmount] = useState<number>(0)
   const [totalEarnings, setTotalEarnings] = useState<number>(0)
   const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({})
-  const [isGenerating, setIsGenerating] = useState(false)
+  const [generatingWeek, setGeneratingWeek] = useState<number | null>(null)
 
+  // Existing timesheet check
+  const [existingTimesheet, setExistingTimesheet] = useState<ExistingTimesheetInfo | null>(null)
+  const [isCheckingExisting, setIsCheckingExisting] = useState(false)
 
-  // Get the current week's Monday
-  const monday = startOfWeek(new Date(), { weekStartsOn: 1 })
+  // Initialize with current year and month
+  const currentDate = new Date()
+  const [selectedYear, setSelectedYear] = useState<number>(currentDate.getFullYear())
+  const [selectedMonth, setSelectedMonth] = useState<number>(currentDate.getMonth() + 1)
+  const [hourlyRate, setHourlyRate] = useState<string>("")
 
-  // Initialize the form data
-  const [formData, setFormData] = useState<TimesheetFormData>({
-    name: `Week of ${format(monday, "MMM d, yyyy")}`,
-    description: "",
-    hourlyRate: "",
-    weekStarting: format(monday, "yyyy-MM-dd"),
-    entries: Array(7)
-      .fill(null)
-      .map((_, index) => ({
-        dayIndex: index,
-        duration: "",
-        description: "",
-      })),
+  // Weekly descriptions for each of the 4 weeks
+  const [weeklyDescriptions, setWeeklyDescriptions] = useState<WeeklyDescriptions>({
+    week1: "",
+    week2: "",
+    week3: "",
+    week4: "",
   })
+
+  // Day entries - indexed by day of month (1-31)
+  const [entries, setEntries] = useState<MonthlyDayEntry[]>([])
+
+  // Get month structure whenever year/month changes
+  const monthStructure = useMemo(() => {
+    return getMonthStructure(selectedYear, selectedMonth)
+  }, [selectedYear, selectedMonth])
+
+  // Initialize entries when month/year changes
+  useEffect(() => {
+    const totalDays = getDaysInMonth(selectedYear, selectedMonth)
+    setEntries(
+      Array.from({ length: totalDays }, (_, i) => ({
+        dayOfMonth: i + 1,
+        duration: "",
+      }))
+    )
+  }, [selectedYear, selectedMonth])
+
+  // Check for existing timesheet when month/year changes
+  useEffect(() => {
+    const checkExistingTimesheet = async () => {
+      setIsCheckingExisting(true)
+      setExistingTimesheet(null)
+
+      try {
+        const response = await fetch(
+          `/api/timesheets/check?year=${selectedYear}&month=${selectedMonth}`
+        )
+
+        if (response.ok) {
+          const data = await response.json()
+          if (data.exists && data.timesheet) {
+            setExistingTimesheet(data.timesheet)
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for existing timesheet:", error)
+      } finally {
+        setIsCheckingExisting(false)
+      }
+    }
+
+    checkExistingTimesheet()
+  }, [selectedYear, selectedMonth])
 
   // Fetch user's hourly rate and organization tax rate
   useEffect(() => {
@@ -56,10 +120,7 @@ export default function CreateTimesheet() {
         const hourlyRateResponse = await fetch("/api/user/hourly-rate")
         if (hourlyRateResponse.ok) {
           const hourlyRateData = await hourlyRateResponse.json()
-          setFormData((prev) => ({
-            ...prev,
-            hourlyRate: hourlyRateData.currentRate.toString(),
-          }))
+          setHourlyRate(hourlyRateData.currentRate.toString())
         }
         setIsLoadingRate(false)
 
@@ -84,57 +145,56 @@ export default function CreateTimesheet() {
   // Calculate tax and total earnings when hours or rates change
   useEffect(() => {
     const totalHours = getTotalHours()
-    const hourlyRate = Number.parseFloat(formData.hourlyRate) || 0
-    const subtotal = totalHours * hourlyRate
+    const rate = Number.parseFloat(hourlyRate) || 0
+    const subtotal = totalHours * rate
     const calculatedTaxAmount = subtotal * (organizationTaxRate / 100)
     const calculatedTotalEarnings = subtotal + calculatedTaxAmount
 
     setTaxAmount(calculatedTaxAmount)
     setTotalEarnings(calculatedTotalEarnings)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formData.entries, formData.hourlyRate, organizationTaxRate])
+  }, [entries, hourlyRate, organizationTaxRate])
 
-  const handleWeekChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedDate = parseISO(e.target.value)
-    // Normalize selected date to Monday (start of week)
-    const mondayDate = startOfWeek(selectedDate, { weekStartsOn: 1 })
-    const normalizedDateString = format(mondayDate, "yyyy-MM-dd")
+  const handleYearChange = (value: string) => {
+    setSelectedYear(parseInt(value, 10))
+  }
 
-    // Only update the week starting date and name.
-    // Do NOT reset daily entries so that any existing values are preserved.
-    setFormData((prev) => ({
-      ...prev,
-      weekStarting: normalizedDateString,
-      name: `Week of ${format(mondayDate, "MMM d, yyyy")}`,
-    }))
+  const handleMonthChange = (value: string) => {
+    setSelectedMonth(parseInt(value, 10))
   }
 
   const handleHourlyRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
+    setHourlyRate(e.target.value)
+  }
+
+  const handleWeeklyDescriptionChange = (weekNumber: number, value: string) => {
+    const weekKey = `week${weekNumber}` as keyof WeeklyDescriptions
+    setWeeklyDescriptions((prev) => ({
       ...prev,
-      hourlyRate: e.target.value,
+      [weekKey]: value,
     }))
   }
 
-  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      description: e.target.value,
-    }))
-  }
+  const handleGenerateDescription = async (weekNumber: number) => {
+    setGeneratingWeek(weekNumber)
 
-  const handleGenerateDescription = async () => {
-    setIsGenerating(true)
-    
     try {
+      // Calculate the start date for this week in the month
+      const startDay = (weekNumber - 1) * 7 + 1
+      const weekStartDate = new Date(selectedYear, selectedMonth - 1, startDay)
+      const weekStarting = weekStartDate.toISOString().split("T")[0]
+
+      const weekKey = `week${weekNumber}` as keyof WeeklyDescriptions
+      const existingDescription = weeklyDescriptions[weekKey]
+
       const response = await fetch("/api/timesheets/generate-description", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          weekStarting: formData.weekStarting,
-          existingDescription: formData.description,
+          weekStarting,
+          existingDescription,
         }),
       })
 
@@ -147,19 +207,18 @@ export default function CreateTimesheet() {
       const generatedDescription = data.description
 
       // If field is empty, fill it; otherwise append
-      if (!formData.description.trim()) {
-        setFormData((prev) => ({
+      if (!existingDescription.trim()) {
+        setWeeklyDescriptions((prev) => ({
           ...prev,
-          description: generatedDescription,
+          [weekKey]: generatedDescription,
         }))
-        toast.success("Description generated successfully")
+        toast.success(`Week ${weekNumber} description generated successfully`)
       } else {
-        // Append to existing content
-        setFormData((prev) => ({
+        setWeeklyDescriptions((prev) => ({
           ...prev,
-          description: `${prev.description}\n\n${generatedDescription}`,
+          [weekKey]: `${prev[weekKey]}\n\n${generatedDescription}`,
         }))
-        toast.success("Description enhanced successfully")
+        toast.success(`Week ${weekNumber} description enhanced successfully`)
       }
     } catch (error) {
       console.error("Error generating description:", error)
@@ -169,68 +228,77 @@ export default function CreateTimesheet() {
           : "Failed to generate description. Please ensure you have uploaded a 3-Year Plan document."
       )
     } finally {
-      setIsGenerating(false)
+      setGeneratingWeek(null)
     }
   }
 
-  const handleDurationChange = (dayIndex: number, value: string) => {
-    const newEntries = [...formData.entries]
-    newEntries[dayIndex] = {
-      ...newEntries[dayIndex],
-      duration: value,
-    }
-    setFormData((prev) => ({
-      ...prev,
-      entries: newEntries,
-    }))
+  const handleDurationChange = (dayOfMonth: number, value: string) => {
+    setEntries((prev) =>
+      prev.map((entry) =>
+        entry.dayOfMonth === dayOfMonth ? { ...entry, duration: value } : entry
+      )
+    )
 
     // Validate hours
-    validateHours(dayIndex, value)
+    validateHours(dayOfMonth, value)
   }
 
-  const validateHours = (dayIndex: number, value: string) => {
+  const validateHours = (dayOfMonth: number, value: string) => {
     const hours = Number.parseFloat(value)
     const errors = { ...validationErrors }
 
     if (hours > 24) {
-      errors[`day-${dayIndex}`] = "Hours cannot exceed 24 per day"
+      errors[`day-${dayOfMonth}`] = "Hours cannot exceed 24 per day"
     } else if (hours > 12) {
-      errors[`day-${dayIndex}`] = "Warning: Hours exceed 12 per day"
+      errors[`day-${dayOfMonth}`] = "Warning: Hours exceed 12 per day"
     } else {
-      delete errors[`day-${dayIndex}`]
+      delete errors[`day-${dayOfMonth}`]
     }
 
     setValidationErrors(errors)
   }
 
   const getTotalHours = () => {
-    return formData.entries.reduce((total, entry) => {
+    return entries.reduce((total, entry) => {
       return total + (Number.parseFloat(entry.duration) || 0)
     }, 0)
+  }
+
+  const getWeekTotalHours = (weekNumber: number) => {
+    const startDay = (weekNumber - 1) * 7 + 1
+    const endDay = weekNumber * 7
+    return entries
+      .filter((e) => e.dayOfMonth >= startDay && e.dayOfMonth <= endDay)
+      .reduce((total, entry) => total + (Number.parseFloat(entry.duration) || 0), 0)
+  }
+
+  const getExtraDaysTotalHours = () => {
+    return entries
+      .filter((e) => e.dayOfMonth > 28)
+      .reduce((total, entry) => total + (Number.parseFloat(entry.duration) || 0), 0)
   }
 
   const validateForm = () => {
     const errors: { [key: string]: string } = {}
 
-    // Check for excessive hours
-    formData.entries.forEach((entry, index) => {
+    // Check for excessive hours per day
+    entries.forEach((entry) => {
       const hours = Number.parseFloat(entry.duration)
       if (hours > 24) {
-        errors[`day-${index}`] = "Hours cannot exceed 24 per day"
+        errors[`day-${entry.dayOfMonth}`] = "Hours cannot exceed 24 per day"
       }
     })
 
-    // Check for excessive total hours
+    // Check for excessive total hours (31 days * 24 hours = 744 max)
     const totalHours = getTotalHours()
-    if (totalHours > 168) {
-      // 24 * 7 = 168 (max possible hours in a week)
-      errors.total = "Total hours cannot exceed 168 per week"
-    } else if (totalHours > 80) {
-      errors.total = "Warning: Total hours exceed 80 per week"
+    if (totalHours > 744) {
+      errors.total = "Total hours exceed maximum possible"
+    } else if (totalHours > 320) {
+      errors.total = "Warning: Total hours exceed 320 for the month"
     }
 
     setValidationErrors(errors)
-    return Object.keys(errors).filter((key) => errors[key].includes("cannot")).length === 0
+    return Object.keys(errors).filter((key) => errors[key].includes("cannot") || errors[key].includes("exceed maximum")).length === 0
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -246,23 +314,62 @@ export default function CreateTimesheet() {
 
     try {
       // Filter out entries with zero duration
-      const validEntries = formData.entries.filter((entry) => Number.parseFloat(entry.duration) > 0)
+      const validEntries = entries.filter((entry) => Number.parseFloat(entry.duration) > 0)
 
-      // Prepare timesheet data
-      const startDate = parseISO(formData.weekStarting)
-      const endDate = addDays(startDate, 6)
+      // Check if there are any entries with hours
+      if (validEntries.length === 0) {
+        toast.error("Please enter hours for at least one day")
+        setIsSubmitting(false)
+        return
+      }
+
+      // Calculate actual date range based on entries with hours
+      const daysWithHours = validEntries.map((e) => e.dayOfMonth).sort((a, b) => a - b)
+      const firstDayWithHours = daysWithHours[0]
+      const lastDayWithHours = daysWithHours[daysWithHours.length - 1]
+
+      const startDate = new Date(selectedYear, selectedMonth - 1, firstDayWithHours)
+      const endDate = new Date(selectedYear, selectedMonth - 1, lastDayWithHours)
+
+      // Determine which weeks have hours logged for the name
+      const weeksWithHours = new Set<number>()
+      validEntries.forEach((entry) => {
+        if (entry.dayOfMonth <= 7) weeksWithHours.add(1)
+        else if (entry.dayOfMonth <= 14) weeksWithHours.add(2)
+        else if (entry.dayOfMonth <= 21) weeksWithHours.add(3)
+        else if (entry.dayOfMonth <= 28) weeksWithHours.add(4)
+        else weeksWithHours.add(5) // Extra days
+      })
+
+      // Create a descriptive name based on weeks with hours
+      let timesheetName: string
+      if (weeksWithHours.size === 1 && !weeksWithHours.has(5)) {
+        const weekNum = Array.from(weeksWithHours)[0]
+        timesheetName = `${getMonthNameFromNumber(selectedMonth)} ${selectedYear} - Week ${weekNum}`
+      } else if (firstDayWithHours === lastDayWithHours) {
+        timesheetName = `${getMonthNameFromNumber(selectedMonth)} ${firstDayWithHours}, ${selectedYear}`
+      } else {
+        timesheetName = `${getMonthNameFromNumber(selectedMonth)} ${firstDayWithHours}-${lastDayWithHours}, ${selectedYear}`
+      }
+
+      // Filter weekly descriptions to only include weeks that have entries
+      const filteredWeeklyDescriptions: typeof weeklyDescriptions = {
+        week1: weeksWithHours.has(1) ? weeklyDescriptions.week1 : "",
+        week2: weeksWithHours.has(2) ? weeklyDescriptions.week2 : "",
+        week3: weeksWithHours.has(3) ? weeklyDescriptions.week3 : "",
+        week4: weeksWithHours.has(4) ? weeklyDescriptions.week4 : "",
+      }
 
       const timesheetData = {
-        name: formData.name,
-        description: formData.description,
+        name: timesheetName,
+        description: "", // Main description is no longer used; we use weeklyDescriptions
         startDate: startDate.toISOString(),
         endDate: endDate.toISOString(),
-        hourlyRate: Number.parseFloat(formData.hourlyRate) || 0,
+        hourlyRate: Number.parseFloat(hourlyRate) || 0,
+        weeklyDescriptions: filteredWeeklyDescriptions,
         entries: validEntries.map((entry) => {
-          const entryDate = addDays(startDate, entry.dayIndex)
+          const entryDate = new Date(selectedYear, selectedMonth - 1, entry.dayOfMonth)
           return {
-            // Daily descriptions are no longer captured on the form.
-            // Preserve the field in the payload but send an empty string.
             description: "",
             startTime: entryDate.toISOString(),
             endTime: entryDate.toISOString(),
@@ -295,14 +402,14 @@ export default function CreateTimesheet() {
     }
   }
 
-  // Day names for display
-  const dayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+  const yearOptions = getYearOptions()
+  const monthOptions = getMonthOptions()
 
   return (
     <div>
       <PageHeader
         title="Log Time"
-        description="Record your working hours for the week"
+        description="Record your working hours for the month"
         action={
           <Link href="/dashboard/timesheets">
             <Button variant="outline">Cancel</Button>
@@ -310,24 +417,46 @@ export default function CreateTimesheet() {
         }
       />
 
-      <DashboardCard title="Weekly Timesheet">
+      <DashboardCard title="Monthly Timesheet">
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2">
+          {/* Year, Month, and Hourly Rate Selection */}
+          <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
-              <Label htmlFor="weekStarting">Week Starting (Monday)</Label>
-              <DatePickerDemo
-                name="weekStarting"
-                id="weekStarting"
-                value={formData.weekStarting}
-                onChange={handleWeekChange}
-              />
+              <Label htmlFor="year">Year</Label>
+              <Select value={selectedYear.toString()} onValueChange={handleYearChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  {yearOptions.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="month">Month</Label>
+              <Select value={selectedMonth.toString()} onValueChange={handleMonthChange}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {monthOptions.map((month) => (
+                    <SelectItem key={month.value} value={month.value.toString()}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
               <Input
                 type="number"
                 id="hourlyRate"
-                value={formData.hourlyRate}
+                value={hourlyRate}
                 onChange={handleHourlyRateChange}
                 placeholder="0.00"
                 min="0"
@@ -337,147 +466,296 @@ export default function CreateTimesheet() {
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Weekly Description </Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={handleDescriptionChange}
-              placeholder="General description of work performed this week"
-              rows={3}
-            />
-            <div>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGenerateDescription}
-                disabled={isGenerating}
-                className="mt-1 flex items-center gap-2"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" />
-                    Generate
-                  </>
-                )}
-              </Button>
+          {/* Existing Timesheet Warning */}
+          {isCheckingExisting && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking for existing timesheet...
             </div>
-          </div>
+          )}
+
+          {existingTimesheet && (
+            <Alert className="border-amber-500 bg-amber-50 dark:bg-amber-950/30">
+              <AlertTriangle className="h-5 w-5 text-amber-600" />
+              <AlertTitle className="text-amber-800 dark:text-amber-200">
+                Timesheet Already Exists
+              </AlertTitle>
+              <AlertDescription className="text-amber-700 dark:text-amber-300">
+                <p className="mb-3">
+                  A timesheet already exists for {getMonthNameFromNumber(selectedMonth)} {selectedYear}:
+                  <br />
+                  <strong>{existingTimesheet.name}</strong>
+                </p>
+                <p className="mb-4">
+                  To add more hours to this month, please edit the existing timesheet instead of creating a new one.
+                </p>
+                <Link href={`/dashboard/timesheets/${existingTimesheet.id}/edit`}>
+                  <Button type="button" className="bg-amber-600 hover:bg-amber-700 text-white">
+                    Edit Existing Timesheet
+                  </Button>
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {/* Organization Tax Rate Display */}
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md">
             <div className="flex items-center mb-2">
               <Percent className="h-4 w-4 text-gray-500 mr-2" />
               <Label className="font-medium">Organization Tax Rate</Label>
             </div>
             {isLoadingTaxRate ? (
-              <div className="animate-pulse h-6 w-24 bg-gray-200 rounded"></div>
+              <div className="animate-pulse h-6 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
             ) : (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
                 All timesheet entries are subject to a {organizationTaxRate}% tax rate as set by your organization.
               </div>
             )}
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Daily Hours</h3>
+          {validationErrors.total && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{validationErrors.total}</AlertDescription>
+            </Alert>
+          )}
 
-            {validationErrors.total && (
-              <Alert>
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{validationErrors.total}</AlertDescription>
-              </Alert>
-            )}
+          {/* Week Sections */}
+          <div className="space-y-8">
+            {monthStructure.weeks.map((week) => {
+              const weekKey = `week${week.weekNumber}` as keyof WeeklyDescriptions
+              const weekTotalHours = getWeekTotalHours(week.weekNumber)
 
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr>
-                    <th className="text-left py-2 px-4 border-b">Day</th>
-                    <th className="text-left py-2 px-4 border-b">Hours</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formData.entries.map((entry, index) => {
-                    const date = addDays(parseISO(formData.weekStarting), index)
-                    const hasError = validationErrors[`day-${index}`]
-                    const isErrorSevere = hasError && hasError.includes("cannot")
-
-                    return (
-                      <tr key={index} className="border-b">
-                        <td className="py-3 px-4">
-                          <div className="font-medium">{dayNames[index]}</div>
-                          <div className="text-sm text-gray-500">{format(date, "MMM d, yyyy")}</div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="space-y-1">
-                            <Input
-                              type="number"
-                              value={entry.duration}
-                              onChange={(e) => handleDurationChange(index, e.target.value)}
-                              min="0"
-                              max="24"
-                              step="0.5"
-                              className={`w-24 ${isErrorSevere ? "border-red-500" : hasError ? "border-yellow-500" : ""}`}
-                              placeholder="0"
-                            />
-                            {hasError && (
-                              <div className={`text-xs ${isErrorSevere ? "text-red-500" : "text-yellow-500"}`}>
-                                {validationErrors[`day-${index}`]}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-50">
-                    <td className="py-3 px-4 font-medium">Total</td>
-                    <td className="py-3 px-4 font-medium">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <span>{getTotalHours()} hrs</span>
-                        <div className="space-y-1 text-right">
-                          <div className="flex justify-between text-sm gap-4">
-                            <span>Subtotal:</span>
-                            <span>
-                              $
-                              {(getTotalHours() * Number.parseFloat(formData.hourlyRate || "0")).toFixed(
-                                2,
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex justify-between text-sm gap-4">
-                            <span>Tax ({organizationTaxRate}%):</span>
-                            <span>${taxAmount.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between font-medium pt-1 border-t border-gray-200 gap-4">
-                            <span>Total Earnings:</span>
-                            <span className="text-green-600">${totalEarnings.toFixed(2)}</span>
-                          </div>
-                        </div>
+              return (
+                <div
+                  key={week.weekNumber}
+                  className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden"
+                >
+                  {/* Week Header */}
+                  <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-gray-500" />
+                        <h3 className="text-lg font-semibold">{week.label}</h3>
                       </div>
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {weekTotalHours} hrs
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Week Description */}
+                  <div className="p-4 bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                    <Label htmlFor={`description-week-${week.weekNumber}`} className="mb-2 block">
+                      Week {week.weekNumber} Description
+                    </Label>
+                    <Textarea
+                      id={`description-week-${week.weekNumber}`}
+                      value={weeklyDescriptions[weekKey]}
+                      onChange={(e) => handleWeeklyDescriptionChange(week.weekNumber, e.target.value)}
+                      placeholder={`Description of work performed in week ${week.weekNumber}`}
+                      rows={2}
+                      className="mb-2"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleGenerateDescription(week.weekNumber)}
+                      disabled={generatingWeek === week.weekNumber}
+                      className="flex items-center gap-2"
+                    >
+                      {generatingWeek === week.weekNumber ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4" />
+                          Generate
+                        </>
+                      )}
+                    </Button>
+                  </div>
+
+                  {/* Week Days Table */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-800">
+                          <th className="text-left py-2 px-4 border-b border-gray-200 dark:border-gray-700 font-medium text-sm">
+                            Day
+                          </th>
+                          <th className="text-left py-2 px-4 border-b border-gray-200 dark:border-gray-700 font-medium text-sm">
+                            Hours
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {week.days.map((day) => {
+                          const entry = entries.find((e) => e.dayOfMonth === day.dayOfMonth)
+                          const hasError = validationErrors[`day-${day.dayOfMonth}`]
+                          const isErrorSevere = hasError && hasError.includes("cannot")
+
+                          return (
+                            <tr
+                              key={day.dayOfMonth}
+                              className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                            >
+                              <td className="py-3 px-4">
+                                <div className="font-medium">{day.dayName}</div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">
+                                  {day.formattedDate}
+                                </div>
+                              </td>
+                              <td className="py-3 px-4">
+                                <div className="space-y-1">
+                                  <Input
+                                    type="number"
+                                    value={entry?.duration || ""}
+                                    onChange={(e) => handleDurationChange(day.dayOfMonth, e.target.value)}
+                                    min="0"
+                                    max="24"
+                                    step="0.5"
+                                    className={`w-24 ${isErrorSevere ? "border-red-500" : hasError ? "border-yellow-500" : ""}`}
+                                    placeholder="0"
+                                  />
+                                  {hasError && (
+                                    <div
+                                      className={`text-xs ${isErrorSevere ? "text-red-500" : "text-yellow-500"}`}
+                                    >
+                                      {validationErrors[`day-${day.dayOfMonth}`]}
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Extra Days Section */}
+            {monthStructure.extraDays.length > 0 && (
+              <div className="border border-amber-300 dark:border-amber-700 rounded-lg overflow-hidden bg-amber-50 dark:bg-amber-950/30">
+                {/* Extra Days Header */}
+                <div className="bg-amber-100 dark:bg-amber-900/50 px-4 py-3 border-b border-amber-300 dark:border-amber-700">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                      <h3 className="text-lg font-semibold text-amber-800 dark:text-amber-200">
+                        Extra Days (End of Month)
+                      </h3>
+                    </div>
+                    <span className="text-sm text-amber-600 dark:text-amber-400">
+                      {getExtraDaysTotalHours()} hrs
+                    </span>
+                  </div>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    These days are outside the 4-week structure and do not have a weekly description.
+                  </p>
+                </div>
+
+                {/* Extra Days Table */}
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-amber-100/50 dark:bg-amber-900/30">
+                        <th className="text-left py-2 px-4 border-b border-amber-200 dark:border-amber-800 font-medium text-sm">
+                          Day
+                        </th>
+                        <th className="text-left py-2 px-4 border-b border-amber-200 dark:border-amber-800 font-medium text-sm">
+                          Hours
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {monthStructure.extraDays.map((day) => {
+                        const entry = entries.find((e) => e.dayOfMonth === day.dayOfMonth)
+                        const hasError = validationErrors[`day-${day.dayOfMonth}`]
+                        const isErrorSevere = hasError && hasError.includes("cannot")
+
+                        return (
+                          <tr
+                            key={day.dayOfMonth}
+                            className="border-b border-amber-100 dark:border-amber-900 hover:bg-amber-100/50 dark:hover:bg-amber-900/30"
+                          >
+                            <td className="py-3 px-4">
+                              <div className="font-medium">{day.dayName}</div>
+                              <div className="text-sm text-amber-600 dark:text-amber-400">
+                                {day.formattedDate}
+                              </div>
+                            </td>
+                            <td className="py-3 px-4">
+                              <div className="space-y-1">
+                                <Input
+                                  type="number"
+                                  value={entry?.duration || ""}
+                                  onChange={(e) => handleDurationChange(day.dayOfMonth, e.target.value)}
+                                  min="0"
+                                  max="24"
+                                  step="0.5"
+                                  className={`w-24 ${isErrorSevere ? "border-red-500" : hasError ? "border-yellow-500" : ""}`}
+                                  placeholder="0"
+                                />
+                                {hasError && (
+                                  <div
+                                    className={`text-xs ${isErrorSevere ? "text-red-500" : "text-yellow-500"}`}
+                                  >
+                                    {validationErrors[`day-${day.dayOfMonth}`]}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Summary Footer */}
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="text-lg font-semibold">
+                Total: {getTotalHours()} hrs
+              </div>
+              <div className="space-y-1 text-right">
+                <div className="flex justify-between text-sm gap-4">
+                  <span>Subtotal:</span>
+                  <span>
+                    ${(getTotalHours() * Number.parseFloat(hourlyRate || "0")).toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm gap-4">
+                  <span>Tax ({organizationTaxRate}%):</span>
+                  <span>${taxAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between font-medium pt-1 border-t border-gray-200 dark:border-gray-700 gap-4">
+                  <span>Total Earnings:</span>
+                  <span className="text-green-600 dark:text-green-400">${totalEarnings.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
           </div>
 
           <div className="flex justify-end">
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting || !!existingTimesheet}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
+              ) : existingTimesheet ? (
+                "Cannot Create - Timesheet Exists"
               ) : (
                 "Save Timesheet"
               )}

@@ -116,9 +116,33 @@ export default function TimesheetsPage() {
   };
 
   const formatDateRange = (startDate: string, endDate: string | null) => {
-    const start = format(parseISO(startDate), "MMM d, yyyy");
+    const startParsed = parseISO(startDate);
+    const start = format(startParsed, "MMM d, yyyy");
+    
     if (!endDate) return start;
-    const end = format(parseISO(endDate), "MMM d, yyyy");
+    
+    const endParsed = parseISO(endDate);
+    
+    // If start and end are the same day, just show one date
+    if (format(startParsed, "yyyy-MM-dd") === format(endParsed, "yyyy-MM-dd")) {
+      return start;
+    }
+    
+    // If same month and year, show compact format: "Jan 1-7, 2026"
+    if (
+      startParsed.getFullYear() === endParsed.getFullYear() &&
+      startParsed.getMonth() === endParsed.getMonth()
+    ) {
+      return `${format(startParsed, "MMM d")}-${format(endParsed, "d, yyyy")}`;
+    }
+    
+    // If same year but different months, show: "Jan 28 - Feb 3, 2026"
+    if (startParsed.getFullYear() === endParsed.getFullYear()) {
+      return `${format(startParsed, "MMM d")} - ${format(endParsed, "MMM d, yyyy")}`;
+    }
+    
+    // Different years, show full format
+    const end = format(endParsed, "MMM d, yyyy");
     return `${start} - ${end}`;
   };
 
@@ -289,7 +313,7 @@ export default function TimesheetsPage() {
                     scope="col"
                     className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0"
                   >
-                    Week
+                    Period
                   </th>
                   <th
                     scope="col"
@@ -305,8 +329,11 @@ export default function TimesheetsPage() {
               <tbody className="divide-y divide-gray-200">
                 {timesheets.map((timesheet) => (
                   <tr key={timesheet.id}>
-                    <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                      {formatDateRange(timesheet.startDate, timesheet.endDate)}
+                    <td className="py-4 pl-4 pr-3 text-sm sm:pl-0">
+                      <div className="font-medium text-gray-900">{timesheet.name}</div>
+                      <div className="text-gray-500">
+                        {formatDateRange(timesheet.startDate, timesheet.endDate)}
+                      </div>
                     </td>
                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                       {calculateTotalHours(timesheet)} hrs

@@ -3,7 +3,12 @@ import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { getWeekNumber } from "@/lib/date-utils"
-import type { Timesheet, TimesheetEntry } from "@/types/timesheet"
+import type { Timesheet, TimesheetEntry, WeeklyDescriptions } from "@/types/timesheet"
+import type { Prisma } from "../../../../generated/prisma"
+
+interface TimesheetRequestData extends Timesheet {
+  weeklyDescriptions?: WeeklyDescriptions
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -96,7 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = decoded.userId
-    const data = (await req.json()) as Timesheet
+    const data = (await req.json()) as TimesheetRequestData
 
     // Validate required fields
     if (!data.startDate) {
@@ -123,9 +128,41 @@ export async function POST(req: NextRequest) {
     const startDate = new Date(data.startDate)
     const weekNumber = getWeekNumber(startDate)
 
-    // Calculate end date (7 days from start)
-    const endDate = new Date(startDate)
-    endDate.setDate(endDate.getDate() + 6)
+    // Check for existing timesheet in the same month (prevent duplicates)
+    const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
+    const monthEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0)
+
+    const existingTimesheet = await prisma.timesheet.findFirst({
+      where: {
+        userId,
+        startDate: {
+          gte: monthStart,
+          lte: monthEnd,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+
+    if (existingTimesheet) {
+      return NextResponse.json(
+        {
+          error: "A timesheet already exists for this month",
+          existingTimesheetId: existingTimesheet.id,
+          existingTimesheetName: existingTimesheet.name,
+        },
+        { status: 409 } // Conflict
+      )
+    }
+
+    // Use provided end date or calculate from start date
+    const endDate = data.endDate ? new Date(data.endDate) : (() => {
+      const calculatedEndDate = new Date(startDate)
+      calculatedEndDate.setDate(calculatedEndDate.getDate() + 6)
+      return calculatedEndDate
+    })()
 
     // Get hourly rate from request or use default
     const hourlyRate = data.hourlyRate ? Number.parseFloat(data.hourlyRate.toString()) : 0
@@ -133,7 +170,7 @@ export async function POST(req: NextRequest) {
     // Get organization tax rate
     const orgTaxRate = user.organization?.tax_rate ? Number.parseFloat(user.organization.tax_rate.toString()) : 0
 
-    // Create timesheet
+    // Create timesheet with weeklyDescriptions if provided
     const timesheet = await prisma.timesheet.create({
       data: {
         name: data.name || `Week ${weekNumber}, ${startDate.getFullYear()}`,
@@ -141,6 +178,9 @@ export async function POST(req: NextRequest) {
         startDate,
         endDate,
         hourlyRate,
+        weeklyDescriptions: data.weeklyDescriptions 
+          ? (data.weeklyDescriptions as unknown as Prisma.InputJsonValue)
+          : undefined,
         user: { connect: { id: userId } },
         organization: user.organization ? { connect: { id: user.organization.id } } : undefined,
         entries: {
@@ -169,7 +209,7 @@ export async function POST(req: NextRequest) {
     })
 
     // Calculate totals
-    const totalHours = timesheet.entries.reduce((sum, entry) => sum + entry.duration, 0)
+    const totalHours = timesheet.entries.reduce((sum: number, entry: { duration: number }) => sum + entry.duration, 0)
     const subtotal = totalHours * hourlyRate
     const taxAmount = subtotal * (orgTaxRate / 100)
     const totalAmount = subtotal + taxAmount

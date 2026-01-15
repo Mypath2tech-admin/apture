@@ -2,7 +2,16 @@ import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
-import type { TimesheetEntry } from "@/types/timesheet"
+import type { TimesheetEntry, WeeklyDescriptions } from "@/types/timesheet"
+import type { Prisma } from "../../../../../generated/prisma"
+
+interface TimesheetUpdateData {
+  name?: string
+  description?: string
+  hourlyRate?: number
+  weeklyDescriptions?: WeeklyDescriptions
+  entries?: TimesheetEntry[]
+}
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -107,7 +116,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     const userId = decoded.userId
     const params = await context.params
     const { id } = params
-    const data = await req.json()
+    const data = await req.json() as TimesheetUpdateData
 
     // Check if timesheet exists and user has access
     const existingTimesheet = await prisma.timesheet.findUnique({
@@ -140,13 +149,17 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
       ? Number.parseFloat(existingTimesheet.organization.tax_rate.toString())
       : 0
 
-    // Update timesheet
+    // Update timesheet with weeklyDescriptions if provided
     const updatedTimesheet = await prisma.timesheet.update({
       where: { id },
       data: {
         name: data.name,
         description: data.description,
         hourlyRate,
+        // Only update weeklyDescriptions if provided in the request
+        ...(data.weeklyDescriptions !== undefined && { 
+          weeklyDescriptions: data.weeklyDescriptions as unknown as Prisma.InputJsonValue 
+        }),
       },
     })
 
@@ -195,6 +208,7 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ id: str
     return NextResponse.json({
       ...updatedTimesheet,
       entries: timesheet?.entries,
+      weeklyDescriptions: timesheet?.weeklyDescriptions,
       totalHours,
       subtotal,
       taxAmount,
