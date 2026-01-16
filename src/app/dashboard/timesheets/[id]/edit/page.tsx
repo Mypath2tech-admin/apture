@@ -35,6 +35,7 @@ export default function EditTimesheetPage() {
   // State for monthly format
   const [isMonthlyFormat, setIsMonthlyFormat] = useState(false)
   const [name, setName] = useState("")
+  const [hourlyRate, setHourlyRate] = useState<string>("")
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear())
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1)
   const [weeklyDescriptions, setWeeklyDescriptions] = useState<WeeklyDescriptions>({
@@ -60,12 +61,18 @@ export default function EditTimesheetPage() {
 
         const data = (await response.json()) as TimesheetResponse
         setTimesheet(data)
+        setHourlyRate(data.hourlyRate.toString())
         setName(data.name)
 
         // Detect if this is a monthly format timesheet
-        const hasWeeklyDescriptions = data.weeklyDescriptions && 
+        const hasWeeklyDescriptions = data.weeklyDescriptions &&
           typeof data.weeklyDescriptions === 'object' &&
           ('week1' in data.weeklyDescriptions || 'week2' in data.weeklyDescriptions)
+
+        setName(data.name)
+
+        // Detect if this is a monthly format timesheet
+       
         
         // Also check by date range - monthly timesheets span more than 7 days
         const startDate = new Date(data.startDate)
@@ -299,6 +306,7 @@ export default function EditTimesheetPage() {
       const timesheetData = {
         name,
         description: "", // Main description is not used for monthly format
+        hourlyRate: Number(hourlyRate) || 0,
         weeklyDescriptions: filteredWeeklyDescriptions,
         entries: validEntries.map((entry) => {
           const entryDate = new Date(selectedYear, selectedMonth - 1, entry.dayOfMonth)
@@ -404,6 +412,23 @@ export default function EditTimesheetPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="hourlyRate">Hourly Rate ($)</Label>
+              <Input
+                type="number"
+                id="hourlyRate"
+                value={hourlyRate}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                onChange={(e) => {
+                  const newValue = e.target.value
+                  setHourlyRate(newValue)
+                  console.log(newValue) 
+                }}
+
               />
             </div>
 
