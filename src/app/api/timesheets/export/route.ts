@@ -248,6 +248,10 @@ export async function GET(req: NextRequest) {
 
     // Format month/year for header
     const monthYear = format(monthStart, "MMMM yyyy")
+    // Format month name for filename
+    const monthName = format(monthStart, "MMMM")
+    // Get user's first name for filename (fallback to email if no first name)
+    const userFirstName = user?.firstName || user?.email?.split("@")[0] || "User"
 
     // Create PDF document
     const pdfDoc = await PDFDocument.create()
@@ -461,7 +465,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(pdfBytes as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="Timesheet-Export-${monthYear.replace(" ", "-")}.pdf"`,
+        "Content-Disposition": `attachment; filename="Timesheet-${monthName}-${userFirstName}.pdf"`,
       },
     })
   } catch (error) {

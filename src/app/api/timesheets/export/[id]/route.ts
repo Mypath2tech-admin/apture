@@ -87,6 +87,9 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       timesheet.user?.firstName && timesheet.user?.lastName
         ? `${timesheet.user.firstName} ${timesheet.user.lastName}`
         : timesheet.user?.email || "User"
+    // Get month name and user first name for filename
+    const monthName = format(new Date(timesheet.startDate), "MMMM")
+    const userFirstName = timesheet.user?.firstName || timesheet.user?.email?.split("@")[0] || "User"
 
     // Group entries by day of week
     const entriesByDay = Array(7)
@@ -162,7 +165,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       return new NextResponse(excelBuffer, {
         headers: {
           "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-          "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.xlsx"`,
+          "Content-Disposition": `attachment; filename="Timesheet-${monthName}-${userFirstName}.xlsx"`,
         },
       })
     } else if (exportFormat === "csv") {
@@ -201,7 +204,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       return new NextResponse(csvString, {
         headers: {
           "Content-Type": "text/csv",
-          "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.csv"`,
+          "Content-Disposition": `attachment; filename="Timesheet-${monthName}-${userFirstName}.csv"`,
         },
       })
     } else {
@@ -422,7 +425,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       return new NextResponse(pdfBytes as unknown as BodyInit, {
         headers: {
           "Content-Type": "application/pdf",
-          "Content-Disposition": `attachment; filename="Timesheet-${timesheet.id}.pdf"`,
+          "Content-Disposition": `attachment; filename="Timesheet-${monthName}-${userFirstName}.pdf"`,
         },
       })
     }
