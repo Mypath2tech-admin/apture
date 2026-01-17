@@ -54,8 +54,27 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
       return NextResponse.json({ error: "Timesheet not found" }, { status: 404 })
     }
 
+    // Get current user to check role and organization
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        organizationId: true,
+      },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
     // Check if user has access to this timesheet
-    if (timesheet.userId !== userId) {
+    // Admins can export any timesheet from their organization
+    const isAdmin = currentUser.role === "ADMIN" || currentUser.role === "ORGANIZATION_ADMIN"
+    const canAccess = timesheet.userId === userId || 
+      (isAdmin && timesheet.organizationId === currentUser.organizationId)
+
+    if (!canAccess) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
     }
 

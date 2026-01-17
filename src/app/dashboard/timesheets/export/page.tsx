@@ -56,16 +56,22 @@ export default function ExportTimesheetsPage() {
     const fetchMonths = async () => {
       setIsLoadingMonths(true)
       try {
-        const response = await fetch("/api/timesheets?page=1&limit=500")
+        // Build query params with userId filter
+        const params = new URLSearchParams({
+          page: "1",
+          limit: "500",
+        })
+        if (selectedUserId) {
+          params.append("userId", selectedUserId)
+        }
+
+        const response = await fetch(`/api/timesheets?${params.toString()}`)
         if (!response.ok) {
           throw new Error("Failed to load timesheets for export")
         }
 
         const data = (await response.json()) as TimesheetListResponse
-        // Filter timesheets for selected user
-        const timesheets = (data.timesheets || []).filter(
-          (ts) => ts.userId === selectedUserId
-        )
+        const timesheets = data.timesheets || []
 
         if (timesheets.length === 0) {
           // No timesheets at all – show only current month marked as empty

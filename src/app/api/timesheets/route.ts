@@ -27,18 +27,60 @@ export async function GET(req: NextRequest) {
     }
 
     const userId = decoded.userId
+    
+    // Get current user to check role and organization
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        organizationId: true,
+      },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Check if user is admin or organization admin
+    const isAdmin = currentUser.role === "ADMIN" || currentUser.role === "ORGANIZATION_ADMIN"
+    
     const searchParams = req.nextUrl.searchParams
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const skip = (page - 1) * limit
+    const filterUserId = searchParams.get("userId") // Optional user filter for admins
+
+    // Build where clause
+    let whereClause: any = {}
+    
+    if (isAdmin && currentUser.organizationId) {
+      // Admins can see all timesheets in their organization
+      whereClause.organizationId = currentUser.organizationId
+      // If userId filter is provided, filter by that user
+      if (filterUserId) {
+        whereClause.userId = filterUserId
+      }
+    } else {
+      // Regular users only see their own timesheets
+      whereClause.userId = userId
+    }
 
     const timesheets = await prisma.timesheet.findMany({
-      where: { userId },
+      where: whereClause,
       orderBy: { startDate: "desc" },
       skip,
       take: limit,
       include: {
         entries: true, // Include entries to calculate total hours
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
         organization: {
           select: {
             tax_rate: true, // Using snake_case as per schema
@@ -47,7 +89,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const total = await prisma.timesheet.count({ where: { userId } })
+    const total = await prisma.timesheet.count({ where: whereClause })
 
     // Process timesheets to include calculated fields
     const processedTimesheets = timesheets.map((timesheet) => {

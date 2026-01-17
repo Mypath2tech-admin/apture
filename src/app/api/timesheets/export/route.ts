@@ -409,7 +409,7 @@ export async function GET(req: NextRequest) {
     yPos -= 20
 
     // Summary Section
-    page.drawText(`Subtotal (${userName}):`, {
+    page.drawText("Subtotal:", {
       x: 350,
       y: yPos,
       size: 12,
