@@ -31,7 +31,6 @@ import {
 } from "@/lib/timesheet-utils"
 import { useOrganizationUsers } from "@/lib/hooks/use-organization-users"
 import { useAuthStore } from "@/lib/store/authStore"
-import type { OrganizationUser } from "@/types/organizations"
 
 interface ExistingTimesheetInfo {
   id: string
