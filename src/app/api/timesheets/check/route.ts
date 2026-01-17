@@ -23,10 +23,11 @@ export async function GET(req: NextRequest) {
       userId: string
     }
 
-    const userId = decoded.userId
+    const creatorUserId = decoded.userId
     const searchParams = req.nextUrl.searchParams
     const year = searchParams.get("year")
     const month = searchParams.get("month")
+    const targetUserIdParam = searchParams.get("userId")
 
     if (!year || !month) {
       return NextResponse.json(
@@ -45,15 +46,51 @@ export async function GET(req: NextRequest) {
       )
     }
 
+    // Determine which user to check for (target user or creator)
+    let targetUserId = creatorUserId
+
+    // If userId parameter is provided, validate it
+    if (targetUserIdParam) {
+      // Get creator's organization
+      const creator = await prisma.user.findUnique({
+        where: { id: creatorUserId },
+        select: { organizationId: true },
+      })
+
+      if (!creator) {
+        return NextResponse.json({ error: "Creator not found" }, { status: 404 })
+      }
+
+      // Get target user and validate they're in the same organization
+      const targetUser = await prisma.user.findUnique({
+        where: { id: targetUserIdParam },
+        select: { id: true, organizationId: true },
+      })
+
+      if (!targetUser) {
+        return NextResponse.json({ error: "Target user not found" }, { status: 404 })
+      }
+
+      // Validate both users are in the same organization
+      if (creator.organizationId !== targetUser.organizationId) {
+        return NextResponse.json(
+          { error: "Target user must be in the same organization" },
+          { status: 403 }
+        )
+      }
+
+      targetUserId = targetUserIdParam
+    }
+
     // Calculate date range for the month
     const monthStart = new Date(yearNum, monthNum - 1, 1)
     const monthEnd = new Date(yearNum, monthNum, 0) // Last day of month
 
-    // Find any timesheet that overlaps with this month
+    // Find any timesheet that overlaps with this month for the target user
     // A timesheet overlaps if its start date falls within the month
     const existingTimesheet = await prisma.timesheet.findFirst({
       where: {
-        userId,
+        userId: targetUserId,
         startDate: {
           gte: monthStart,
           lte: monthEnd,

@@ -27,18 +27,60 @@ export async function GET(req: NextRequest) {
     }
 
     const userId = decoded.userId
+    
+    // Get current user to check role and organization
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        role: true,
+        organizationId: true,
+      },
+    })
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    }
+
+    // Check if user is admin or organization admin
+    const isAdmin = currentUser.role === "ADMIN" || currentUser.role === "ORGANIZATION_ADMIN"
+    
     const searchParams = req.nextUrl.searchParams
     const page = Number.parseInt(searchParams.get("page") || "1")
     const limit = Number.parseInt(searchParams.get("limit") || "10")
     const skip = (page - 1) * limit
+    const filterUserId = searchParams.get("userId") // Optional user filter for admins
+
+    // Build where clause
+    const whereClause: Prisma.TimesheetWhereInput = {}
+    
+    if (isAdmin && currentUser.organizationId) {
+      // Admins can see all timesheets in their organization
+      whereClause.organizationId = currentUser.organizationId
+      // If userId filter is provided, filter by that user
+      if (filterUserId) {
+        whereClause.userId = filterUserId
+      }
+    } else {
+      // Regular users only see their own timesheets
+      whereClause.userId = userId
+    }
 
     const timesheets = await prisma.timesheet.findMany({
-      where: { userId },
+      where: whereClause,
       orderBy: { startDate: "desc" },
       skip,
       take: limit,
       include: {
         entries: true, // Include entries to calculate total hours
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
         organization: {
           select: {
             tax_rate: true, // Using snake_case as per schema
@@ -47,7 +89,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const total = await prisma.timesheet.count({ where: { userId } })
+    const total = await prisma.timesheet.count({ where: whereClause })
 
     // Process timesheets to include calculated fields
     const processedTimesheets = timesheets.map((timesheet) => {
@@ -100,7 +142,7 @@ export async function POST(req: NextRequest) {
       userId: string
     }
 
-    const userId = decoded.userId
+    const creatorUserId = decoded.userId
     const data = (await req.json()) as TimesheetRequestData
 
     // Validate required fields
@@ -108,9 +150,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Start date is required" }, { status: 400 })
     }
 
-    // Get user's organization to fetch tax rate
+    // Determine target user (for whom the timesheet is being created)
+    let targetUserId = creatorUserId
+
+    // If targetUserId is provided, validate it
+    if (data.targetUserId) {
+      // Get creator's organization
+      const creator = await prisma.user.findUnique({
+        where: { id: creatorUserId },
+        include: {
+          organization: {
+            select: {
+              id: true,
+              tax_rate: true,
+            },
+          },
+        },
+      })
+
+      if (!creator) {
+        return NextResponse.json({ error: "Creator not found" }, { status: 404 })
+      }
+
+      // Get target user and validate they're in the same organization
+      const targetUser = await prisma.user.findUnique({
+        where: { id: data.targetUserId },
+        include: {
+          organization: {
+            select: {
+              id: true,
+              tax_rate: true,
+            },
+          },
+        },
+      })
+
+      if (!targetUser) {
+        return NextResponse.json({ error: "Target user not found" }, { status: 404 })
+      }
+
+      // Validate both users are in the same organization
+      if (creator.organizationId !== targetUser.organizationId) {
+        return NextResponse.json(
+          { error: "Target user must be in the same organization" },
+          { status: 403 }
+        )
+      }
+
+      targetUserId = data.targetUserId
+    }
+
+    // Get user's organization to fetch tax rate (use target user's organization)
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: targetUserId },
       include: {
         organization: {
           select: {
@@ -128,13 +220,13 @@ export async function POST(req: NextRequest) {
     const startDate = new Date(data.startDate)
     const weekNumber = getWeekNumber(startDate)
 
-    // Check for existing timesheet in the same month (prevent duplicates)
+    // Check for existing timesheet in the same month for the target user (prevent duplicates)
     const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
     const monthEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0)
 
     const existingTimesheet = await prisma.timesheet.findFirst({
       where: {
-        userId,
+        userId: targetUserId,
         startDate: {
           gte: monthStart,
           lte: monthEnd,
@@ -181,7 +273,7 @@ export async function POST(req: NextRequest) {
         weeklyDescriptions: data.weeklyDescriptions 
           ? (data.weeklyDescriptions as unknown as Prisma.InputJsonValue)
           : undefined,
-        user: { connect: { id: userId } },
+        user: { connect: { id: targetUserId } },
         organization: user.organization ? { connect: { id: user.organization.id } } : undefined,
         entries: {
           create: data.entries.map((entry: TimesheetEntry) => {

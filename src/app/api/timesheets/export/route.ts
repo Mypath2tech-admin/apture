@@ -3,7 +3,8 @@ import { prisma } from "@/lib/prisma"
 import { cookies } from "next/headers"
 import jwt from "jsonwebtoken"
 import { PDFDocument, StandardFonts } from "pdf-lib"
-import { format, parseISO } from "date-fns"
+import { format, parseISO, getDaysInMonth } from "date-fns"
+import type { WeeklyDescriptions } from "@/types/timesheet"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
@@ -21,10 +22,11 @@ export async function GET(req: NextRequest) {
       userId: string
     }
 
-    const userId = decoded.userId
+    const creatorUserId = decoded.userId
     const searchParams = req.nextUrl.searchParams
     const startDateParam = searchParams.get("startDate")
     const endDateParam = searchParams.get("endDate")
+    const targetUserIdParam = searchParams.get("userId")
 
     if (!startDateParam || !endDateParam) {
       return NextResponse.json({ error: "Start date and end date are required" }, { status: 400 })
@@ -33,10 +35,47 @@ export async function GET(req: NextRequest) {
     const monthStart = parseISO(startDateParam)
     const monthEnd = parseISO(endDateParam)
 
-    // Fetch all timesheets for the selected month
-    const timesheets = await prisma.timesheet.findMany({
+    // Determine target user (for whom the timesheet is being exported)
+    let targetUserId = creatorUserId
+
+    // If targetUserId is provided, validate it
+    if (targetUserIdParam) {
+      // Get creator's organization
+      const creator = await prisma.user.findUnique({
+        where: { id: creatorUserId },
+        select: { organizationId: true },
+      })
+
+      if (!creator) {
+        return NextResponse.json({ error: "Creator not found" }, { status: 404 })
+      }
+
+      // Get target user and validate they're in the same organization
+      const targetUser = await prisma.user.findUnique({
+        where: { id: targetUserIdParam },
+        select: { id: true, organizationId: true },
+      })
+
+      if (!targetUser) {
+        return NextResponse.json({ error: "Target user not found" }, { status: 404 })
+      }
+
+      // Validate both users are in the same organization
+      if (creator.organizationId !== targetUser.organizationId) {
+        return NextResponse.json(
+          { error: "Target user must be in the same organization" },
+          { status: 403 }
+        )
+      }
+
+      targetUserId = targetUserIdParam
+    }
+
+    // Fetch the monthly timesheet for the selected user and month
+    // Since only one timesheet per user per month exists, we should get at most one
+    const timesheet = await prisma.timesheet.findFirst({
       where: {
-        userId,
+        userId: targetUserId,
         startDate: {
           gte: monthStart,
           lte: monthEnd,
@@ -62,71 +101,147 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    if (timesheets.length === 0) {
-      return NextResponse.json({ error: "No timesheets found for the selected month" }, { status: 404 })
+    if (!timesheet) {
+      return NextResponse.json({ error: "No timesheet found for the selected user and month" }, { status: 404 })
     }
 
-    // Get user's first name for header
-    const firstName = timesheets[0].user?.firstName || "User"
-    const userName = firstName
+    // Get user's full name for header
+    const user = timesheet.user
+    const userName = user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user?.email || "User"
 
-    // Get hourly rate (assume same rate for all timesheets in month, use first one)
-    const hourlyRate = timesheets[0].hourlyRate || 0
+    // Get hourly rate
+    const hourlyRate = timesheet.hourlyRate || 0
 
     // Get tax rate (MERC) from organization
-    const taxRate = timesheets[0].organization?.tax_rate
-      ? Number.parseFloat(timesheets[0].organization.tax_rate.toString())
+    const taxRate = timesheet.organization?.tax_rate
+      ? Number.parseFloat(timesheet.organization.tax_rate.toString())
       : 20 // Default 20%
 
-    // Group timesheets by week and aggregate
-    const weekMap = new Map<string, {
-      weekStart: Date
-      weekEnd: Date
+    // Extract weeklyDescriptions from timesheet
+    const weeklyDescriptions = (timesheet.weeklyDescriptions as unknown as WeeklyDescriptions) || {
+      week1: "",
+      week2: "",
+      week3: "",
+      week4: "",
+    }
+
+    // Get month and year for calendar week calculations
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const month = monthStart.getMonth() + 1 // 1-12
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const year = monthStart.getFullYear()
+    const daysInMonth = getDaysInMonth(monthStart)
+
+    // Group entries by day of month
+    const entriesByDay = new Map<number, number>() // dayOfMonth -> total hours
+
+    timesheet.entries.forEach((entry) => {
+      const entryDate = new Date(entry.startTime)
+      const dayOfMonth = entryDate.getDate()
+      const existingHours = entriesByDay.get(dayOfMonth) || 0
+      entriesByDay.set(dayOfMonth, existingHours + entry.duration)
+    })
+
+    // Calculate hours for each calendar week
+    const week1Days = [1, 2, 3, 4, 5, 6, 7]
+    const week2Days = [8, 9, 10, 11, 12, 13, 14]
+    const week3Days = [15, 16, 17, 18, 19, 20, 21]
+    const week4Days = [22, 23, 24, 25, 26, 27, 28]
+    const extraDays = [29, 30, 31].filter((day) => day <= daysInMonth)
+
+    const calculateWeekHours = (days: number[]) => {
+      return days.reduce((sum, day) => sum + (entriesByDay.get(day) || 0), 0)
+    }
+
+    const week1Hours = calculateWeekHours(week1Days)
+    const week2Hours = calculateWeekHours(week2Days)
+    const week3Hours = calculateWeekHours(week3Days)
+    const week4Hours = calculateWeekHours(week4Days)
+    const extraDaysHours = calculateWeekHours(extraDays)
+
+    // Build week entries array
+    const weekEntries: Array<{
+      weekRange: string
       description: string
       hours: number
       pay: number
       merc: number
-    }>()
+    }> = []
 
-    timesheets.forEach((timesheet) => {
-      // Use the timesheet's actual start and end dates
-      const weekStart = new Date(timesheet.startDate)
-      const weekEnd = timesheet.endDate ? new Date(timesheet.endDate) : new Date(weekStart)
-      // Use start date as key for grouping (timesheets are already grouped by week)
-      const weekKey = format(weekStart, "yyyy-MM-dd")
+    const monthName = format(monthStart, "MMMM")
 
-      // Calculate total hours for this timesheet
-      const totalHours = timesheet.entries.reduce((sum, entry) => sum + entry.duration, 0)
-      const pay = totalHours * hourlyRate
+    // Week 1
+    if (week1Hours > 0 || weeklyDescriptions.week1) {
+      const hours = week1Hours
+      const pay = hours * hourlyRate
       const merc = pay * (taxRate / 100)
+      weekEntries.push({
+        weekRange: `${monthName} 1 – 7`,
+        description: weeklyDescriptions.week1 || timesheet.description || "",
+        hours,
+        pay,
+        merc,
+      })
+    }
 
-      if (weekMap.has(weekKey)) {
-        // Aggregate with existing week entry
-        const existing = weekMap.get(weekKey)!
-        existing.hours += totalHours
-        existing.pay += pay
-        existing.merc += merc
-        // Use description from timesheet if it exists, otherwise keep existing
-        if (timesheet.description && !existing.description) {
-          existing.description = timesheet.description
-        }
-      } else {
-        // Create new week entry
-        weekMap.set(weekKey, {
-          weekStart,
-          weekEnd,
-          description: timesheet.description || "",
-          hours: totalHours,
-          pay,
-          merc,
-        })
-      }
-    })
+    // Week 2
+    if (week2Hours > 0 || weeklyDescriptions.week2) {
+      const hours = week2Hours
+      const pay = hours * hourlyRate
+      const merc = pay * (taxRate / 100)
+      weekEntries.push({
+        weekRange: `${monthName} 8 – 14`,
+        description: weeklyDescriptions.week2 || "",
+        hours,
+        pay,
+        merc,
+      })
+    }
 
-    // Convert map to array and sort by week start date
-    const weekEntries = Array.from(weekMap.values()).sort(
-      (a, b) => a.weekStart.getTime() - b.weekStart.getTime()
-    )
+    // Week 3
+    if (week3Hours > 0 || weeklyDescriptions.week3) {
+      const hours = week3Hours
+      const pay = hours * hourlyRate
+      const merc = pay * (taxRate / 100)
+      weekEntries.push({
+        weekRange: `${monthName} 15 – 21`,
+        description: weeklyDescriptions.week3 || "",
+        hours,
+        pay,
+        merc,
+      })
+    }
+
+    // Week 4
+    if (week4Hours > 0 || weeklyDescriptions.week4) {
+      const hours = week4Hours
+      const pay = hours * hourlyRate
+      const merc = pay * (taxRate / 100)
+      weekEntries.push({
+        weekRange: `${monthName} 22 – 28`,
+        description: weeklyDescriptions.week4 || "",
+        hours,
+        pay,
+        merc,
+      })
+    }
+
+    // Extra Days (if applicable)
+    if (extraDaysHours > 0 && extraDays.length > 0) {
+      const hours = extraDaysHours
+      const pay = hours * hourlyRate
+      const merc = pay * (taxRate / 100)
+      const lastDay = extraDays[extraDays.length - 1]
+      weekEntries.push({
+        weekRange: `${monthName} 29 – ${lastDay}`,
+        description: "", // Extra days don't have weekly descriptions
+        hours,
+        pay,
+        merc,
+      })
+    }
 
     // Calculate totals
     const totalPay = weekEntries.reduce((sum, entry) => sum + entry.pay, 0)
@@ -135,6 +250,8 @@ export async function GET(req: NextRequest) {
 
     // Format month/year for header
     const monthYear = format(monthStart, "MMMM yyyy")
+    // Get user's first name for filename (fallback to email if no first name)
+    const userFirstName = user?.firstName || user?.email?.split("@")[0] || "User"
 
     // Create PDF document
     const pdfDoc = await PDFDocument.create()
@@ -249,16 +366,11 @@ export async function GET(req: NextRequest) {
 
     // Table Rows
     weekEntries.forEach((entry) => {
-      // Format week range (e.g., "Jul 1-4")
-      const weekStartFormatted = format(entry.weekStart, "MMM d")
-      const weekEndFormatted = format(entry.weekEnd, "d")
-      const weekRange = `${weekStartFormatted}-${weekEndFormatted}`
-
       // Use full weekly description for export (no manual truncation)
       const descriptionLines = wrapText(entry.description || "")
       const rowHeight = Math.max(lineHeight, descriptionLines.length * lineHeight)
 
-      page.drawText(weekRange, {
+      page.drawText(entry.weekRange, {
         x: 50,
         y: yPos,
         size: 10,
@@ -301,7 +413,7 @@ export async function GET(req: NextRequest) {
     yPos -= 20
 
     // Summary Section
-    page.drawText(`Subtotal (${userName}):`, {
+    page.drawText("Subtotal:", {
       x: 350,
       y: yPos,
       size: 12,
@@ -353,7 +465,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(pdfBytes as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="Timesheet-Export-${monthYear.replace(" ", "-")}.pdf"`,
+        "Content-Disposition": `attachment; filename="Timesheet-${monthName}-${userFirstName}.pdf"`,
       },
     })
   } catch (error) {

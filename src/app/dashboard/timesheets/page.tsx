@@ -4,6 +4,14 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import PageHeader from "@/components/dashboard/PageHeader";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { TimesheetListResponse } from "@/types/timesheet";
 import {
   endOfWeek,
@@ -16,8 +24,14 @@ import { Clock, Download, FileText, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { useOrganizationUsers } from "@/lib/hooks/use-organization-users";
+import { useAuthStore } from "@/lib/store/authStore";
 
 export default function TimesheetsPage() {
+  const { data: organizationUsers = [], isLoading: isLoadingUsers } = useOrganizationUsers()
+  const { user: currentUser } = useAuthStore()
+  const isAdmin = currentUser?.role === "ADMIN" || currentUser?.role === "ORGANIZATION_ADMIN"
+  const [selectedUserId, setSelectedUserId] = useState<string>("all")
   const [timesheets, setTimesheets] = useState<
     TimesheetListResponse["timesheets"]
   >([]);
@@ -34,14 +48,25 @@ export default function TimesheetsPage() {
   useEffect(() => {
     fetchTimesheets();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]); // Add currentPage as a dependency
+  }, [currentPage, selectedUserId]); // Add selectedUserId as dependency
 
   const fetchTimesheets = async () => {
     setIsLoading(true);
     try {
+      // Build query params
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: "100",
+      })
+      
+      // Add userId filter if admin and a specific user is selected
+      if (isAdmin && selectedUserId && selectedUserId !== "all") {
+        params.append("userId", selectedUserId)
+      }
+
       // Fetch all timesheets for statistics calculation
       const response = await fetch(
-        `/api/timesheets?page=${currentPage}&limit=100`
+        `/api/timesheets?${params.toString()}`
       );
       if (!response.ok) throw new Error("Failed to fetch timesheets");
 
@@ -167,7 +192,7 @@ export default function TimesheetsPage() {
     <div>
       <PageHeader
         title="Timesheets"
-        description="Track and manage your working hours"
+        description={isAdmin ? "View and manage all organization timesheets" : "Track and manage your working hours"}
         action={
           <Link href="/dashboard/timesheets/create">
             <Button className="inline-flex items-center bg-teal-600 hover:bg-teal-700">
@@ -179,7 +204,7 @@ export default function TimesheetsPage() {
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 mb-6">
-        <DashboardCard title="Current Week">
+        <DashboardCard title={isAdmin && selectedUserId === "all" ? "Organization - Current Week" : "Current Week"}>
           <div className="flex items-center">
             <div className="flex-shrink-0 rounded-md bg-green-50 p-3 text-green-600">
               <Clock className="h-6 w-6" aria-hidden="true" />
@@ -187,7 +212,7 @@ export default function TimesheetsPage() {
             <div className="ml-5 w-0 flex-1">
               <dl>
                 <dt className="text-sm font-medium text-gray-500 truncate">
-                  Hours Logged This Week
+                  {isAdmin && selectedUserId === "all" ? "Org Hours This Week" : "Hours Logged This Week"}
                 </dt>
                 <dd>
                   <div className="text-lg font-medium text-gray-900">
@@ -230,11 +255,11 @@ export default function TimesheetsPage() {
           </div>
         </DashboardCard>
 
-        <DashboardCard title="Monthly Summary" className="lg:col-span-2">
+        <DashboardCard title={isAdmin && selectedUserId === "all" ? "Organization - Monthly Summary" : "Monthly Summary"} className="lg:col-span-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h4 className="text-xs font-medium uppercase text-gray-500">
-                Total Hours (This Month)
+                {isAdmin && selectedUserId === "all" ? "Org Total Hours (This Month)" : "Total Hours (This Month)"}
               </h4>
               <div className="mt-1 text-2xl font-semibold text-gray-900">
                 {isLoading ? (
@@ -261,7 +286,7 @@ export default function TimesheetsPage() {
       </div>
 
       <DashboardCard
-        title="Recent Timesheets"
+        title={isAdmin ? "All Timesheets" : "Recent Timesheets"}
         action={
           <Link
             href="/dashboard/timesheets/export"
@@ -271,6 +296,34 @@ export default function TimesheetsPage() {
           </Link>
         }
       >
+        {/* User Filter for Admins */}
+        {isAdmin && organizationUsers.length > 0 && (
+          <div className="mb-4 space-y-2">
+            <Label htmlFor="user-filter">Filter by User</Label>
+            <Select
+              value={selectedUserId}
+              onValueChange={setSelectedUserId}
+              disabled={isLoadingUsers}
+            >
+              <SelectTrigger className="w-full sm:w-64">
+                <SelectValue placeholder="All users" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Users</SelectItem>
+                {organizationUsers.map((user) => {
+                  const displayName = user.firstName && user.lastName
+                    ? `${user.firstName} ${user.lastName} (${user.email})`
+                    : user.email
+                  return (
+                    <SelectItem key={user.id} value={user.id || ""}>
+                      {displayName}
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
         {isLoading ? (
           <div className="space-y-4">
             {[...Array(5)].map((_, i) => (
@@ -315,6 +368,14 @@ export default function TimesheetsPage() {
                   >
                     Period
                   </th>
+                  {isAdmin && (
+                    <th
+                      scope="col"
+                      className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                    >
+                      User
+                    </th>
+                  )}
                   <th
                     scope="col"
                     className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -327,36 +388,47 @@ export default function TimesheetsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {timesheets.map((timesheet) => (
-                  <tr key={timesheet.id}>
-                    <td className="py-4 pl-4 pr-3 text-sm sm:pl-0">
-                      <div className="font-medium text-gray-900">{timesheet.name}</div>
-                      <div className="text-gray-500">
-                        {formatDateRange(timesheet.startDate, timesheet.endDate)}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                      {calculateTotalHours(timesheet)} hrs
-                    </td>
-                    <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                      <div className="flex justify-end space-x-2">
-                        <Link
-                          href={`/dashboard/timesheets/${timesheet.id}`}
-                          className="text-green-600 hover:text-green-900"
-                        >
-                          View
-                        </Link>
-                        <Link
-                          href={`/api/timesheets/export/${timesheet.id}?format=pdf`}
-                          className="text-gray-600 hover:text-gray-900"
-                          target="_blank"
-                        >
-                          <Download className="h-4 w-4" />
-                        </Link>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {timesheets.map((timesheet) => {
+                  const userName = timesheet.user?.firstName && timesheet.user?.lastName
+                    ? `${timesheet.user.firstName} ${timesheet.user.lastName}`
+                    : timesheet.user?.email || "Unknown User"
+                  
+                  return (
+                    <tr key={timesheet.id}>
+                      <td className="py-4 pl-4 pr-3 text-sm sm:pl-0">
+                        <div className="font-medium text-gray-900">{timesheet.name}</div>
+                        <div className="text-gray-500">
+                          {formatDateRange(timesheet.startDate, timesheet.endDate)}
+                        </div>
+                      </td>
+                      {isAdmin && (
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {userName}
+                        </td>
+                      )}
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                        {calculateTotalHours(timesheet)} hrs
+                      </td>
+                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
+                        <div className="flex justify-end space-x-2">
+                          <Link
+                            href={`/dashboard/timesheets/${timesheet.id}`}
+                            className="text-green-600 hover:text-green-900"
+                          >
+                            View
+                          </Link>
+                          <Link
+                            href={`/api/timesheets/export/${timesheet.id}?format=pdf`}
+                            className="text-gray-600 hover:text-gray-900"
+                            target="_blank"
+                          >
+                            <Download className="h-4 w-4" />
+                          </Link>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>

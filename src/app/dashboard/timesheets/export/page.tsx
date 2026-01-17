@@ -6,11 +6,20 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import DashboardCard from "@/components/dashboard/DashboardCard"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Calendar, Download, Loader2 } from "lucide-react"
 import { format, startOfMonth, endOfMonth } from "date-fns"
 import { toast } from "react-toastify"
 import Link from "next/link"
 import type { TimesheetListResponse } from "@/types/timesheet"
+import { useOrganizationUsers } from "@/lib/hooks/use-organization-users"
+import { useAuthStore } from "@/lib/store/authStore"
 
 interface MonthOption {
   value: string // yyyy-MM
@@ -21,6 +30,9 @@ interface MonthOption {
 export default function ExportTimesheetsPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const router = useRouter()
+  const { data: organizationUsers = [], isLoading: isLoadingUsers } = useOrganizationUsers()
+  const { user: currentUser } = useAuthStore()
+  const [selectedUserId, setSelectedUserId] = useState<string>("")
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingMonths, setIsLoadingMonths] = useState(true)
   const [selectedMonth, setSelectedMonth] = useState<string>(() => {
@@ -30,12 +42,30 @@ export default function ExportTimesheetsPage() {
   })
   const [months, setMonths] = useState<MonthOption[]>([])
 
-  // Fetch timesheets to determine which months have data
+  // Initialize selectedUserId to current user when users are loaded
   useEffect(() => {
+    if (currentUser?.id && !selectedUserId) {
+      setSelectedUserId(currentUser.id)
+    }
+  }, [currentUser, selectedUserId])
+
+  // Fetch timesheets to determine which months have data for selected user
+  useEffect(() => {
+    if (!selectedUserId) return
+
     const fetchMonths = async () => {
       setIsLoadingMonths(true)
       try {
-        const response = await fetch("/api/timesheets?page=1&limit=500")
+        // Build query params with userId filter
+        const params = new URLSearchParams({
+          page: "1",
+          limit: "500",
+        })
+        if (selectedUserId) {
+          params.append("userId", selectedUserId)
+        }
+
+        const response = await fetch(`/api/timesheets?${params.toString()}`)
         if (!response.ok) {
           throw new Error("Failed to load timesheets for export")
         }
@@ -103,7 +133,7 @@ export default function ExportTimesheetsPage() {
 
     fetchMonths()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [selectedUserId])
 
   const handleExport = async () => {
     if (!selectedMonth) {
@@ -130,6 +160,7 @@ export default function ExportTimesheetsPage() {
         format: "pdf",
         startDate: format(monthStart, "yyyy-MM-dd"),
         endDate: format(monthEnd, "yyyy-MM-dd"),
+        userId: selectedUserId,
       })
 
       // Trigger download
@@ -174,6 +205,37 @@ export default function ExportTimesheetsPage() {
 
       <DashboardCard title="Export Settings">
         <div className="space-y-6">
+          {/* User Selection (for delegated export) */}
+          {organizationUsers.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="user">Select User</Label>
+              <Select
+                value={selectedUserId}
+                onValueChange={setSelectedUserId}
+                disabled={isLoadingUsers}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizationUsers.map((user) => {
+                    const displayName = user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName} (${user.email})`
+                      : user.email
+                    return (
+                      <SelectItem key={user.id} value={user.id || ""}>
+                        {displayName}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Select the user whose timesheet you want to export
+              </p>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="month">Select Month</Label>
             <div className="relative">
