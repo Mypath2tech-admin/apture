@@ -26,6 +26,7 @@ export interface Timesheet {
     organizationId?: string
     entries: TimesheetEntry[]
     weeklyDescriptions?: WeeklyDescriptions
+    targetUserId?: string // Optional: ID of user for whom timesheet is being created (for delegated creation)
 }
 
 export interface MonthlyDayEntry {

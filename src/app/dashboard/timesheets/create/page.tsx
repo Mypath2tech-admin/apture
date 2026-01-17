@@ -29,6 +29,9 @@ import {
   getMonthNameFromNumber,
   getDaysInMonth,
 } from "@/lib/timesheet-utils"
+import { useOrganizationUsers } from "@/lib/hooks/use-organization-users"
+import { useAuthStore } from "@/lib/store/authStore"
+import type { OrganizationUser } from "@/types/organizations"
 
 interface ExistingTimesheetInfo {
   id: string
@@ -51,6 +54,11 @@ export default function CreateTimesheet() {
   // Existing timesheet check
   const [existingTimesheet, setExistingTimesheet] = useState<ExistingTimesheetInfo | null>(null)
   const [isCheckingExisting, setIsCheckingExisting] = useState(false)
+
+  // User selection for delegated timesheet creation
+  const { data: organizationUsers = [], isLoading: isLoadingUsers } = useOrganizationUsers()
+  const { user: currentUser } = useAuthStore()
+  const [selectedUserId, setSelectedUserId] = useState<string>("")
 
   // Initialize with current year and month
   const currentDate = new Date()
@@ -85,15 +93,24 @@ export default function CreateTimesheet() {
     )
   }, [selectedYear, selectedMonth])
 
-  // Check for existing timesheet when month/year changes
+  // Initialize selectedUserId to current user when users are loaded
   useEffect(() => {
+    if (currentUser?.id && !selectedUserId) {
+      setSelectedUserId(currentUser.id)
+    }
+  }, [currentUser, selectedUserId])
+
+  // Check for existing timesheet when month/year or selected user changes
+  useEffect(() => {
+    if (!selectedUserId) return
+
     const checkExistingTimesheet = async () => {
       setIsCheckingExisting(true)
       setExistingTimesheet(null)
 
       try {
         const response = await fetch(
-          `/api/timesheets/check?year=${selectedYear}&month=${selectedMonth}`
+          `/api/timesheets/check?year=${selectedYear}&month=${selectedMonth}&userId=${selectedUserId}`
         )
 
         if (response.ok) {
@@ -110,7 +127,7 @@ export default function CreateTimesheet() {
     }
 
     checkExistingTimesheet()
-  }, [selectedYear, selectedMonth])
+  }, [selectedYear, selectedMonth, selectedUserId])
 
   // Fetch user's hourly rate and organization tax rate
   useEffect(() => {
@@ -161,6 +178,10 @@ export default function CreateTimesheet() {
 
   const handleMonthChange = (value: string) => {
     setSelectedMonth(parseInt(value, 10))
+  }
+
+  const handleUserChange = (value: string) => {
+    setSelectedUserId(value)
   }
 
   const handleHourlyRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -367,6 +388,7 @@ export default function CreateTimesheet() {
         endDate: endDate.toISOString(),
         hourlyRate: Number.parseFloat(hourlyRate) || 0,
         weeklyDescriptions: filteredWeeklyDescriptions,
+        targetUserId: selectedUserId && selectedUserId !== currentUser?.id ? selectedUserId : undefined,
         entries: validEntries.map((entry) => {
           const entryDate = new Date(selectedYear, selectedMonth - 1, entry.dayOfMonth)
           return {
@@ -419,6 +441,37 @@ export default function CreateTimesheet() {
 
       <DashboardCard title="Monthly Timesheet">
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* User Selection (for delegated creation) */}
+          {organizationUsers.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="user">Select User</Label>
+              <Select
+                value={selectedUserId}
+                onValueChange={handleUserChange}
+                disabled={isLoadingUsers}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizationUsers.map((user) => {
+                    const displayName = user.firstName && user.lastName
+                      ? `${user.firstName} ${user.lastName} (${user.email})`
+                      : user.email
+                    return (
+                      <SelectItem key={user.id} value={user.id || ""}>
+                        {displayName}
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Select the user for whom this timesheet is being created
+              </p>
+            </div>
+          )}
+
           {/* Year, Month, and Hourly Rate Selection */}
           <div className="grid gap-6 md:grid-cols-3">
             <div className="space-y-2">
@@ -482,7 +535,7 @@ export default function CreateTimesheet() {
               </AlertTitle>
               <AlertDescription className="text-amber-700 dark:text-amber-300">
                 <p className="mb-3">
-                  A timesheet already exists for {getMonthNameFromNumber(selectedMonth)} {selectedYear}:
+                  A timesheet already exists for the selected user for {getMonthNameFromNumber(selectedMonth)} {selectedYear}:
                   <br />
                   <strong>{existingTimesheet.name}</strong>
                 </p>

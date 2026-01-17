@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       userId: string
     }
 
-    const userId = decoded.userId
+    const creatorUserId = decoded.userId
     const data = (await req.json()) as TimesheetRequestData
 
     // Validate required fields
@@ -108,9 +108,59 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Start date is required" }, { status: 400 })
     }
 
-    // Get user's organization to fetch tax rate
+    // Determine target user (for whom the timesheet is being created)
+    let targetUserId = creatorUserId
+
+    // If targetUserId is provided, validate it
+    if (data.targetUserId) {
+      // Get creator's organization
+      const creator = await prisma.user.findUnique({
+        where: { id: creatorUserId },
+        include: {
+          organization: {
+            select: {
+              id: true,
+              tax_rate: true,
+            },
+          },
+        },
+      })
+
+      if (!creator) {
+        return NextResponse.json({ error: "Creator not found" }, { status: 404 })
+      }
+
+      // Get target user and validate they're in the same organization
+      const targetUser = await prisma.user.findUnique({
+        where: { id: data.targetUserId },
+        include: {
+          organization: {
+            select: {
+              id: true,
+              tax_rate: true,
+            },
+          },
+        },
+      })
+
+      if (!targetUser) {
+        return NextResponse.json({ error: "Target user not found" }, { status: 404 })
+      }
+
+      // Validate both users are in the same organization
+      if (creator.organizationId !== targetUser.organizationId) {
+        return NextResponse.json(
+          { error: "Target user must be in the same organization" },
+          { status: 403 }
+        )
+      }
+
+      targetUserId = data.targetUserId
+    }
+
+    // Get user's organization to fetch tax rate (use target user's organization)
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: targetUserId },
       include: {
         organization: {
           select: {
@@ -128,13 +178,13 @@ export async function POST(req: NextRequest) {
     const startDate = new Date(data.startDate)
     const weekNumber = getWeekNumber(startDate)
 
-    // Check for existing timesheet in the same month (prevent duplicates)
+    // Check for existing timesheet in the same month for the target user (prevent duplicates)
     const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1)
     const monthEnd = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0)
 
     const existingTimesheet = await prisma.timesheet.findFirst({
       where: {
-        userId,
+        userId: targetUserId,
         startDate: {
           gte: monthStart,
           lte: monthEnd,
@@ -181,7 +231,7 @@ export async function POST(req: NextRequest) {
         weeklyDescriptions: data.weeklyDescriptions 
           ? (data.weeklyDescriptions as unknown as Prisma.InputJsonValue)
           : undefined,
-        user: { connect: { id: userId } },
+        user: { connect: { id: targetUserId } },
         organization: user.organization ? { connect: { id: user.organization.id } } : undefined,
         entries: {
           create: data.entries.map((entry: TimesheetEntry) => {
