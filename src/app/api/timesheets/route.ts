@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     const filterUserId = searchParams.get("userId") // Optional user filter for admins
 
     // Build where clause
-    let whereClause: any = {}
+    const whereClause: Prisma.TimesheetWhereInput = {}
     
     if (isAdmin && currentUser.organizationId) {
       // Admins can see all timesheets in their organization

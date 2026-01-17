@@ -120,7 +120,7 @@ export async function GET(req: NextRequest) {
       : 20 // Default 20%
 
     // Extract weeklyDescriptions from timesheet
-    const weeklyDescriptions = (timesheet.weeklyDescriptions as WeeklyDescriptions) || {
+    const weeklyDescriptions = (timesheet.weeklyDescriptions as unknown as WeeklyDescriptions) || {
       week1: "",
       week2: "",
       week3: "",
@@ -128,7 +128,9 @@ export async function GET(req: NextRequest) {
     }
 
     // Get month and year for calendar week calculations
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const month = monthStart.getMonth() + 1 // 1-12
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const year = monthStart.getFullYear()
     const daysInMonth = getDaysInMonth(monthStart)
 
@@ -248,8 +250,6 @@ export async function GET(req: NextRequest) {
 
     // Format month/year for header
     const monthYear = format(monthStart, "MMMM yyyy")
-    // Format month name for filename
-    const monthName = format(monthStart, "MMMM")
     // Get user's first name for filename (fallback to email if no first name)
     const userFirstName = user?.firstName || user?.email?.split("@")[0] || "User"
 
