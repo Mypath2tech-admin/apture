@@ -173,10 +173,21 @@ export default function ExportTimesheetsPage() {
 
       // Get the blob and create download link
       const blob = await response.blob()
+      
+      // Extract filename from Content-Disposition header if available
+      const contentDisposition = response.headers.get("Content-Disposition")
+      let filename = `Timesheet-Export-${selectedMonth}.pdf` // fallback
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]+)"?/i)
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1]
+        }
+      }
+      
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement("a")
       a.href = url
-      a.download = `Timesheet-Export-${selectedMonth}.pdf`
+      a.download = filename
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
